@@ -96,3 +96,5 @@ phrasing removed; bytes-as-starting-vocabulary and word-boundary limits added; "
 is the only knob" qualified. Rejected: rewriting the mechanism as byte-level BPE (the character
 version is the one the reader can tally; bytes are named in Limits); showing a production
 tokenizer's split of "strawberry" (no tokenizer on disk to run; nothing claimed from memory).
+Pro lane rerun (read 2026-09-13, late): applied — the "snug" table row (n and u are adjacent, in
+the wrong order) and the printed form of the merge list; "1994" was already removed.

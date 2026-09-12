@@ -175,8 +175,7 @@ changed before its essay is drafted.
 - **`model-is-a-learned-function`** — pitch A. Drafted and reviewed 2026-09-13 (main session);
   9 findings applied, 2 rejected (§8). Status `reviewed`.
 - **`tokens-not-characters`** — pitch A. Drafted 2026-09-13 (subagent); flash lane and readers
-  applied by the main session (essay note); pro lane rerun pending in
-  `checks/reviews/tokens-not-characters/pro2.json`. BPE paper arXiv:1508.07909 §3.2 added to
+  applied by the main session (essay note); pro lane rerun read and applied (2 findings). BPE paper arXiv:1508.07909 §3.2 added to
   sources. Status `reviewed`.
 - **`attention-is-a-soft-lookup`** — pitch B. Drafted 2026-09-13 (subagent); readers applied;
   review lanes pending in `checks/reviews/attention-is-a-soft-lookup/`. llm-deep-dive pp. 63–68,

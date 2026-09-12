@@ -64,7 +64,7 @@ Now encode. Replaying the merge list on each word gives:
 | sung | s u n g → s un g → sun g → sung | 1 |
 | gun | g u n → g un; nothing else fires | 2 |
 | gong | no pair in the list occurs | 4 |
-| snug | u and n are present but not adjacent | 4 |
+| snug | n and u are adjacent but in the wrong order for u+n | 4 |
 
 "snug" never appeared in the corpus. It has the same four letters as "sung" and costs four integers where "sung" costs one. That is the asymmetry of the scheme: the frequent word is cheap and opaque, the rare word expensive and transparent.
 
@@ -133,7 +133,7 @@ for w in ["sung", "gun", "gong", "snug"]:
     print(w, "->", pieces, "->", [ids[p] for p in pieces])           # what the network receives
 ```
 
-**Expected result.** This script was run with Python 3 and nothing else (the output is in the essay's corpus). The merge list prints as u+n, s+un, sun+g, in that order. The table has eight entries, g, n, o, s, sun, sung, u, un, numbered 0 to 7 in that order, so "sung" arrives as the single integer 5, "gun" as [0, 7], "gong" as [0, 2, 1, 0] and "snug" as [3, 1, 6, 0]. Those lists are all the network ever gets. If your merges come out in a different order, print the pair counts at each round and compare them with the two tables above; the counts are the whole algorithm.
+**Expected result.** This script was run with Python 3 and nothing else (the output is in the essay's corpus). The merge list prints as three pairs, ('u', 'n'), ('s', 'un') and ('sun', 'g'), in that order. The table has eight entries, g, n, o, s, sun, sung, u, un, numbered 0 to 7 in that order, so "sung" arrives as the single integer 5, "gun" as [0, 7], "gong" as [0, 2, 1, 0] and "snug" as [3, 1, 6, 0]. Those lists are all the network ever gets. If your merges come out in a different order, print the pair counts at each round and compare them with the two tables above; the counts are the whole algorithm.
 
 Then run it on a page of your own prose: lower-case it, split on anything that is not a letter, count the words, and train for 200 merges. The first merges will be the letter pairs English is made of, th, er, in, an and the like, followed by short common words; a word the page repeats often ends as a single entry, and a proper noun that appears once comes back in several pieces. Count those pieces. That count is how many integers the network would receive for the name, and it is the number to have in your head the next time a model gets a name's spelling wrong.
 

@@ -1,0 +1,28 @@
+```json
+[
+  {
+    "priority": 2,
+    "severity": "medium",
+    "location": "a 1994 compression trick",
+    "finding": "The year 1994 is a number that is not derived on the page and does not appear in receipts.tsv.",
+    "evidence": "Checked corpus/tokens-not-characters/receipts.tsv; the date 1994 is absent.",
+    "fix": "Remove the year or add a receipt for it to receipts.tsv."
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "u and n are present but not adjacent",
+    "finding": "In the word 'snug', 'u' and 'n' are adjacent (next to each other), but in the reverse order ('n' followed by 'u') compared to the merge pair 'u+n'.",
+    "evidence": "Recomputed the letter positions in 'snug' (s-n-u-g); 'n' and 'u' are adjacent.",
+    "fix": "Change the explanation to state that 'u' and 'n' are in the wrong order, or that the specific pair 'u+n' does not occur."
+  },
+  {
+    "priority": 6,
+    "severity": "low",
+    "location": "The merge list prints as u+n, s+un, sun+g",
+    "finding": "The expected result claims the Python script prints the merges as 'u+n, s+un, sun+g', but the script prints a list of tuples.",
+    "evidence": "Ran the provided Python script; the output format is `[('u', 'n'), ('s', 'un'), ('sun', 'g')]`, not strings joined by '+'.",
+    "fix": "Update the expected result text to match the Python output exactly: `[('u', 'n'), ('s', 'un'), ('sun', 'g')]`."
+  }
+]
+```
