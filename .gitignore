@@ -12,3 +12,6 @@ tools/log/*
 __pycache__/
 *.pyc
 node_modules/
+
+# local python env for exercises
+.venv/
