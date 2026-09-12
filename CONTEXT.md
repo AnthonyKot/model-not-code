@@ -152,7 +152,9 @@ changed before its essay is drafted.
   author's instruction so it can be read on Pages. Author's read in progress: provisional 3 of 5,
   "does not block starting new chapters". Read notes: (1) the subtitle under the title was the
   catalog mechanism line, cryptic before reading — fixed by a reader-facing `payoff` on every essay
-  (§2).
+  (§2). (2) The forward-pass formula was not annotated and the alpha paragraph was too fast —
+  fixed; standing lesson: every display formula gets a term-by-term gloss, and a hyperparameter
+  is introduced before its convention is stated.
 
 ## 7. Pipeline
 

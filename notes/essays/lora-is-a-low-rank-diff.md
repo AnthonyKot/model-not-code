@@ -69,3 +69,8 @@ mechanism and may cite 07-03/07-05 for the 4-bit levels; this essay uses only th
 1. The subtitle ("A low-rank delta B·A of rank r is trained beside frozen weights; QLoRA keeps
    the base in 4-bit…") is cryptic before reading. Applied: `payoff` field added to the catalog and
    shown under the title and on the shelf card instead of `mechanism`; rule in CONTEXT §2.
+2. The forward-pass formula was unannotated and the alpha paragraph moved too fast ("we may
+   expect some university education from a person, but this is too fast pace"). Applied: a
+   term-by-term gloss under the formula; the alpha paragraph now introduces alpha as the second
+   hyperparameter, says why the scale is divided by r, and only then does the copied-settings
+   arithmetic.
