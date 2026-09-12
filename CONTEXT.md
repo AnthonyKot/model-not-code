@@ -126,6 +126,22 @@ One entry per slug, appended as the essay moves through §7. Format: pitch chose
 one line), sources actually used, checks status, review findings accepted / rejected with a
 line each, the author's read verdict, published date. Empty until the pitch gate runs.
 
+**Pitch picks, Parts I and II (author, 2026-09-13; agents' recommendations accepted as
+picked):** 1 `model-is-a-learned-function` A · 2 `tokens-not-characters` A ·
+3 `attention-is-a-soft-lookup` B · 4 `embeddings-are-coordinates` B ·
+5 `validation-set-is-a-budget` A · 6 `class-imbalance-changes-the-loss` A ·
+7 `augmentation-declares-invariance` A · 8 `input-pipeline-is-the-bottleneck` A ·
+9 `transfer-learning-freeze-then-thaw` B · 10 `lora-is-a-low-rank-diff` A ·
+11 `learn-the-action-or-learn-its-worth` B · 12 `ppo-clips-the-step` A. Any pick may be
+changed before its essay is drafted.
+
+- **`lora-is-a-low-rank-diff`** — pitch A. Drafted 2026-09-13 (main session). Sources used:
+  course-6100015 07-02..07-06, 07-11, 07-12, 07-20; raschka-qai pp. 141–142; arXiv:2106.09685
+  §4.1–4.2. Checks green (15 receipts passed, 5 paper receipts unchecked, 0 paraphrase hits).
+  Two `disputed` receipts: alpha convention (essay follows the paper's alpha / r) and Raschka's
+  printed 25 × 50 = 6,250 (essay gives 1,250). Status `drafted`; review findings pending in
+  `notes/essays/lora-is-a-low-rank-diff.md`.
+
 ## 7. Pipeline
 
 1. **Pitch gate** — for each slug in a part, three four-sentence pitches (problem, mechanism,
@@ -186,6 +202,20 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   §3.5); the RL lectures show formulas only on slides, so Lapan's pages are needed for the written
   updates. codex was unavailable (usage limit); the phase-0 port was done by a Sonnet agent
   (`notes/codex/phase0-report.md`); review.sh/readers.sh are ported but not yet exercised.
+
+- **2026-09-13** — A Codex session (before this one) stepped back from the pitch pipeline to
+  audit the sources; its reports are now in `notes/research/source-map-2026-09-13.md` and
+  `notes/research/codex-handoff-2026-09-13.md` (the file inventory, which holds private paths,
+  stays in the ignored `workspace/`). The author decided: pilot first, audit after — draft the
+  LoRA pilot now from pitch A, accept the agents' Part I–II picks as the author's, and run an
+  outline audit of Parts III–VI (`notes/research/outline-audit-2026-09-13.md`, recommendation
+  only) before pitching those parts. Part III/IV pitch agents were therefore not launched.
+  Findings from the source map carried into drafting: Raschka's LoRA page (physical 142) has a
+  wrong product (6,250 for 25 × 50); the retrieval-evaluation lectures use keyword proxies; no
+  cited lecture derives BPE merges; several local editions are early releases or drafts and
+  receipts should say so; four books (Data Contracts, Data Engineering Design Patterns,
+  Kubeflow, OpenShift MLOps) are candidates for the manifest.
+- **2026-09-13** — LoRA pilot drafted; `review.sh` / `readers.sh` exercised for the first time.
 
 ## 10. Open questions
 

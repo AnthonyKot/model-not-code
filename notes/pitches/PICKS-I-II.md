@@ -17,17 +17,17 @@ Read each `notes/pitches/<slug>.md` (three four-sentence pitches, A/B/C, with th
 | 11 | `learn-the-action-or-learn-its-worth` | **B** | measured return versus bootstrapped guess: four-episode Q-table walk vs one-episode Monte Carlo |
 | 12 | `ppo-clips-the-step` | **A** | ratio as a leash, clipped where it goes taut; four-row table; B foregrounds the trust region |
 
-Your picks (fill in):
+Your picks (author, 2026-09-13 — the recommendations accepted as picked; any may be changed before its essay is drafted):
 
-- model-is-a-learned-function: 
-- tokens-not-characters: 
-- attention-is-a-soft-lookup: 
-- embeddings-are-coordinates: 
-- validation-set-is-a-budget: 
-- class-imbalance-changes-the-loss: 
-- augmentation-declares-invariance: 
-- input-pipeline-is-the-bottleneck: 
-- transfer-learning-freeze-then-thaw: 
-- lora-is-a-low-rank-diff: 
-- learn-the-action-or-learn-its-worth: 
-- ppo-clips-the-step: 
+- model-is-a-learned-function: A
+- tokens-not-characters: A
+- attention-is-a-soft-lookup: B
+- embeddings-are-coordinates: B
+- validation-set-is-a-budget: A
+- class-imbalance-changes-the-loss: A
+- augmentation-declares-invariance: A
+- input-pipeline-is-the-bottleneck: A
+- transfer-learning-freeze-then-thaw: B
+- lora-is-a-low-rank-diff: A
+- learn-the-action-or-learn-its-worth: B
+- ppo-clips-the-step: A
