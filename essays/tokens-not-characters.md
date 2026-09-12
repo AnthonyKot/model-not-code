@@ -6,7 +6,7 @@ The component that turned your text into integers is the tokenizer, and it is th
 
 ## Text becomes integers before anything else happens
 
-A tokenizer does two things. It cuts text into chunks, and it looks each chunk up in a fixed table that maps every chunk it holds to an integer. The chunk is the token; the integer is the token ID; in practice people say "token" for both. Only the integers go forward. The vectors you may have heard of are produced later, inside the network, from those integers; they are not the input. The first layer of the network says the same thing in its shape: a matrix with one row per entry in the tokenizer's table, so that the tokenized text is nothing more than a list of row numbers.
+A tokenizer does two things. It cuts text into chunks, and it looks each chunk up in a fixed table that maps every chunk it holds to an integer. The chunk is the token; the integer is the token ID; in practice people say "token" for both. Only the integers go forward. The embedding vectors are produced later, inside the network, from those integers; they are not the input. The first layer of the network says the same thing in its shape: a matrix with one row per entry in the tokenizer's table, so that the tokenized text is nothing more than a list of row numbers.
 
 The table belongs to one model. It is built on that model's training corpus before the model is trained, because its output is the model's input, and it holds a few reserved entries, for "beginning of text" and the like, whose meaning is nothing but a convention the training data followed every time. Two models can give the same sentence different integers and a different number of them, and a table built on code holds entries for punctuation runs that a table built on prose does not. None of this is a property of the network; it is a property of the counting that produced the table.
 
@@ -20,7 +20,7 @@ The procedure is byte-pair encoding, named after a 1994 compression trick that r
 4. Take the most frequent pair and merge it: everywhere the two symbols stand next to each other, replace them with one new symbol, and add that symbol to the vocabulary. Record the pair; the ordered record is the merge list.
 5. Go back to step 3. Stop after a fixed number of merges.
 
-The merge count is the only knob. The final table has one entry per starting character plus one per merge, and every symbol in it has been seen in the training corpus at least once, because it was built by merging things that were there. A frequent word becomes a single symbol after enough merges; a rare word stays in pieces; a word never seen at all falls back to whatever pieces its characters happen to form.
+The merge count is the main knob; the rule that splits the corpus into words in step 1 is the other, and it fixes where a merge can never cross. The final table has one entry per starting character plus one per merge, and every symbol in it has been seen in the training corpus at least once, because it was built by merging things that were there. A frequent word becomes a single symbol after enough merges; a rare word stays in pieces; a word never seen at all falls back to whatever pieces its characters happen to form.
 
 To encode new text, the merge list is replayed in the order it was learned: for each recorded pair, scan the word and merge that pair wherever it occurs adjacent, then move to the next pair. There is no search for the shortest split. What a word becomes is fixed by the corpus counts and the merge order, and by nothing else.
 
@@ -76,7 +76,7 @@ The same mechanism covers a few things you will meet on the first day. A rule of
 
 ## Limits
 
-The toy leaves out things a production tokenizer has, and they matter for anyone reproducing a real table. The paper that adapted the procedure to text appends an end-of-word symbol to every word before merging, so that a piece at the end of a word and the same piece in the middle are different symbols; the toy omits it, which is why `un` in "gun" and `un` inside "sung" are the same entry. Real tables are also large: one open model's table has 128,256 entries, of which 256 are reserved. The toy's count is 5 + 3. Ties are also a decision the toy does not make: when two pairs share the top count, some rule has to pick one, and different rules give different tables from the same corpus.
+The toy leaves out things a production tokenizer has, and they matter for anyone reproducing a real table. The paper that adapted the procedure to text appends an end-of-word symbol to every word before merging, so that a piece at the end of a word and the same piece in the middle are different symbols; the toy omits it, which is why `un` in "gun" and `un` inside "sung" are the same entry. Real tables are also large: one open model's table has 128,256 entries, of which 256 are reserved. The toy's count is 5 + 3. Ties are also a decision: when two pairs share the top count, some rule has to pick one, and different rules give different tables from the same corpus; the script below picks the alphabetically first. Real tables also usually start from the 256 byte values rather than from characters, so that no input is ever outside the table, and they keep the space in front of a word as part of its first piece, which is why the same word can be two different tokens at the start of a line and in the middle of one.
 
 The table is a product of a particular corpus and a particular merge count, which is why it belongs to one model and why a token count under one table is not a token count under another. The rule of thumb above is for English prose; code, numbers and rare names cost more, and a different corpus mix moves all of it.
 
@@ -101,7 +101,7 @@ def train(words, n_merges):                     # words: {word: count}
                 pairs[(s[i], s[i + 1])] += count
         if not pairs:
             break
-        best = max(pairs, key=lambda p: (pairs[p], p))   # ties broken alphabetically
+        best = min(pairs, key=lambda p: (-pairs[p], p))  # highest count; ties broken alphabetically
         merges.append(best)
         symbols = {w: apply(symbols[w], best) for w in symbols}
     return merges

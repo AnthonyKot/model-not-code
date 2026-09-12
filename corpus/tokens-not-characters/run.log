@@ -7,11 +7,3 @@ vocabulary: ['g', 'n', 'o', 's', 'sun', 'sung', 'u', 'un']
 'gun' -> ['g', 'un']  (2 tokens)
 'gong' -> ['g', 'o', 'n', 'g']  (4 tokens)
 'snug' -> ['s', 'n', 'u', 'g']  (4 tokens)
-=== 200 merges on the essay's prose (code block, tables, source line removed; final text) ===
-1791 words, 469 distinct; 200 merges
-first 20 merges: ['th', 'the', 'er', 'in', 'or', 'an', 'un', 'en', 're', 'is', 'on', 'es', 'co', 'and', 'at', 'it', 'to', 'ed', 'wor', 'le']
-last 10 merges: ['writ', 'write', 'why', 'wo', 'unk', 'und', 'ure', 'tokenizer', 'toy', 'ther']
-'strawberry' -> ['st', 'ra', 'w', 'b', 'er', 'r', 'y']  (7 tokens)
-'snug' -> ['s', 'nu', 'g']  (3 tokens)
-'gong' -> ['g', 'ong']  (2 tokens)
-'sung' -> ['sung']  (1 tokens)
