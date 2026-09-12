@@ -80,7 +80,7 @@ export const essays = [
   E("lora-is-a-low-rank-diff", "II", "Fine-Tuning Without Touching the Weights",
     "A low-rank delta B·A of rank r is trained beside frozen weights; QLoRA keeps the base in 4-bit and the adapters in higher precision.",
     [C("6100015", "07-02", "07-03", "07-04", "07-05", "07-06", "07-11", "07-12", "07-20"), B("raschka-qai", "pp. 141–142"), P("arXiv:2106.09685", "4.1")],
-    { recommended: true, status: "reviewed" }),
+    { recommended: true, status: "published" }),
   E("learn-the-action-or-learn-its-worth", "II", "Learn What To Do, or Learn What It Is Worth",
     "Value methods estimate returns and act greedily; policy-gradient methods move action probabilities in proportion to return.",
     [C("3725442", "05-08", "09-03", "09-04", "11-01", "11-02", "11-03", "11-04", "11-05"), B("lapan-drl")]),

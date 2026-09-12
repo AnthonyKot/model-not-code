@@ -140,8 +140,8 @@ changed before its essay is drafted.
   §4.1–4.2. Checks green (15 receipts passed, 5 paper receipts unchecked, 0 paraphrase hits).
   Two `disputed` receipts: alpha convention (essay follows the paper's alpha / r) and Raschka's
   printed 25 × 50 = 6,250 (essay gives 1,250). Reviewed 2026-09-13: 8 findings accepted and
-  applied, 2 rejected (see §8 and `notes/essays/lora-is-a-low-rank-diff.md`). Status `reviewed`;
-  awaiting the author's read.
+  applied, 2 rejected (see §8 and `notes/essays/lora-is-a-low-rank-diff.md`). Published 2026-09-13 on the
+  author's instruction so it can be read on Pages; the author's read note is still owed.
 
 ## 7. Pipeline
 
