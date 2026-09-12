@@ -172,6 +172,15 @@ changed before its essay is drafted.
   PyTorch, run on CPU, explained line by line, plus the PEFT config as an illustrative snippet.
   Lesson for the contract: the exercise shows the mechanism in the code a practitioner would
   actually write (PyTorch by default), still CPU-only, still run with its output in the corpus.
+- **`model-is-a-learned-function`** — pitch A. Drafted and reviewed 2026-09-13 (main session);
+  9 findings applied, 2 rejected (§8). Status `reviewed`.
+- **`tokens-not-characters`** — pitch A. Drafted 2026-09-13 (subagent); flash lane and readers
+  applied by the main session (essay note); pro lane rerun pending in
+  `checks/reviews/tokens-not-characters/pro2.json`. BPE paper arXiv:1508.07909 §3.2 added to
+  sources. Status `reviewed`.
+- **`attention-is-a-soft-lookup`** — pitch B. Drafted 2026-09-13 (subagent); readers applied;
+  review lanes pending in `checks/reviews/attention-is-a-soft-lookup/`. llm-deep-dive pp. 63–68,
+  81 added to sources. Status `drafted` until the lanes are read.
 
 ## 7. Pipeline
 

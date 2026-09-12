@@ -56,7 +56,7 @@ export const essays = [
   E("tokens-not-characters", "I", "Why the Model Cannot Count the Letters in “Strawberry”",
     "Byte-pair merges map text to integer IDs from a fixed table; tokens, not characters, are the unit of cost, context length and many errors.",
     [C("6100015", "01-29", "01-30", "01-31", "01-32", "03-11", "03-12", "03-13", "03-14"), C("6538601", "03-02"), B("llm-deep-dive", "pp. 65–66, 77"), P("arXiv:1508.07909", "3.2")],  // 01-24..01-27 held no tokenizer material (pitch note 2026-09-12)
-    { status: "drafted",
+    { status: "reviewed",
       payoff: "How a tokenizer's table is built by counting, why a common word reaches the network as one integer, and what that does to any question about its letters.",
       caution: "The 128,256-entry table and the four-characters-per-token rule are Llama 3 / English-prose figures as of the course's recording (2025)." }),
   E("attention-is-a-soft-lookup", "I", "Attention Is a Dictionary Lookup That Returns a Weighted Mix",
