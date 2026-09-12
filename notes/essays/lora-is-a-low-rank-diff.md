@@ -64,3 +64,8 @@ Rejected:
 
 **Owes:** nothing to another essay. `four-bits-per-weight` (Part IV) owns the quantisation
 mechanism and may cite 07-03/07-05 for the 4-bit levels; this essay uses only the byte counts.
+
+**Author's read (2026-09-13, in progress, provisional 3/5):**
+1. The subtitle ("A low-rank delta B·A of rank r is trained beside frozen weights; QLoRA keeps
+   the base in 4-bit…") is cryptic before reading. Applied: `payoff` field added to the catalog and
+   shown under the title and on the shelf card instead of `mechanism`; rule in CONTEXT §2.

@@ -37,6 +37,12 @@ and `status`. Array order is reading order. Slugs never change; titles may.
 | VI | The job | 27–30 |
 
 Thirty candidates; the pitch gate (§7) cuts to whatever earns its place, expected 24–30.
+
+Two one-liners per essay, for two readers: `mechanism` is the register's statement of what the
+essay explains, in the book's technical shorthand; `payoff` is the line shown under the title and
+on the shelf card, written for someone who has not read the essay yet (author's note on the LoRA
+pilot, 2026-09-13: the mechanism line was "cryptic if you have not read the thing"). Every drafted
+essay gets a `payoff`; the build falls back to `mechanism` only when it is empty.
 Pilots: `kv-cache` (IV), `lora-is-a-low-rank-diff` (II), `measure-retrieval-before-blaming-the-model`
 (III) — three parts, three source shapes.
 
@@ -144,7 +150,9 @@ changed before its essay is drafted.
   printed 25 × 50 = 6,250 (essay gives 1,250). Reviewed 2026-09-13: 8 findings accepted and
   applied, 2 rejected (see §8 and `notes/essays/lora-is-a-low-rank-diff.md`). Published 2026-09-13 on the
   author's instruction so it can be read on Pages. Author's read in progress: provisional 3 of 5,
-  "does not block starting new chapters"; reason for the score still to be recorded.
+  "does not block starting new chapters". Read notes: (1) the subtitle under the title was the
+  catalog mechanism line, cryptic before reading — fixed by a reader-facing `payoff` on every essay
+  (§2).
 
 ## 7. Pipeline
 

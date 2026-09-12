@@ -205,7 +205,7 @@ function essayPage(essay, index) {
     <header class="essay-hero">
       <div class="essay-kicker"><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(partLabel)}</div>
       <h1 class="essay-title">${escapeHtml(essay.title)}</h1>
-      <p class="essay-payoff">${escapeHtml(essay.mechanism)}</p>
+      <p class="essay-payoff">${escapeHtml(essay.payoff || essay.mechanism)}</p>
     </header>
     <article class="prose">${article}</article>
     <div class="mission-action" data-mission-action="${essay.slug}">
