@@ -26,15 +26,39 @@ Four things follow from that one line.
 
 **The diff has rank at most r.** Write B·A out and it is the sum of r outer products: the first column of B times the first row of A, plus the second column times the second row, and so on. Each outer product is a rank-1 matrix, so their sum can express at most r independent directions of change. This is the bet LoRA makes: that the change your task needs is closer to a few directions than to an arbitrary matrix. The exercise at the end lets you see both cases.
 
-## Worked example: a 512 × 512 projection at rank 8
+## Worked example: a diff of rank 1 you can write out, then the real sizes
 
-The numbers below are the book's own and the model is invented; the shapes are chosen to be easy to check by hand.
+The numbers below are the book's own and the models are invented.
 
-Suppose one attention projection maps 512 inputs to 512 outputs. W has 512 × 512 = 262,144 entries, and a full fine-tune would train every one of them.
+Start small enough to write every entry. Take a layer with four inputs and four outputs, so W is 4 × 4 with 16 frozen entries, and attach an adapter of rank r = 1. A is then 1 × 4 and B is 4 × 1. Give them values:
 
-Now attach an adapter of rank 8. A is 8 × 512, which is 4,096 numbers. B is 512 × 8, another 4,096. The adapter trains 8,192 numbers and can produce a 262,144-entry change. That is 8,192 / 262,144 = 3.125% of the entries it stands in for.
+<p class="formula">A = [1, 0, −1, 2],&nbsp;&nbsp;&nbsp; B = [1, 2, 0, 1]<sup>T</sup></p>
 
-Scale it up to a small model with twelve layers, each with four such projections: 48 matrices. The frozen weights in those projections are 48 × 262,144 = 12,582,912. The adapters are 48 × 8,192 = 393,216. Stored at four bytes each, the adapter file is 393,216 × 4 = 1,572,864 bytes, or about 1.57 MB, and it is shipped as its own file. Merge it into W when you want a single artefact for serving, or keep it beside the base and swap it for another task's adapter. Either way the base model is never patched in place.
+That is eight trainable numbers. Multiplying them gives the diff B·A, a 4 × 4 matrix whose row i is B<sub>i</sub> times the row A:
+
+| Row of B·A | = B<sub>i</sub> × A | Entries |
+|---|---|---|
+| 1 | 1 × [1, 0, −1, 2] | 1, 0, −1, 2 |
+| 2 | 2 × [1, 0, −1, 2] | 2, 0, −2, 4 |
+| 3 | 0 × [1, 0, −1, 2] | 0, 0, 0, 0 |
+| 4 | 1 × [1, 0, −1, 2] | 1, 0, −1, 2 |
+
+Sixteen entries, produced from eight numbers, and every row is a multiple of the same row A. That is what "rank 1" means in practice: the diff can scale one pattern up or down per output, and nothing else. A rank-2 adapter would add a second row pattern with its own column of multipliers, and so on up to r.
+
+Now run an input through it, to see the order of operations in the formula. Take x = (1, 1, 1, 1). A·x is one number: 1 + 0 − 1 + 2 = 2. B·(A·x) is B scaled by that number: (2, 4, 0, 2). Check it against the long way round, (B·A)·x, which sums each row of the table above: 2, 4, 0, 2. The same answer, but the short way never built the 4 × 4 matrix; it passed the input through a single number in the middle. That bottleneck is the adapter. The layer's output is then W·x, whatever the frozen weights give, plus s times (2, 4, 0, 2).
+
+Now the real sizes, with the same arithmetic. Suppose one attention projection maps 512 inputs to 512 outputs and you attach an adapter of rank 8.
+
+| Matrix | Shape | Entries | Trained? |
+|---|---|---|---|
+| W | 512 × 512 | 262,144 | no, frozen |
+| A | 8 × 512 | 4,096 | yes |
+| B | 512 × 8 | 4,096 | yes |
+| B·A | 512 × 512 | 262,144 | never stored; produced from A and B |
+
+The adapter trains 8,192 numbers and can produce a 262,144-entry change: 8,192 / 262,144 = 3.125% of the entries it stands in for. The general count is (d<sub>in</sub> + d<sub>out</sub>) × r against d<sub>in</sub> × d<sub>out</sub>, and the saving grows with the layer's width because the first is linear in the width and the second is quadratic.
+
+Scale up once more to a small model with twelve layers, each with four such projections: 48 matrices. The frozen weights in those projections are 48 × 262,144 = 12,582,912. The adapters are 48 × 8,192 = 393,216. Stored at four bytes each, the adapter file is 393,216 × 4 = 1,572,864 bytes, about 1.57 MB, and it is shipped as its own file. Merge it into W when you want a single artefact for serving, or keep it beside the base and swap it for another task's adapter. Either way the base model is never patched in place.
 
 ## Checking the formula against a reported configuration
 

@@ -74,3 +74,7 @@ mechanism and may cite 07-03/07-05 for the 4-bit levels; this essay uses only th
    term-by-term gloss under the formula; the alpha paragraph now introduces alpha as the second
    hyperparameter, says why the scale is divided by r, and only then does the copied-settings
    arithmetic.
+3. The 512 × 512 worked example was hard to track ("what happens exactly"; not worth a section
+   as it was). Applied: the section now opens with a rank-1 diff written out entry by entry on a
+   4 × 4 layer (receipt lora-22), runs an input through both B·(A·x) and (B·A)·x to show the order
+   of operations and the bottleneck, and only then gives the 512 × 512 sizes as a shape table.

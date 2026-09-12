@@ -155,6 +155,9 @@ changed before its essay is drafted.
   (§2). (2) The forward-pass formula was not annotated and the alpha paragraph was too fast —
   fixed; standing lesson: every display formula gets a term-by-term gloss, and a hyperparameter
   is introduced before its convention is stated.
+  (3) The 512 × 512 worked example only counted parameters and was hard to follow — replaced by
+  a rank-1 diff written out entry by entry, then the sizes; lesson: a worked example shows the
+  computation on numbers small enough to write, before it shows the sizes.
 
 ## 7. Pipeline
 
