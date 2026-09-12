@@ -16,6 +16,27 @@ Here is the whole mechanism as a forward pass. For an input vector x:
 
 Read it term by term. x is the layer's input, a vector of d<sub>in</sub> numbers. W·x is what the layer computed before any fine-tuning: the frozen weights applied to the input, giving d<sub>out</sub> numbers. A·x squeezes the same input down to r numbers, and B·(A·x) stretches those r numbers back out to d<sub>out</sub>, so the second term has the same shape as the first and can be added to it. s is a fixed scale, discussed below. h is the layer's output, the base model's answer plus a correction that passes through an r-wide bottleneck.
 
+<figure class="diagram">
+<svg viewBox="0 0 640 230" width="100%" role="img" aria-label="Shapes of W, A and B: W is a square d_out by d_in; A is a short wide strip r by d_in; B is a tall narrow strip d_out by r; the product B·A has the shape of W" style="max-width:640px;font-family:inherit;font-size:14px">
+  <g fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="20" y="40" width="150" height="150"/>
+    <rect x="250" y="40" width="40" height="150"/>
+    <rect x="330" y="40" width="150" height="30"/>
+    <rect x="20" y="40" width="150" height="150" stroke-dasharray="4 3" transform="translate(470 0)"/>
+  </g>
+  <g fill="currentColor" text-anchor="middle">
+    <text x="95" y="120">W</text><text x="95" y="212" font-size="12">d<tspan baseline-shift="sub" font-size="9">in</tspan> wide, d<tspan baseline-shift="sub" font-size="9">out</tspan> tall</text>
+    <text x="95" y="28" font-size="12">frozen, d<tspan baseline-shift="sub" font-size="9">in</tspan> × d<tspan baseline-shift="sub" font-size="9">out</tspan> entries</text>
+    <text x="270" y="120">B</text><text x="270" y="212" font-size="12">r wide</text>
+    <text x="405" y="60">A</text><text x="405" y="92" font-size="12">r tall, d<tspan baseline-shift="sub" font-size="9">in</tspan> wide</text>
+    <text x="565" y="120">B·A</text><text x="565" y="212" font-size="12">same shape as W</text>
+    <text x="565" y="28" font-size="12">never stored</text>
+    <text x="210" y="120" font-size="20">+</text><text x="310" y="120" font-size="16">·</text><text x="500" y="120" font-size="20">=</text>
+  </g>
+</svg>
+<figcaption>The frozen weight W and the two adapter matrices. B·A has W's shape but is generated from (d<sub>in</sub> + d<sub>out</sub>) × r numbers, and the forward pass never builds it: A·x is computed first, r numbers, then B stretches them back out.</figcaption>
+</figure>
+
 Four things follow from that one line.
 
 **Only A and B receive gradients.** W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W. The optimiser state, which for the Adam family is a running record per trainable parameter, is kept only for A and B too. The memory that scales with what you train, the gradients and the optimiser state, is now proportional to the diff rather than to the model. The frozen base still has to be resident, and the activations saved for the backward pass still grow with batch size and sequence length. LoRA removes the first cost and leaves the other two where they were.
@@ -60,31 +81,41 @@ The adapter trains 8,192 numbers and can produce a 262,144-entry change: 8,192 /
 
 Scale up once more to a small model with twelve layers, each with four such projections: 48 matrices. The frozen weights in those projections are 48 × 262,144 = 12,582,912. The adapters are 48 × 8,192 = 393,216. Stored at four bytes each, the adapter file is 393,216 × 4 = 1,572,864 bytes, about 1.57 MB, and it is shipped as its own file. Merge it into W when you want a single artefact for serving, or keep it beside the base and swap it for another task's adapter. Either way the base model is never patched in place.
 
-## Checking the formula against a reported configuration
+## Checking the formula on a real model
 
-The same formula can be checked against a real configuration reported in the course this essay draws on: adapters of rank 32 on the four attention projections q, k, v and o of each of 28 decoder layers, quoted there as 18 million parameters and 73 MB, with the saved adapter file at 73.4 MB on disk.
+Now a real model: Llama 3.2 with about three billion weights, 28 decoder layers and an inner width of 3072. A common adapter configuration puts rank-32 adapters on the four attention projections of every layer, called q, k, v and o, and the adapter file that results is 73.4 MB on disk. Does the formula give that?
 
-The course gives the model's inner width as 3072 and describes the k and v projections in round numbers, as having about 1,000 outputs. Take 3072 for the width. Per layer:
+Two of the projections keep the full width; the other two, k and v, are narrower on the output side, at 1024. Per layer:
 
-| Projection | d<sub>in</sub> + d<sub>out</sub> | × r = 32 |
-|---|---|---|
-| q, 3072 → 3072 | 6,144 | 196,608 |
-| o, 3072 → 3072 | 6,144 | 196,608 |
-| k, 3072 → 1024 | 4,096 | 131,072 |
-| v, 3072 → 1024 | 4,096 | 131,072 |
-| per layer | | 655,360 |
+| Projection | Shape | d<sub>in</sub> + d<sub>out</sub> | × r = 32 |
+|---|---|---|---|
+| q | 3072 → 3072 | 6,144 | 196,608 |
+| o | 3072 → 3072 | 6,144 | 196,608 |
+| k | 3072 → 1024 | 4,096 | 131,072 |
+| v | 3072 → 1024 | 4,096 | 131,072 |
+| **per layer** | | | **655,360** |
 
-Over 28 layers that is 655,360 × 28 = 18,350,080 parameters, and at four bytes each, 73,400,320 bytes: 73.4 MB. A width of 1,000 in place of 1024 would give 18,307,072 parameters and 73.2 MB, so the reported file size is what fixes the k and v width at 1024.
+Over 28 layers that is 655,360 × 28 = 18,350,080 parameters, and at four bytes each, 73,400,320 bytes: 73.4 MB, the file size. (If the narrow width were a round 1,000 instead of 1024 the total would be 73.2 MB, so the file size itself pins the width; it is one of the few things about a model you can check from the outside.)
 
-The course's heavier configuration reproduces the same way: rank 256 on the attention projections and on the three MLP matrices, which widen 3072 to about 8,000 and back, reported as 389 million parameters and 1.56 GB. With widths 3072 and 8192, the attention projections contribute (6,144 + 6,144 + 4,096 + 4,096) × 256 = 5,242,880 per layer and the three MLP matrices (3072 + 8192) × 256 × 3 = 8,650,752, together 13,893,632 per layer and 389,021,696 over 28 layers, which is 1,556,086,784 bytes. Both reported figures fall out of (d<sub>in</sub> + d<sub>out</sub>) × r, summed over the target modules, times the layer count, times four bytes. That is the whole cost model, and you can now run it on any configuration you are handed.
+A heavier configuration on the same model, rank 256 with the three MLP matrices added as targets, gives a 1.56 GB adapter. The MLP matrices widen 3072 out to 8192 and back. Same table, more rows:
+
+| Target | Shape | d<sub>in</sub> + d<sub>out</sub> | × r = 256 |
+|---|---|---|---|
+| q, o (two) | 3072 → 3072 | 6,144 each | 1,572,864 each |
+| k, v (two) | 3072 → 1024 | 4,096 each | 1,048,576 each |
+| gate, up (two) | 3072 → 8192 | 11,264 each | 2,883,584 each |
+| down | 8192 → 3072 | 11,264 | 2,883,584 |
+| **per layer** | | | **13,893,632** |
+| × 28 layers | | | 389,021,696 |
+| × 4 bytes | | | 1,556,086,784 ≈ 1.56 GB |
+
+Both files come out of one rule: for each target matrix, add its two widths and multiply by r; sum over the targets in a layer; multiply by the number of layers; multiply by four bytes. That is the whole cost model for an adapter, and you can run it on any configuration you are handed before you train anything.
 
 ## What the rank cannot do
 
 Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is the trade behind the two configurations above: the heavier one was chosen when the training set grew from 20,000 rows to 800,000. There is no formula for the right r; target modules, r and alpha are found by trial against your evaluation metric.
 
 A diff of rank r is not a full fine-tune with fewer parameters. It is a different function class. Two runs with different r or different alpha are two different experiments, and the alpha convention above means a setting copied from one codebase may not mean the same thing in another.
-
-The example arithmetic in the sources also deserves the recomputation this essay asks of you. The Q&A book used here gives an update matrix of 25 × 50 with inner dimension 5 and correctly counts the factors at 125 and 250, 375 in total; the local edition, dated 2023-05-21, prints the size of the full update as 6,250, where 25 × 50 is 1,250 (Raschka, *Machine Learning Q and AI*, pp. 141–142). The saving is still real, 375 against 1,250, but the point stands: count the entries yourself.
 
 Finally, LoRA is only half of QLoRA. The other half, holding the frozen base in four-bit precision while the adapters stay in full precision, is why a 2.2 GB base plus a 73 MB adapter fits on the free card. How those four bits are chosen is the subject of a separate essay in Part IV. What matters here is that the quantisation is applied to the base and never to the diff.
 

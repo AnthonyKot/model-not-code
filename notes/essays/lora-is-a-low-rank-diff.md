@@ -78,3 +78,10 @@ mechanism and may cite 07-03/07-05 for the 4-bit levels; this essay uses only th
    as it was). Applied: the section now opens with a rank-1 diff written out entry by entry on a
    4 × 4 layer (receipt lora-22), runs an input through both B·(A·x) and (B·A)·x to show the order
    of operations and the bottleneck, and only then gives the 512 × 512 sizes as a shape table.
+4. "The course gives…" — we are the course. Applied: no "course"/"reported" narration left in
+   the prose; the real-model section states Llama 3.2's configuration as fact (receipts lora-06..09).
+5. The heavy-configuration paragraph read worse than the lecture, "maybe pictures". Applied: both
+   configurations are tables; an inline SVG of the W / B / A shapes under the formula.
+6. "What Q&A book, let's stop referencing. We are the source of truth for the reader." Applied:
+   the paragraph about the Raschka page's 25 × 50 error is cut; receipt lora-16 stays `disputed`
+   for the record; the credit line still names the book.

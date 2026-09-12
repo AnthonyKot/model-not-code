@@ -86,8 +86,10 @@ Added for this book:
   (Author's rule, 2026-09-13, after the LoRA pilot: inline "(lecture 7.3, as reported)" citations
   read as refereeing a video and distract; the essay names the course once where a figure is the
   course's, `reported` receipts carry the lecture numbers, and the source credit at the end lists
-  them.) Where a source and a primary disagree, the essay states the correct version and does not
-  stage the disagreement. Nothing a lecturer said is repeated as the book's own finding.
+  them.) The prose never says "the course", "the lecturer", "reported" or "as reported": the book
+  is the voice ("we are the course" — author, 2026-09-13); facts are stated as facts and the
+  receipts say where they came from. Where a source and a primary disagree, the essay states the
+  correct version and does not stage the disagreement.
 
 ## 5. Sourcing standard
 
@@ -158,6 +160,13 @@ changed before its essay is drafted.
   (3) The 512 × 512 worked example only counted parameters and was hard to follow — replaced by
   a rank-1 diff written out entry by entry, then the sizes; lesson: a worked example shows the
   computation on numbers small enough to write, before it shows the sizes.
+  (4) "The course gives the model's inner width as 3072" — "we are the course": no source
+  narration in prose at all (rule in §4). (5) The heavy-configuration paragraph was a wall of
+  arithmetic; "I can bet the course explains this better, maybe pictures" — both configurations
+  are now tables and a shape diagram sits under the forward-pass formula; lesson: arithmetic over
+  more than three terms goes in a table, and a shape or flow gets a picture.
+  (6) "What Q&A book, let's stop referencing. We are the source of truth for the reader" — the
+  Raschka-error paragraph is cut; no essay discusses a source's mistakes; the receipts keep them.
 
 ## 7. Pipeline
 
