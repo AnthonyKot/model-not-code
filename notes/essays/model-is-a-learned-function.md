@@ -28,4 +28,16 @@ derivative of the loss with respect to", reworded once.
 much you can trust that number"); `class-imbalance-changes-the-loss` owns the loss-choice
 mechanism, this essay gives it one paragraph as a limit.
 
-**Review:** pending.
+**Review (2026-09-13):** Gemini flash 6 findings, pro 4; three reader personas (codex
+rate-limited, consolidated by hand). Accepted and applied: "nine numbers" leaked from the
+course's eight-feature model (both lanes + two readers) → "the same m and c"; "seven billion"
+unreceipted and a close paraphrase of 03-05 → "billions"; "the only knob not derived from the
+data" contradicted the loss-choice paragraph → step-size definition; "twenty lines" → "one
+screen"; closing sentence overclaimed that the curve cannot distinguish 0.048 from 2 →
+qualified; "a decision was made" → "the numbers were set"; readers: chain-rule sentence added
+for the 2 × error × x gradient, "nothing conceptually new at scale" softened with autodiff and
+mini-batches named, "the course" phrasing removed, the holdout claim in the opening now
+explicitly deferred to the validation essay. Rejected: the pull-request opening as a
+"manufactured scene" (second person, the reader's situation, is what BRIEF asks for); replacing
+the collinear worked example with noisy points (the outlier exercise shows the non-zero floor;
+the collinear case keeps the hand arithmetic exact).

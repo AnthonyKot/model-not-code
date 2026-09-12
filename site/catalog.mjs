@@ -51,7 +51,7 @@ export const essays = [
   E("model-is-a-learned-function", "I", "The Program Is Now a Table of Numbers, and Training Is the Compile Step",
     "Loss plus gradient descent turn a parametrised function into behaviour; the artefact you ship is weights plus preprocessing, not code.",
     [C("4735368", "03-05", "03-06", "03-07", "03-09"), B("geron-pytorch", "pp. 173–177")],
-    { status: "drafted",
+    { status: "reviewed",
       payoff: "The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong." }),
   E("tokens-not-characters", "I", "Why the Model Cannot Count the Letters in “Strawberry”",
     "Byte-pair merges map text to integer IDs from a fixed table; tokens, not characters, are the unit of cost, context length and many errors.",

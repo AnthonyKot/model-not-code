@@ -1,0 +1,50 @@
+[
+  {
+    "priority": 1,
+    "severity": "high",
+    "location": "The model the course builds puts a normalisation layer in front of the line, and that layer's mean and spread are computed once from the training data and never updated by the loop; the library reports them as non-trainable parameters. They are parameters all the same. Ship the weights without them, or recompute them on different data, and the same nine numbers give different answers.",
+    "finding": "Toured, not explained. The essay introduces a straight line with two parameters (slope m and intercept c), but later asserts that shipping the weights without the normalisation layer causes 'the same nine numbers' to give different answers. The step explaining where 'nine numbers' come from—the course model's eight input features giving eight weights plus one bias—is completely missing from the prose, leaving the reader unable to account for the parameter count.",
+    "evidence": "Checked essays/model-is-a-learned-function.md line 9 (which defines the model as a two-parameter line y = m·x + c) against line 57 ('in front of the line... the same nine numbers'). Checked resources/udemy-subs/course-4735368/03-05-linear-regression-model.txt lines 185-195 and corpus/model-is-a-learned-function/receipts.tsv claim learned-01 ('with eight input features it has eight weights and one bias, nine trainable parameters'). The eight input features were omitted from the essay.",
+    "fix": "Explain the feature dimensions so the parameter count is derived, e.g.: 'The model the course builds puts a normalisation layer in front of an eight-feature linear regression (eight weights and one bias)... and the same nine numbers give different answers.'"
+  },
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "The number η is the learning rate. It is chosen by you, and it is the only knob in the loop that is not derived from the data.",
+    "finding": "Incorrect mechanism explanation that contradicts the rest of the essay. The learning rate is not the 'only knob in the loop that is not derived from the data.' The parameter initialization (m=0, c=0 in step 1), the stopping threshold or epoch count, and the choice of loss formula are all practitioner choices not derived from data. In fact, the essay's next section explicitly states that 'The loss formula is a choice, and the choice is part of the program.'",
+    "evidence": "Checked essays/model-is-a-learned-function.md line 23 against line 13 ('At the start the parameters are arbitrary. Set them to zero'), line 25 ('Stop when the loss stops falling, or when you run out of patience or budget'), and line 55 ('The loss formula is a choice, and the choice is part of the program').",
+    "fix": "Change 'and it is the only knob in the loop that is not derived from the data' to 'it is the step-size hyperparameter you choose to control how far each parameter moves along its gradient.'"
+  },
+  {
+    "priority": 2,
+    "severity": "high",
+    "location": "a model with seven billion parameters is seven billion of these",
+    "finding": "The figure 'seven billion' is not derived on the page and is not registered in receipts.tsv. Under CONTEXT.md §4, every number in the prose must be derived on the page, in a receipt, or absent.",
+    "evidence": "Checked corpus/model-is-a-learned-function/receipts.tsv; none of the 18 claims registers 'seven billion'. The figure is spoken by the instructor in resources/udemy-subs/course-4735368/03-05-linear-regression-model.txt line 49 ('if you get that a model has, for example, seven billion parameters').",
+    "fix": "Add a reported receipt for the seven-billion illustrative figure to receipts.tsv referencing course-4735368 03-05, or rephrase to refer generically to scale without an unreceipted number."
+  },
+  {
+    "priority": 3,
+    "severity": "medium",
+    "location": "The course this essay draws on calls m a weight and c a bias, and it is worth holding on to that: a model with seven billion parameters is seven billion of these, and the same loop fills all of them.",
+    "finding": "Close paraphrase of lecture 03-05. The sentence directly tracks the instructor's sequence of terms and specific illustrative example.",
+    "evidence": "Transcript resources/udemy-subs/course-4735368/03-05-linear-regression-model.txt lines 42-53: 'So in this case, our M is the weight, and then C is the model's bias. And so if you get that a model has, for example, seven billion parameters, then it means that we have seven billions of this kinds of weights and biases, which have been tuned such that the model represents the data properly.' Essay line 9: 'The course this essay draws on calls m a weight and c a bias, and it is worth holding on to that: a model with seven billion parameters is seven billion of these, and the same loop fills all of them.'",
+    "fix": "Paraphrase the conceptual takeaway in original phrasing without mirroring the instructor's exact sequence and conversational 7B illustration."
+  },
+  {
+    "priority": 4,
+    "severity": "low",
+    "location": "The script below is plain Python and fits within twenty lines.",
+    "finding": "Wrong arithmetic / inaccurate line count. The Python script block spans 25 lines (lines 67–91). Excluding blank lines (3), it is 22 lines; excluding comments and blank lines, it contains 21 executable code lines. Under CONTEXT.md §4 ('Numbers or nothing'), the count 'twenty lines' is inaccurate.",
+    "evidence": "Recomputed line count of the code block in essays/model-is-a-learned-function.md lines 67–91: exactly 25 lines total, 22 non-empty lines, 21 lines of code.",
+    "fix": "Change 'fits within twenty lines' to 'fits in twenty-five lines' or 'fits on a single screen without dependencies.'"
+  },
+  {
+    "priority": 9,
+    "severity": "medium",
+    "location": "Both runs end with a curve that has flattened. Only one of them is near the data, and the curve alone cannot tell you which.",
+    "finding": "A slogan closing the essay, violating CONTEXT.md §4 ('A provocation may open an essay. It may not close one; if a sentence stands unqualified at the end, qualify it or cut it'). Additionally, the assertion is factually misleading: a loss curve displays loss magnitude on its vertical axis, where an MSE flattening at ~2.0 clearly distinguishes an outlier fit with residual error from an MSE flattening at 0.00062.",
+    "evidence": "Checked CONTEXT.md §4 ('Voice') and essays/model-is-a-learned-function.md line 95. The outlier run reaches a plateau of MSE = 2.03 (and analytically 2.0 for the least-squares line y = 5x - 4), whereas the consistent run reaches 0.00062; reading the curve's loss axis directly reveals whether the error reached zero.",
+    "fix": "Replace the closing punchline with a qualified sentence explaining that reading the loss plateau against the target scale or baseline error is required to tell whether the flattened curve represents a solved fit or an unresolvable residual."
+  }
+]

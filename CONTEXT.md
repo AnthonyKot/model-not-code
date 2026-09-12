@@ -197,6 +197,15 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   800,000 rows unreceipted (both lanes independently); exercise updated B before A's gradient;
   assertion locator; "gradient says so"; why weight-space fit stands in for the task loss; the
   evaluation-metric claim cited to 7.11 instead of 7.6.
+  Retro note for the pilots: the review lanes worked without codex; the flash lane's first run
+  wandered into a file search and had to be rerun; the codex persona is dead whenever codex is
+  rate-limited.
+- **`model-is-a-learned-function`** (2026-09-13; flash 6, pro 4, three personas). Accepted: the
+  "nine numbers" leak from the course's eight-feature model (both lanes, two readers); "seven
+  billion" unreceipted / close to 03-05; learning rate "the only knob not derived from data";
+  "twenty lines"; a closing overclaim about what a flat curve shows; "a decision was made";
+  chain-rule step for the gradient; scale claim softened; "the course" phrasing removed.
+  Rejected: the pull-request opening as a scene; noisy points in the worked example.
   Rejected: drop lecture citations and state model dimensions from memory (against §4/§5);
   speculate on the cause of Raschka's arithmetic error. Retro note for the pilots: the review
   lanes worked without codex; the flash lane's first run wandered into a file search and had

@@ -1,0 +1,34 @@
+[
+  {
+    "priority": 1,
+    "severity": "high",
+    "location": "the same nine numbers give different answers",
+    "finding": "The essay refers to 'nine numbers' without prior explanation. The only model introduced on the page is a straight line with two parameters (m and c). The step explaining the course's 8-feature dataset that leads to 9 trainable parameters is missing.",
+    "evidence": "Page reading. The worked example derives 2 parameters, and the text subsequently references 9 without having introduced them.",
+    "fix": "Explain the 8-feature model that leads to the 9 parameters before referring to them, or change 'the same nine numbers' to 'the same parameters' to avoid the unreceipted leap."
+  },
+  {
+    "priority": 2,
+    "severity": "medium",
+    "location": "a model with seven billion parameters",
+    "finding": "The figure 'seven billion' is presented in the prose but is not derived on the page and does not appear in receipts.tsv.",
+    "evidence": "Checked corpus/model-is-a-learned-function/receipts.tsv; 'seven billion' is absent.",
+    "fix": "Add a receipt for 'seven billion' to receipts.tsv (since it appears in the 03-05 lecture), or remove the specific number and use a generic phrase like 'a large model'."
+  },
+  {
+    "priority": 8,
+    "severity": "medium",
+    "location": "because the loop is the only place where a decision was made",
+    "finding": "The text anthropomorphizes the loop by claiming it makes a 'decision', without a subsequent clause explaining what mechanical action 'decision' stands for.",
+    "evidence": "Page reading against CONTEXT.md rule 'No anthropomorphism that hides the mechanism... The word is allowed only when the next clause says what it stands for.'",
+    "fix": "Replace 'where a decision was made' with the concrete mechanical action, such as 'where the parameters were updated'."
+  },
+  {
+    "priority": 9,
+    "severity": "medium",
+    "location": "You are asked to review a change that alters what the system does. The pull request touches no logic. It replaces one binary file...",
+    "finding": "The essay opens with a manufactured scene about reviewing a pull request, violating the strict 'No scenes' rule.",
+    "evidence": "Page reading against CONTEXT.md rule 'No scenes' and BRIEF.md rule 'No manufactured scenes'.",
+    "fix": "Rewrite the opening to state the problem directly without placing the reader in a fictional pull request review scene."
+  }
+]
