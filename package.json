@@ -1,0 +1,19 @@
+{
+  "name": "book20",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node site/build.mjs",
+    "check": "node site/check.mjs && node checks/receipts.mjs && node checks/paraphrase.mjs",
+    "consistency": "node checks/consistency.mjs",
+    "test:visual": "node site/visual-check.mjs"
+  },
+  "dependencies": {
+    "marked": "^16.2.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
+  },
+  "description": "Standalone essays for a senior developer moving into ML / AI engineering"
+}

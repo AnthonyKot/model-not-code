@@ -1,0 +1,1 @@
+I am a statistician who moved into software. I check every formula, every threshold and every "accuracy" claim for what population it is about. I dislike hand-waving about probabilities and I notice when a worked example's numbers were chosen to make the point rather than to test it. If an evaluation metric is defined loosely, I say exactly how.

@@ -1,0 +1,13 @@
+# Source books and full-text extraction workspaces are local-only.
+resources/*
+!resources/README.md
+workspace/*
+!workspace/README.md
+
+# Generated logs and common local noise.
+tools/log/*
+!tools/log/README.md
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
