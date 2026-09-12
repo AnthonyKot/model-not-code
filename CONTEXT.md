@@ -139,8 +139,9 @@ changed before its essay is drafted.
   course-6100015 07-02..07-06, 07-11, 07-12, 07-20; raschka-qai pp. 141–142; arXiv:2106.09685
   §4.1–4.2. Checks green (15 receipts passed, 5 paper receipts unchecked, 0 paraphrase hits).
   Two `disputed` receipts: alpha convention (essay follows the paper's alpha / r) and Raschka's
-  printed 25 × 50 = 6,250 (essay gives 1,250). Status `drafted`; review findings pending in
-  `notes/essays/lora-is-a-low-rank-diff.md`.
+  printed 25 × 50 = 6,250 (essay gives 1,250). Reviewed 2026-09-13: 8 findings accepted and
+  applied, 2 rejected (see §8 and `notes/essays/lora-is-a-low-rank-diff.md`). Status `reviewed`;
+  awaiting the author's read.
 
 ## 7. Pipeline
 
@@ -178,6 +179,17 @@ currency (bounded with "as of" in the `caution` field; tools are examples); that
 learned anything (exercises carry expected results; nothing claims an outcome).
 
 Review log (accepted / rejected, by essay) accumulates below as essays are reviewed.
+
+- **`lora-is-a-low-rank-diff`** (2026-09-13; Gemini flash 6 findings, Gemini pro 2, three reader
+  personas; codex at its usage limit, consolidated by hand). Accepted: memory claim overclaimed
+  (only gradients and optimiser state scale with the diff); SVD check lacked the formula; 20,000 /
+  800,000 rows unreceipted (both lanes independently); exercise updated B before A's gradient;
+  assertion locator; "gradient says so"; why weight-space fit stands in for the task loss; the
+  evaluation-metric claim cited to 7.11 instead of 7.6.
+  Rejected: drop lecture citations and state model dimensions from memory (against §4/§5);
+  speculate on the cause of Raschka's arithmetic error. Retro note for the pilots: the review
+  lanes worked without codex; the flash lane's first run wandered into a file search and had
+  to be rerun; the codex persona is dead whenever codex is rate-limited.
 
 ## 9. Decision log
 

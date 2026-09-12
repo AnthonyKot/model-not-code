@@ -1,0 +1,20 @@
+```json
+[
+  {
+    "priority": 2,
+    "severity": "high",
+    "location": "from 20,000 rows to 800,000",
+    "finding": "The numbers 20,000 and 800,000 are not derived on the page and have no receipt in receipts.tsv.",
+    "evidence": "Checked corpus/lora-is-a-low-rank-diff/receipts.tsv; neither 20,000 nor 800,000 is registered as a reported claim.",
+    "fix": "Add a receipt for the 20,000 and 800,000 dataset sizes to receipts.tsv."
+  },
+  {
+    "priority": 8,
+    "severity": "low",
+    "location": "until the gradient says so",
+    "finding": "Anthropomorphism that hides the mechanism. A gradient does not 'say' anything; it takes a non-zero value during the backward pass.",
+    "evidence": "Page inspection: 'Nothing about the base is disturbed until the gradient says so.'",
+    "fix": "Change to 'until a non-zero gradient updates them' or similar."
+  }
+]
+```

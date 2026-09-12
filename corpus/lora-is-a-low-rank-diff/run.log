@@ -1,2 +1,2 @@
-rank-1 target: fraction of the target left unexplained after 3000 steps = 0.000
-random target: fraction of the target left unexplained after 3000 steps = 0.780
+rank-1 target: left unexplained after 3000 steps = 0.000; best any rank-4 matrix can do = 0.000
+random target: left unexplained after 3000 steps = 0.780; best any rank-4 matrix can do = 0.780

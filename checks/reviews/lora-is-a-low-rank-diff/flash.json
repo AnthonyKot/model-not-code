@@ -1,0 +1,51 @@
+I have launched the search for `CONTEXT.md` across the environment and will wait for it to complete.
+[
+  {
+    "priority": 1,
+    "severity": "high",
+    "location": "The memory you were fighting is now proportional to the diff, not to the model.",
+    "finding": "The mechanism explanation misrepresents GPU memory scaling during LoRA training. The frozen base model weights (13 GB at 32-bit, or 2.2 GB at 4-bit) must remain resident in GPU memory throughout training, and activation memory still scales with model architecture, sequence length, and batch size. Only the gradients and optimizer states become proportional to the diff. Stating that the memory you were fighting is now proportional to the diff implies that total memory scales with the diff alone, obscuring why LoRA alone cannot fit on smaller cards without quantizing the base model.",
+    "evidence": "CONTEXT.md §1 and §3; lecture 7.2 transcript (lines 48–50: base model weights require 13 GB GPU RAM) and lecture 7.5 transcript (lines 87, 108–111: 4-bit base is 2.2 GB, total with LoRA is 2.27 GB).",
+    "fix": "Qualify the claim to state that only the memory scaling with what is trained—the gradients and optimizer states—becomes proportional to the diff, while the frozen base model weights and activations remain resident on the GPU."
+  },
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "Compute the singular values of that same random matrix with `np.linalg.svd(T, compute_uv=False)` and you will find that its best possible rank-4 approximation also leaves 0.78 of the squared entries unexplained.",
+    "finding": "A step is missing to recompute the 0.78 figure from the singular values. `np.linalg.svd(T, compute_uv=False)` returns a 1D array of 64 singular values, not a scalar ratio. The reader cannot recompute 0.78 without the unstated formula relating singular values to unexplained Frobenius variance (the Eckart-Young-Mirsky theorem: the sum of squared singular values from index r onward divided by the total sum of squared singular values).",
+    "evidence": "Recomputation in Python with numpy 2.5.3 and seed 0: `np.linalg.svd(T, compute_uv=False)` produces a length-64 vector of singular values. Computing `(S[4:] ** 2).sum() / (S ** 2).sum()` yields 0.77987... (~0.780).",
+    "fix": "Add the computation directly into the script (`S = np.linalg.svd(T, compute_uv=False)`, `best = (S[r:] ** 2).sum() / (S ** 2).sum()`) or state the formula explicitly in the prose so the reader can recompute 0.78."
+  },
+  {
+    "priority": 2,
+    "severity": "medium",
+    "location": "when the training set grew from 20,000 rows to 800,000 (lecture 7.6, as reported)",
+    "finding": "The numbers 20,000 and 800,000 appear in the prose but are not derived on the page and have no corresponding entry in the claim register. CONTEXT.md §4 requires that every number in the prose must be derived on the page, present in receipts.tsv, or absent.",
+    "evidence": "Checked corpus/lora-is-a-low-rank-diff/receipts.tsv; neither \"20,000\" nor \"800,000\" appears anywhere in the file.",
+    "fix": "Add receipts for 20,000 (from lecture 7.5) and 800,000 (from lecture 7.6) to corpus/lora-is-a-low-rank-diff/receipts.tsv, or remove the exact row figures from the text."
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "B -= lr * (2 * R @ A.T)            # gradients of sum(R**2) with respect to B and A\n        A -= lr * (2 * B.T @ R)",
+    "finding": "Flawed gradient descent implementation in the exercise. Updating B in-place before evaluating A's update causes line 92 to evaluate `2 * B.T @ R` with the newly updated matrix B while using the un-updated residual R. This violates simultaneous gradient descent and contradicts the comment asserting both lines compute the gradients of sum(R**2) at the current step.",
+    "evidence": "Checked loss function L = ||(W + B @ A) - (W + T)||_F^2 = ||B @ A - T||_F^2. The partial gradients evaluated at the current state (A_t, B_t) are dL/dB = 2 * R @ A.T and dL/dA = 2 * B.T @ R. Mutating B before computing dL/dA computes 2 * B_{t+1}.T @ R_t.",
+    "fix": "Calculate both gradient matrices before applying in-place updates: `gB, gA = 2 * R @ A.T, 2 * B.T @ R` followed by `B -= lr * gB` and `A -= lr * gA`."
+  },
+  {
+    "priority": 6,
+    "severity": "low",
+    "location": "First, confirm the assertion on the first line of the loop is doing real work",
+    "finding": "Incorrect locator for the assertion in the exercise instructions. `assert np.all(W + B @ A == W)` is located on line 4 of the outer targets loop (line 88 of the listing), and sits outside the inner training loop (`for _ in range(steps):`). It is not on the first line of either loop.",
+    "evidence": "Inspected the Python script in essays/lora-is-a-low-rank-diff.md lines 85–89.",
+    "fix": "Change \"the assertion on the first line of the loop\" to \"the assertion before the training loop\" or \"the assertion inside the targets loop\"."
+  },
+  {
+    "priority": 7,
+    "severity": "low",
+    "location": "when the training set grew from 20,000 rows to 800,000 (lecture 7.6, as reported)",
+    "finding": "The 20,000 dataset size is attributed to lecture 7.6, but lecture 7.6 only mentions the 800,000 data point training run. The 20,000 figure was reported in lecture 7.5.",
+    "evidence": "Checked transcript resources/udemy-subs/course-6100015/07-05-day-1-loading-models-with-8-bit-and-4-bit-quantization-using.txt line 168 (\"The training data size is 20,000\") vs 07-06-day-1-lora-parameter-calculations-and-model-size-on-hugging-.txt lines 43 and 52 (\"800,000 data points\").",
+    "fix": "Attribute the 20,000 baseline to lecture 7.5 and the 800,000 heavy run to lecture 7.6."
+  }
+]

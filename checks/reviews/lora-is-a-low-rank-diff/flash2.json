@@ -1,0 +1,34 @@
+[
+  {
+    "priority": 2,
+    "severity": "high",
+    "location": "from 20,000 rows to 800,000",
+    "finding": "The numbers 20,000 and 800,000 are not derived on the page and have no receipt in receipts.tsv. Under CONTEXT.md §4, every number in the prose must be derived on the page, in a receipt, or absent.",
+    "evidence": "Checked corpus/lora-is-a-low-rank-diff/receipts.tsv; neither 20,000 nor 800,000 appears in any row of the claim register.",
+    "fix": "Add a receipt for the 20,000 and 800,000 dataset sizes to receipts.tsv (or remove the specific numbers from the sentence)."
+  },
+  {
+    "priority": 7,
+    "severity": "medium",
+    "location": "when the training set grew from 20,000 rows to 800,000 (lecture 7.6, as reported)",
+    "finding": "The 20,000 row figure is attributed to lecture 7.6, but lecture 7.6 only reports the 800,000 data point heavy training run. The 20,000 dataset size was introduced in lecture 7.5 (line 168).",
+    "evidence": "Checked resources/udemy-subs/course-6100015/07-06-day-1-lora-parameter-calculations-and-model-size-on-hugging-.txt (lines 30, 39 mention 800,000 data points, but 20,000 does not appear) and 07-05-day-1-loading-models-with-8-bit-and-4-bit-quantization-using.txt (line 168 states 'The training data size is 20,000').",
+    "fix": "Update the attribution to cite both lectures: '(lectures 7.5 and 7.6, as reported)'."
+  },
+  {
+    "priority": 7,
+    "severity": "medium",
+    "location": "target modules, r and alpha are found by trial against your evaluation metric (lecture 7.11)",
+    "finding": "Attributing the statement about finding target modules and hyperparameters by trial against an evaluation metric to lecture 7.11 is a source misattribution. The lecturer makes this statement in lecture 7.6; lecture 7.11 discusses hyperparameter definitions but does not mention an evaluation metric.",
+    "evidence": "Checked resources/udemy-subs/course-6100015/07-06-day-1-lora-parameter-calculations-and-model-size-on-hugging-.txt lines 122-124 ('The most important way to get the right target modules is to experiment and find out what performs best with your eval metric. No shortcut to experimenting.'). Grepped 'metric' in 07-11-day-3-fine-tuning-hyperparameters-qlora-settings-and-trainin.txt with 0 matches.",
+    "fix": "Change the citation from '(lecture 7.11)' to '(lecture 7.6, as reported)'."
+  },
+  {
+    "priority": 8,
+    "severity": "low",
+    "location": "until the gradient says so",
+    "finding": "Anthropomorphism that personifies the gradient ('says so') and obscures the mechanism. The phrasing also misleadingly implies that the frozen base weights are eventually modified once gradients arrive, whereas the base model is permanently frozen and only adapter matrices A and B receive gradient updates.",
+    "evidence": "Essay line 23 ('Nothing about the base is disturbed until the gradient says so.') contradicts line 21 ('W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W') and line 37 ('the base model is never patched in place'). CONTEXT.md §4 prohibits anthropomorphism that hides the mechanism.",
+    "fix": "Replace 'Nothing about the base is disturbed until the gradient says so.' with 'The base weights remain untouched throughout training; only the adapter matrices receive gradients and update.'"
+  }
+]

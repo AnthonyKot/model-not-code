@@ -18,9 +18,9 @@ h = W·x + s · B·(A·x)
 
 Four things follow from that one line.
 
-**Only A and B receive gradients.** W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W. The optimiser state, which for the Adam family is a running record per trainable parameter (lecture 7.12, as reported), is kept only for A and B too. The memory you were fighting is now proportional to the diff, not to the model.
+**Only A and B receive gradients.** W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W. The optimiser state, which for the Adam family is a running record per trainable parameter (lecture 7.12, as reported), is kept only for A and B too. The memory that scales with what you train, the gradients and the optimiser state, is now proportional to the diff rather than to the model. The frozen base still has to be resident, and the activations saved for the backward pass still grow with batch size and sequence length. LoRA removes the first cost and leaves the other two where they were.
 
-**Training starts exactly at the base model.** The LoRA paper initialises A with random Gaussian entries and B with zeros, so B·A is the zero matrix at the first step and the first forward pass is the untouched model (arXiv:2106.09685, §4.1). Nothing about the base is disturbed until the gradient says so.
+**Training starts exactly at the base model.** The LoRA paper initialises A with random Gaussian entries and B with zeros, so B·A is the zero matrix at the first step and the first forward pass is the untouched model (arXiv:2106.09685, §4.1). Nothing about the base's behaviour changes until a non-zero gradient has moved B.
 
 **The scale s is a convention, and the two sources disagree about it.** The course describes a hyperparameter alpha that multiplies the product before it is added (lectures 7.2 and 7.3). The paper defines the applied scale as alpha divided by r. This essay follows the paper and says so, because the difference matters when you copy settings: with alpha = 16, an adapter of rank 8 is applied at scale 2 and the same adapter at rank 64 is applied at scale 0.25. The rule of thumb the lecturer reports, alpha = 2r, keeps the scale at 2 whatever r you pick: 64/32 and 512/256 both give 2 (lectures 7.3 and 7.20, as reported).
 
@@ -56,7 +56,7 @@ The lecturer's heavier configuration reproduces the same way. Lecture 7.6 report
 
 ## What the rank cannot do
 
-Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is exactly the trade the lecturer reports making when the training set grew from 20,000 rows to 800,000 (lecture 7.6, as reported). There is no formula for the right r; the course is explicit that target modules, r and alpha are found by trial against your evaluation metric (lecture 7.11).
+Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is exactly the trade the lecturer reports making when the training set grew from 20,000 rows to 800,000 (lectures 7.5 and 7.6, as reported). There is no formula for the right r; the course is explicit that target modules, r and alpha are found by trial against your evaluation metric (lecture 7.6, as reported).
 
 A diff of rank r is not a full fine-tune with fewer parameters. It is a different function class. Two runs with different r or different alpha are two different experiments, and the alpha convention above means a setting copied from one codebase may not mean the same thing in another.
 
@@ -67,7 +67,7 @@ Finally, LoRA is one of two tricks in the course's QLoRA week. The other, holdin
 <!--mission-->
 ## Exercise: see what a rank-4 diff can and cannot express
 
-You need Python with numpy and nothing else; no GPU, no model, no download. The script freezes a random 64 × 64 matrix W, attaches an adapter of rank 4 with A random and B zero, and trains A and B alone by gradient descent so that W + B·A approaches W + T. It does this for two targets T: one that is a single outer product, so it has rank 1, and one that is fully random.
+You need Python with numpy and nothing else; no GPU, no model, no download. The script freezes a random 64 × 64 matrix W, attaches an adapter of rank 4 with A random and B zero, and trains A and B alone by gradient descent so that W + B·A approaches W + T. It does this for two targets T: one that is a single outer product, so it has rank 1, and one that is fully random. Real training never sees a target update; the gradient arrives through the task loss. The exercise removes that layer on purpose so that one question is left: what can a product of rank r express?
 
 ```python
 import numpy as np
@@ -88,14 +88,17 @@ for name, T in targets.items():
     assert np.all(W + B @ A == W)
     for _ in range(steps):
         R = (W + B @ A) - (W + T)          # how far the adapted weight is from the target weight
-        B -= lr * (2 * R @ A.T)            # gradients of sum(R**2) with respect to B and A
-        A -= lr * (2 * B.T @ R)
+        gB, gA = 2 * R @ A.T, 2 * B.T @ R  # gradients of sum(R**2), both taken from the same R
+        B -= lr * gB
+        A -= lr * gA
+    S = np.linalg.svd(T, compute_uv=False) # singular values, largest first
+    best = (S[r:] ** 2).sum() / (S ** 2).sum()  # what the best rank-r matrix would leave
     remaining = (R ** 2).sum() / (T ** 2).sum()
-    print(f"{name}: fraction of the target left unexplained after {steps} steps = {remaining:.3f}")
+    print(f"{name}: left unexplained after {steps} steps = {remaining:.3f}; best any rank-{r} matrix can do = {best:.3f}")
 ```
 
-**Expected result.** This script was run with numpy 2.5.3 and seed 0 (the output is in the essay's corpus). The rank-1 target is fitted to 0.000 remaining: a rank-4 adapter contains a rank-1 change with room to spare. The random target stalls at 0.780 remaining, and no extra steps move it. Compute the singular values of that same random matrix with `np.linalg.svd(T, compute_uv=False)` and you will find that its best possible rank-4 approximation also leaves 0.78 of the squared entries unexplained. Gradient descent on A and B found the ceiling, and the ceiling is r.
+**Expected result.** This script was run with numpy 2.5.3 and seed 0 (the output is in the essay's corpus). The rank-1 target is fitted to 0.000 remaining: a rank-4 adapter contains a rank-1 change with room to spare. The random target stalls at 0.780 remaining, and no extra steps move it. The last two lines of the loop say why. The squared singular values of T add up to its total squared size, and the best rank-r matrix keeps the r largest, so the fraction any rank-4 matrix must leave behind is the sum of the squared singular values from the fifth onward over the sum of all of them. For this random matrix that is 0.780, the same number gradient descent reached. The adapter found the ceiling, and the ceiling is r.
 
-Two things to try once that matches. First, confirm the assertion on the first line of the loop is doing real work by changing B's start to random and checking that W + B·A no longer equals W at step zero. Second, raise r to 8 and 16 for the random target and record the remaining fraction each time. It falls, and each doubling of r doubles the adapter's 2 × 64 × r numbers, which is the trade the rest of the essay was about.
+Two things to try once that matches. First, confirm the assertion before the loop is doing real work by changing B's start to random and checking that W + B·A no longer equals W at step zero. Second, raise r to 8 and 16 for the random target and record the remaining fraction each time. It falls, and each doubling of r doubles the adapter's 2 × 64 × r numbers, which is the trade the rest of the essay was about.
 
 *Sources: the LLM Engineering course (Ed Donner, Udemy), lectures 7.2 to 7.6, 7.11, 7.12 and 7.20, paraphrased as study material; Sebastian Raschka, Machine Learning Q and AI, Leanpub edition of 2023-05-21, pp. 141–142; Hu et al., LoRA: Low-Rank Adaptation of Large Language Models, arXiv:2106.09685, §4.1 and §4.2.*
