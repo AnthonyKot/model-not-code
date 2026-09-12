@@ -54,10 +54,11 @@ Accepted and applied:
 
 Rejected:
 - (working-mle, hiring-manager) drop the "as reported in the lecture" citations and state the
-  Llama dimensions as known facts / name grouped-query attention for the 1024 width — rejected:
-  CONTEXT §4 and §5 require lecture citations and forbid numbers from memory; the inference
-  from the reported file size is the honest route. Citation density can be thinned in the
-  consistency pass if the author agrees.
+  Llama dimensions as known facts / name grouped-query attention for the 1024 width — first
+  rejected under CONTEXT §4/§5; then the author, reading the essay on Pages, asked for the
+  citations and the "two sources disagree" framing to go. Applied 2026-09-13: no inline lecture
+  numbers remain, the alpha paragraph states alpha / r as the scale, the 1024 width is still
+  inferred from the reported file size (no numbers from memory). Rule recorded in CONTEXT §4.
 - (stats-sceptic) explain Raschka's 6,250 as 1,250 × 5 — plausible but a guess about the
   author's error; not added.
 

@@ -1,28 +1,26 @@
 # Fine-Tuning Without Touching the Weights
 
-You have a model whose behaviour you need to change on your task, and it has about three billion weights. A full fine-tune updates every one of them, which means every one needs its value, its gradient and whatever the optimiser keeps per weight, all resident on the GPU at once. The LLM Engineering course reports that a Llama 3.2 base of that size takes about 13 GB just to hold at 32-bit precision before training starts (lecture 7.2, as reported). The card you actually have is the free one in a notebook. The full fine-tune does not fit, and it would not fit with twice the card either.
+You have a model whose behaviour you need to change on your task, and it has about three billion weights. A full fine-tune updates every one of them, which means every one needs its value, its gradient and whatever the optimiser keeps per weight, all resident on the GPU at once. A Llama 3.2 base of that size takes about 13 GB of GPU memory just to hold at 32-bit precision, before training starts. The card you actually have is the free one in a notebook. The full fine-tune does not fit, and it would not fit with twice the card either.
 
 The way out is not to make the model smaller. It is to stop treating the model as the thing you edit. You leave every weight where it is and train a separate, much smaller object that is added to the model's output. That object is a diff, and this essay is about why a diff of a particular shape is so much cheaper than the weights it changes.
 
 ## A weight update is a matrix, and a matrix can be factored
 
-Take one weight matrix inside the model, call it W, with d_in columns and d_out rows. During a full fine-tune W becomes W + ΔW, where ΔW has exactly the same shape as W. That is where the cost comes from: the update has as many entries as the weight.
+Take one weight matrix inside the model, call it W, with d<sub>in</sub> columns and d<sub>out</sub> rows. During a full fine-tune W becomes W + ΔW, where ΔW has exactly the same shape as W. That is where the cost comes from: the update has as many entries as the weight.
 
-Low-rank adaptation, LoRA, replaces ΔW with a product of two thin matrices. A has r rows and d_in columns; B has d_out rows and r columns. Their product B·A has the shape of W, so it can be added to W, but its entries are not free: they are generated from (d_in + d_out) × r numbers rather than d_in × d_out. The number r is the adapter's rank, and it is chosen by you. The course reports 8, 16 and 32 as the usual starting values (lecture 7.3).
+Low-rank adaptation, LoRA, replaces ΔW with a product of two thin matrices. A has r rows and d<sub>in</sub> columns; B has d<sub>out</sub> rows and r columns. Their product B·A has the shape of W, so it can be added to W, but its entries are not free: they are generated from (d<sub>in</sub> + d<sub>out</sub>) × r numbers rather than d<sub>in</sub> × d<sub>out</sub>. The number r is the adapter's rank, and it is chosen by you. The usual starting values are 8, 16 and 32.
 
 Here is the whole mechanism as a forward pass. For an input vector x:
 
-```text
-h = W·x + s · B·(A·x)
-```
+<p class="formula">h = W·x + s · B·(A·x)</p>
 
 Four things follow from that one line.
 
-**Only A and B receive gradients.** W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W. The optimiser state, which for the Adam family is a running record per trainable parameter (lecture 7.12, as reported), is kept only for A and B too. The memory that scales with what you train, the gradients and the optimiser state, is now proportional to the diff rather than to the model. The frozen base still has to be resident, and the activations saved for the backward pass still grow with batch size and sequence length. LoRA removes the first cost and leaves the other two where they were.
+**Only A and B receive gradients.** W is marked frozen, so the backward pass computes how the loss changes with A and with B and never allocates a gradient for W. The optimiser state, which for the Adam family is a running record per trainable parameter, is kept only for A and B too. The memory that scales with what you train, the gradients and the optimiser state, is now proportional to the diff rather than to the model. The frozen base still has to be resident, and the activations saved for the backward pass still grow with batch size and sequence length. LoRA removes the first cost and leaves the other two where they were.
 
-**Training starts exactly at the base model.** The LoRA paper initialises A with random Gaussian entries and B with zeros, so B·A is the zero matrix at the first step and the first forward pass is the untouched model (arXiv:2106.09685, §4.1). Nothing about the base's behaviour changes until a non-zero gradient has moved B.
+**Training starts exactly at the base model.** The LoRA paper initialises A with random Gaussian entries and B with zeros, so B·A is the zero matrix at the first step and the first forward pass is the untouched model. Nothing about the base's behaviour changes until a non-zero gradient has moved B.
 
-**The scale s is a convention, and the two sources disagree about it.** The course describes a hyperparameter alpha that multiplies the product before it is added (lectures 7.2 and 7.3). The paper defines the applied scale as alpha divided by r. This essay follows the paper and says so, because the difference matters when you copy settings: with alpha = 16, an adapter of rank 8 is applied at scale 2 and the same adapter at rank 64 is applied at scale 0.25. The rule of thumb the lecturer reports, alpha = 2r, keeps the scale at 2 whatever r you pick: 64/32 and 512/256 both give 2 (lectures 7.3 and 7.20, as reported).
+**The scale s is alpha divided by r.** The adapter's second hyperparameter, alpha, does not multiply the product directly; the LoRA paper defines the applied scale as alpha / r, and descriptions that call alpha a plain multiplier are shorthand for that. Keep the two apart when you copy settings: with alpha = 16, an adapter of rank 8 is applied at scale 2 and the same adapter at rank 64 at scale 0.25. The common rule of thumb alpha = 2r keeps the scale at 2 whatever r you pick: 64/32 and 512/256 both give 2.
 
 **The diff has rank at most r.** Write B·A out and it is the sum of r outer products: the first column of B times the first row of A, plus the second column times the second row, and so on. Each outer product is a rank-1 matrix, so their sum can express at most r independent directions of change. This is the bet LoRA makes: that the change your task needs is closer to a few directions than to an arbitrary matrix. The exercise at the end lets you see both cases.
 
@@ -38,11 +36,11 @@ Scale it up to a small model with twelve layers, each with four such projections
 
 ## Checking the formula against a reported configuration
 
-The same formula can be checked against the model in the course. Lecture 7.5 reports adapters of rank 32 on the four attention projections q, k, v and o of each of 28 decoder layers, and gives the total as 18 million parameters and 73 MB; lecture 7.6 reports the saved adapter file at 73.4 MB on disk (as reported).
+The same formula can be checked against a real configuration reported in the course this essay draws on: adapters of rank 32 on the four attention projections q, k, v and o of each of 28 decoder layers, quoted there as 18 million parameters and 73 MB, with the saved adapter file at 73.4 MB on disk.
 
-The lecture describes the projections in round speech: an inner width it gives once as 3072 and otherwise calls "3000", with the k and v projections having "1000" outputs (lecture 7.4, as reported). Take 3072 for the width. Per layer:
+The course gives the model's inner width as 3072 and describes the k and v projections in round numbers, as having about 1,000 outputs. Take 3072 for the width. Per layer:
 
-| Projection | d_in + d_out | × r = 32 |
+| Projection | d<sub>in</sub> + d<sub>out</sub> | × r = 32 |
 |---|---|---|
 | q, 3072 → 3072 | 6,144 | 196,608 |
 | o, 3072 → 3072 | 6,144 | 196,608 |
@@ -50,19 +48,19 @@ The lecture describes the projections in round speech: an inner width it gives o
 | v, 3072 → 1024 | 4,096 | 131,072 |
 | per layer | | 655,360 |
 
-Over 28 layers that is 655,360 × 28 = 18,350,080 parameters, and at four bytes each, 73,400,320 bytes: 73.4 MB. The spoken "1000" in place of 1024 would give 18,307,072 parameters and 73.2 MB, so the reported file size is what fixes the k and v width at 1024. The essay infers that width from the reported figure; the lecture never states it.
+Over 28 layers that is 655,360 × 28 = 18,350,080 parameters, and at four bytes each, 73,400,320 bytes: 73.4 MB. A width of 1,000 in place of 1024 would give 18,307,072 parameters and 73.2 MB, so the reported file size is what fixes the k and v width at 1024.
 
-The lecturer's heavier configuration reproduces the same way. Lecture 7.6 reports rank 256 on the attention projections and on the three MLP matrices, spoken as "3000 to 8000" and back, and gives 389 million parameters and 1.56 GB. With widths 3072 and 8192, the attention projections contribute (6,144 + 6,144 + 4,096 + 4,096) × 256 = 5,242,880 per layer and the three MLP matrices (3072 + 8192) × 256 × 3 = 8,650,752, together 13,893,632 per layer and 389,021,696 over 28 layers, which is 1,556,086,784 bytes. Both reported figures fall out of (d_in + d_out) × r, summed over the target modules, times the layer count, times four bytes. That is the whole cost model, and you can now run it on any configuration you are handed.
+The course's heavier configuration reproduces the same way: rank 256 on the attention projections and on the three MLP matrices, which widen 3072 to about 8,000 and back, reported as 389 million parameters and 1.56 GB. With widths 3072 and 8192, the attention projections contribute (6,144 + 6,144 + 4,096 + 4,096) × 256 = 5,242,880 per layer and the three MLP matrices (3072 + 8192) × 256 × 3 = 8,650,752, together 13,893,632 per layer and 389,021,696 over 28 layers, which is 1,556,086,784 bytes. Both reported figures fall out of (d<sub>in</sub> + d<sub>out</sub>) × r, summed over the target modules, times the layer count, times four bytes. That is the whole cost model, and you can now run it on any configuration you are handed.
 
 ## What the rank cannot do
 
-Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is exactly the trade the lecturer reports making when the training set grew from 20,000 rows to 800,000 (lectures 7.5 and 7.6, as reported). There is no formula for the right r; the course is explicit that target modules, r and alpha are found by trial against your evaluation metric (lecture 7.6, as reported).
+Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is the trade behind the two configurations above: the heavier one was chosen when the training set grew from 20,000 rows to 800,000. There is no formula for the right r; target modules, r and alpha are found by trial against your evaluation metric.
 
 A diff of rank r is not a full fine-tune with fewer parameters. It is a different function class. Two runs with different r or different alpha are two different experiments, and the alpha convention above means a setting copied from one codebase may not mean the same thing in another.
 
 The example arithmetic in the sources also deserves the recomputation this essay asks of you. The Q&A book used here gives an update matrix of 25 × 50 with inner dimension 5 and correctly counts the factors at 125 and 250, 375 in total; the local edition, dated 2023-05-21, prints the size of the full update as 6,250, where 25 × 50 is 1,250 (Raschka, *Machine Learning Q and AI*, pp. 141–142). The saving is still real, 375 against 1,250, but the point stands: count the entries yourself.
 
-Finally, LoRA is one of two tricks in the course's QLoRA week. The other, holding the frozen base in four-bit precision while the adapters stay in full precision, is why a 2.2 GB base plus a 73 MB adapter is reported to fit on the free card (lecture 7.5). How those four bits are chosen is the subject of a separate essay in Part IV. What matters here is that the quantisation is applied to the base and never to the diff.
+Finally, LoRA is only half of QLoRA. The other half, holding the frozen base in four-bit precision while the adapters stay in full precision, is why a 2.2 GB base plus a 73 MB adapter fits on the free card. How those four bits are chosen is the subject of a separate essay in Part IV. What matters here is that the quantisation is applied to the base and never to the diff.
 
 <!--mission-->
 ## Exercise: see what a rank-4 diff can and cannot express

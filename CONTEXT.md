@@ -76,10 +76,12 @@ Added for this book:
 - **Frameworks are examples, not the subject.** TensorFlow, PyTorch, LangChain, vLLM appear as
   the instance the source used, dated "as of" the course's recording where it matters. The
   mechanism must survive a change of framework.
-- **Courses are named study sources.** "Lecture 7.3 of the LLM Engineering course walks through
-  the QLoRA settings" is fine; a lecture's number is written "as reported in the lecture" and
-  labelled `reported` in the receipts. Nothing a lecturer said is repeated as the book's own
-  finding.
+- **Courses are named study sources, in the receipts and the credit line, not in the prose.**
+  (Author's rule, 2026-09-13, after the LoRA pilot: inline "(lecture 7.3, as reported)" citations
+  read as refereeing a video and distract; the essay names the course once where a figure is the
+  course's, `reported` receipts carry the lecture numbers, and the source credit at the end lists
+  them.) Where a source and a primary disagree, the essay states the correct version and does not
+  stage the disagreement. Nothing a lecturer said is repeated as the book's own finding.
 
 ## 5. Sourcing standard
 
@@ -228,6 +230,15 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   receipts should say so; four books (Data Contracts, Data Engineering Design Patterns,
   Kubeflow, OpenShift MLOps) are candidates for the manifest.
 - **2026-09-13** — LoRA pilot drafted; `review.sh` / `readers.sh` exercised for the first time.
+- **2026-09-13** — Author's read of the pilot on Pages: (a) published for reading before the read
+  note, on the author's say; (b) inline lecture citations and the "two sources disagree" framing
+  removed from the prose at the author's instruction (rule recorded in §4); (c) formulas: `d_in`
+  style underscores replaced by HTML subscripts and a `.formula` display line added to the
+  stylesheet after the author found the rendering odd in Chrome.
+- **2026-09-13** — Outline audit of Parts III–VI delivered as recommendation only
+  (`notes/research/outline-audit-2026-09-13.md`): 11 keep, 2 merge, 3 defer, 1 drop, 6 proposed
+  additions on the engineering spine, four manifest rows to add, eight open questions. Awaits
+  the author's decisions before Parts III–VI are pitched.
 
 ## 10. Open questions
 
