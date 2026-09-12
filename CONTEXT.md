@@ -143,7 +143,8 @@ changed before its essay is drafted.
   Two `disputed` receipts: alpha convention (essay follows the paper's alpha / r) and Raschka's
   printed 25 × 50 = 6,250 (essay gives 1,250). Reviewed 2026-09-13: 8 findings accepted and
   applied, 2 rejected (see §8 and `notes/essays/lora-is-a-low-rank-diff.md`). Published 2026-09-13 on the
-  author's instruction so it can be read on Pages; the author's read note is still owed.
+  author's instruction so it can be read on Pages. Author's read in progress: provisional 3 of 5,
+  "does not block starting new chapters"; reason for the score still to be recorded.
 
 ## 7. Pipeline
 

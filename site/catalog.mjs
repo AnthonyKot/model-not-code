@@ -50,7 +50,8 @@ export const essays = [
   // ── I. The program is now a set of weights ──────────────────────────────
   E("model-is-a-learned-function", "I", "The Program Is Now a Table of Numbers, and Training Is the Compile Step",
     "Loss plus gradient descent turn a parametrised function into behaviour; the artefact you ship is weights plus preprocessing, not code.",
-    [C("4735368", "03-05", "03-06", "03-07", "03-08", "03-09"), B("geron-pytorch")]),
+    [C("4735368", "03-05", "03-06", "03-07", "03-09"), B("geron-pytorch", "pp. 173–177")],
+    { status: "drafted" }),
   E("tokens-not-characters", "I", "Why the Model Cannot Count the Letters in “Strawberry”",
     "Byte-pair merges map text to integer IDs from a fixed table; tokens, not characters, are the unit of cost, context length and many errors.",
     [C("6100015", "01-29", "01-30", "01-31", "01-32", "03-11", "03-12", "03-13", "03-14"), C("6538601", "03-02"), B("llm-deep-dive")]),  // 01-24..01-27 held no tokenizer material (pitch note 2026-09-12)

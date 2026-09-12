@@ -1,0 +1,12 @@
+learning rate 0.05: start loss 18.6667
+  step   1: m = 0.9333  c = 0.4000  loss = 3.763
+  step   2: m = 1.3511  c = 0.5733  loss = 0.8055
+  step   3: m = 1.5393  c = 0.6458  loss = 0.2175
+  step  10: m = 1.7121  c = 0.6530  loss = 0.06121
+  step  50: m = 1.8229  c = 0.4027  loss = 0.02326
+  step 200: m = 1.9711  c = 0.0656  loss = 0.0006182
+learning rate 0.5: start loss 18.6667
+  step   1: m = 9.3333  c = 4.0000  loss = 384.3
+  step   2: m = -32.8889  c = -14.6667  loss = 7942
+  step   3: m = 159.2593  c = 69.7778  loss = 1.642e+05
+  diverged: loss above a million at step 4
