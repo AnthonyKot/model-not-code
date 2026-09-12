@@ -207,7 +207,7 @@ What each part does:
 In a training library the same three moves, freeze, attach, train the attachment, are one configuration object. With the Hugging Face PEFT library, the configuration for the rank-32 attention-only setup from the tables above is:
 
 ```python
-# illustrative, not executed; API as of the course's library versions
+# illustrative, not executed; PEFT API as of the time of writing
 from peft import LoraConfig, get_peft_model
 
 config = LoraConfig(r=32, lora_alpha=64, lora_dropout=0.1,

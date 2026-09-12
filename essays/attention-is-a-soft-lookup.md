@@ -10,7 +10,7 @@ A dictionary takes a key, finds an exact match and returns the value stored ther
 
 Every token carries three vectors, each produced from the token's embedding by its own learned matrix: a query q, a key k and a value v. The query is what a token is matched with, the key is what each token is matched against, and the value is what each token contributes to the result. For one query against every stored key:
 
-1. Score each key by the dot product q·k<sub>j</sub>. A large product means the query and that key point the same way.
+1. Score each key by the dot product q·k<sub>j</sub>. A large product means the query and that key are aligned and long; a short key pointing the same way scores less than a long one, so magnitude counts as well as direction.
 2. Divide every score by the square root of d<sub>k</sub>, the number of entries in a key. Dot products of wide vectors spread wide; without the divisor the next step would return almost exactly one entry every time, with tiny gradients.
 3. Turn the scaled scores into weights with a softmax: exponentiate each and divide by the sum of the exponentials. The weights are positive and sum to one.
 4. Return the sum of the values, each multiplied by its weight.
@@ -27,9 +27,9 @@ That parallelism is the training pass. One pass over S tokens produces S output 
 
 ## The mask: minus infinity above the diagonal
 
-The fix is applied to the score table before the softmax. Add a mask matrix M with 0 in every entry whose column index is at most its row index, and −∞ in every entry whose column comes after its row:
+The fix is applied to the scaled score table before the softmax. Add a mask matrix M with 0 in every entry whose column index is at most its row index, and −∞ in every entry whose column comes after its row:
 
-<p class="formula">weights = softmax((Q·K<sup>T</sup> + M) / √d<sub>k</sub>)</p>
+<p class="formula">weights = softmax(Q·K<sup>T</sup> / √d<sub>k</sub> + M)</p>
 
 The exponential of −∞ is 0, so a masked entry contributes 0 to its row's numerator and 0 to its denominator. In code the −∞ is a large negative number such as −10<sup>9</sup>; `exp` of that is 0.0 in floating point and the effect is the same. The weight table comes out lower-triangular: row k has weights on columns 1 to k that sum to one, and exact zeros beyond.
 
@@ -73,7 +73,7 @@ Two consequences follow, and they answer the opening worry. Training on a whole 
 
 The mask is the decoder's. An encoder-only model of the BERT family has no causal mask: every row mixes every column, which is what makes it good at embedding a whole sentence and unusable for generating one. In an encoder–decoder model the decoder's attention over the encoder's output is not masked either; only its attention over its own tokens is. And the word "mask" names something else in those encoder models: masked language modelling replaces random input tokens with a placeholder and trains the model to predict them. Same word, different object.
 
-The mask hides work without saving it: in the plain form the S × S table is computed in full and half of it is then set to −∞.
+In the plain form the mask hides work without saving it: the S × S table is computed in full and half of it is then set to −∞. Production attention kernels know the mask's shape in advance and skip the blocks above the diagonal, so the saving is real there; the arithmetic that survives is the same.
 
 The invariance has preconditions. The earlier keys and values must stay put: edit the prefix and every row from that point on is recomputed, and the position information added to each token must depend on its own position, not on the sequence length. It also holds exactly only in exact arithmetic: the exercise passes an `==` check because the masked terms add a literal 0.0, but a framework's batched kernel may sum a row in a different order from its single-token path, so compare with a tolerance there.
 
@@ -147,7 +147,7 @@ except AssertionError as e:
     print(f"assertion without the mask: failed as expected ({e})")
 ```
 
-**Expected result.** Run with Python 3.12 and nothing else; the output is in the essay's corpus. The masked three-token rows print (1, 0), (0.119, 0.881) and (0.910, 0.335); after the append they print the same numbers and the first assertion passes, and row 4 prints (0.594, 1.000). The unmasked rows all differ from their three-token versions, and the second assertion fails on row 1. Then write one sentence, in your own words, on why "the model saw the future during training" is false. It should say what row k is a function of; if it mentions intent rather than arithmetic, it is not finished.
+**Expected result.** Run with Python 3.12 and nothing else; the output is in the essay's corpus. The masked three-token rows print (1, 0), (0.119, 0.881) and (0.910, 0.335); after the append they print the same numbers and the first assertion passes, and row 4 prints (0.594, 1.000). The unmasked rows all differ from their three-token versions, and the second assertion fails on row 1. Then write one sentence, in your own words, on why "the model saw the future during training" is false. The test of the sentence is whether it says what row k is a function of.
 
 One thing to try once that matches: change `NEG` to `-30` and rerun. `math.exp(-30)` is small but not 0.0, so the masked columns carry a sliver of weight and the first assertion fails, which is why the number must underflow rather than merely be negative.
 
