@@ -82,3 +82,11 @@ a cost essay is ever added. Nothing borrowed from other essays.
 **Style checks done by hand:** no "we"; no inline lecture citations; the course named once
 where the 8/64/512 figure is its report; "attends to" avoided throughout (the lecture's phrase
 is not used); no slogan ending (the last prose paragraph is a limit, the exercise closes).
+
+**Review (2026-09-13, main session):** three reader personas read (review lanes launched; report
+to be read next session in checks/reviews/attention-is-a-soft-lookup/). Applied from readers:
+formula now scales before masking, matching the code; dot-product sentence now says magnitude
+counts as well as direction; the "hides work without saving it" claim bounded (production kernels
+skip masked blocks); "not finished" tone softened; the (0.213, 0.893) value confirmed against the
+exact softmax (0.8935 rounds to 0.893 from the unrounded weights); "the TensorFlow course reports"
+removed. Rejected: replacing the hand-sized integer vectors with "realistic" ones.

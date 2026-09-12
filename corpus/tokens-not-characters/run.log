@@ -1,9 +1,6 @@
-merge 1: 'u'+'n' count 9  pairs: {('s', 'u'): 7, ('u', 'n'): 9, ('n', 'g'): 4, ('g', 'u'): 2, ('g', 'o'): 1, ('o', 'n'): 1}
-merge 2: 's'+'un' count 7  pairs: {('s', 'un'): 7, ('un', 'g'): 3, ('g', 'un'): 2, ('g', 'o'): 1, ('o', 'n'): 1, ('n', 'g'): 1}
-merge 3: 'sun'+'g' count 3  pairs: {('sun', 'g'): 3, ('g', 'un'): 2, ('g', 'o'): 1, ('o', 'n'): 1, ('n', 'g'): 1}
-vocabulary: ['g', 'n', 'o', 's', 'sun', 'sung', 'u', 'un']
-'sun' -> ['sun']  (1 token)
-'sung' -> ['sung']  (1 token)
-'gun' -> ['g', 'un']  (2 tokens)
-'gong' -> ['g', 'o', 'n', 'g']  (4 tokens)
-'snug' -> ['s', 'n', 'u', 'g']  (4 tokens)
+merges: [('u', 'n'), ('s', 'un'), ('sun', 'g')]
+table: {'g': 0, 'n': 1, 'o': 2, 's': 3, 'sun': 4, 'sung': 5, 'u': 6, 'un': 7}
+sung -> ('sung',) -> [5]
+gun -> ('g', 'un') -> [0, 7]
+gong -> ('g', 'o', 'n', 'g') -> [0, 2, 1, 0]
+snug -> ('s', 'n', 'u', 'g') -> [3, 1, 6, 0]

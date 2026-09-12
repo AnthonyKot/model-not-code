@@ -84,3 +84,15 @@ this part") — that essay does not exist in the catalog under this slug; if no 
 picks it up, the sentence should be softened to "elsewhere". Nothing owed to other essays
 otherwise; `attention-is-a-soft-lookup` and `embeddings-are-coordinates` may cite tokens-01 /
 tokens-16 for "token IDs in, vectors later".
+
+**Review (2026-09-13, main session):** Gemini flash 8 findings (pro lane timed out; rerun launched,
+result to be read next session in checks/reviews/tokens-not-characters/pro2.json); three reader
+personas. Accepted and applied: exercise now builds the fragment → ID table and prints integer
+IDs (the title's claim); tie-break comment/code (min with −count); "thirty lines" and "1994"
+dropped; the opening tokenizer paragraph restructured away from lecture 03-11's order; the
+self-referential 200-merge numbers removed (receipt tokens-24 withdrawn) in favour of the
+expected pattern; 128,256 named as the Llama 3 family with a catalog caution; "the course"
+phrasing removed; bytes-as-starting-vocabulary and word-boundary limits added; "the merge count
+is the only knob" qualified. Rejected: rewriting the mechanism as byte-level BPE (the character
+version is the one the reader can tally; bytes are named in Limits); showing a production
+tokenizer's split of "strawberry" (no tokenizer on disk to run; nothing claimed from memory).

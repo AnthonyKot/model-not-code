@@ -2,17 +2,17 @@
 
 You ask a language model how many times a letter appears in a word, it answers with the wrong number, and you file the result under "not as clever as advertised". The filing is aimed at the wrong component. The network that produced the answer never received the word. It received a short list of integers, and the letters you were asking about are not in that list. Whether they can be recovered from it is a separate question, and the answer is "only indirectly", for a reason that this essay derives on the page.
 
-The component that turned your text into integers is the tokenizer, and it is the one part of the system that is not learned by gradient descent. It is a table, built once before training by a counting procedure that takes about thirty lines to write. The essay builds one.
+The component that turned your text into integers is the tokenizer, and it is the one part of the system that is not learned by gradient descent. It is a table, built once before training by a counting procedure that fits on one screen. The essay builds one.
 
 ## Text becomes integers before anything else happens
 
-A tokenizer does two things. It cuts text into chunks, and it looks each chunk up in a fixed table that maps every chunk it holds to an integer. The chunk is the token; the integer is the token ID; in practice people say "token" for both. Only the integers go forward. The embedding vectors are produced later, inside the network, from those integers; they are not the input. The first layer of the network says the same thing in its shape: a matrix with one row per entry in the tokenizer's table, so that the tokenized text is nothing more than a list of row numbers.
+Between your text and the network sits a fixed table: a list of text fragments, each with a row number. The tokenizer's whole job is to cut the text into fragments that are in the table and hand the network the row numbers, and nothing else crosses that boundary. A fragment is a token and its row number is the token ID, though in practice both are called tokens. The network's first layer is shaped by the same table, one row of embedding numbers per entry, so what it does with an ID is look up a row. The embedding is produced inside the network, after the lookup; it is not the input.
 
 The table belongs to one model. It is built on that model's training corpus before the model is trained, because its output is the model's input, and it holds a few reserved entries, for "beginning of text" and the like, whose meaning is nothing but a convention the training data followed every time. Two models can give the same sentence different integers and a different number of them, and a table built on code holds entries for punctuation runs that a table built on prose does not. None of this is a property of the network; it is a property of the counting that produced the table.
 
 ## How the table is built
 
-The procedure is byte-pair encoding, named after a 1994 compression trick that repeatedly replaced the most frequent pair of bytes in a file with an unused byte. Applied to text for a vocabulary, it runs on characters and goes like this.
+The procedure is byte-pair encoding, named after an older compression trick that repeatedly replaced the most frequent pair of bytes in a file with an unused byte. Applied to text for a vocabulary, it runs on characters and goes like this.
 
 1. Split the training corpus into words and count how often each word occurs. Everything after this step works on the word list with those counts; a pair of symbols is never counted across a word boundary.
 2. Write every word as a sequence of single characters. The characters are the starting vocabulary.
@@ -76,7 +76,7 @@ The same mechanism covers a few things you will meet on the first day. A rule of
 
 ## Limits
 
-The toy leaves out things a production tokenizer has, and they matter for anyone reproducing a real table. The paper that adapted the procedure to text appends an end-of-word symbol to every word before merging, so that a piece at the end of a word and the same piece in the middle are different symbols; the toy omits it, which is why `un` in "gun" and `un` inside "sung" are the same entry. Real tables are also large: one open model's table has 128,256 entries, of which 256 are reserved. The toy's count is 5 + 3. Ties are also a decision: when two pairs share the top count, some rule has to pick one, and different rules give different tables from the same corpus; the script below picks the alphabetically first. Real tables also usually start from the 256 byte values rather than from characters, so that no input is ever outside the table, and they keep the space in front of a word as part of its first piece, which is why the same word can be two different tokens at the start of a line and in the middle of one.
+The toy leaves out things a production tokenizer has, and they matter for anyone reproducing a real table. The paper that adapted the procedure to text appends an end-of-word symbol to every word before merging, so that a piece at the end of a word and the same piece in the middle are different symbols; the toy omits it, which is why `un` in "gun" and `un` inside "sung" are the same entry. Real tables are also large: the Llama 3 family's table has 128,256 entries, of which 256 are reserved. The toy's count is 5 + 3. Ties are also a decision: when two pairs share the top count, some rule has to pick one, and different rules give different tables from the same corpus; the script below picks the alphabetically first. Real tables also usually start from the 256 byte values rather than from characters, so that no input is ever outside the table, and they keep the space in front of a word as part of its first piece, which is why the same word can be two different tokens at the start of a line and in the middle of one.
 
 The table is a product of a particular corpus and a particular merge count, which is why it belongs to one model and why a token count under one table is not a token count under another. The rule of thumb above is for English prose; code, numbers and rare names cost more, and a different corpus mix moves all of it.
 
@@ -121,14 +121,20 @@ def encode(word, merges):
         s = apply(s, pair)
     return s
 
-merges = train({"sun": 4, "sung": 3, "gun": 2, "gong": 1}, 3)
-print(merges)
+words = {"sun": 4, "sung": 3, "gun": 2, "gong": 1}
+merges = train(words, 3)
+print("merges:", merges)
+
+table = sorted(set("".join(words)) | {a + b for a, b in merges})   # characters + one entry per merge
+ids = {piece: i for i, piece in enumerate(table)}                    # the table: fragment -> row number
+print("table:", ids)
 for w in ["sung", "gun", "gong", "snug"]:
-    print(w, encode(w, merges))
+    pieces = encode(w, merges)
+    print(w, "->", pieces, "->", [ids[p] for p in pieces])           # what the network receives
 ```
 
-**Expected result.** This script was run with Python 3 and nothing else (the output is in the essay's corpus). The merge list prints as u+n, s+un, sun+g, in that order, and the encodings are `sung` in one piece, `g`, `un` for "gun", four characters for "gong" and four for "snug". If your merges come out in a different order, print the pair counts at each round and compare them with the two tables above; the counts are the whole algorithm.
+**Expected result.** This script was run with Python 3 and nothing else (the output is in the essay's corpus). The merge list prints as u+n, s+un, sun+g, in that order. The table has eight entries, g, n, o, s, sun, sung, u, un, numbered 0 to 7 in that order, so "sung" arrives as the single integer 5, "gun" as [0, 7], "gong" as [0, 2, 1, 0] and "snug" as [3, 1, 6, 0]. Those lists are all the network ever gets. If your merges come out in a different order, print the pair counts at each round and compare them with the two tables above; the counts are the whole algorithm.
 
-Then run it on a page of your own prose: lower-case it, split on anything that is not a letter, count the words, and train for 200 merges. Run on an earlier draft of this essay, about 1,800 words, the first eight merges were th, the, er, in, or, an, un and en, and "and" was the fourteenth entry; "strawberry" came back as seven pieces, st, ra, w, b, er, r, y, and "snug" as three, while "sung", which the page repeats often, was one entry. Do the same with a proper noun from your page and count its pieces. That count is how many integers the network would receive for the name, and it is the number to have in your head the next time a model gets a name's spelling wrong.
+Then run it on a page of your own prose: lower-case it, split on anything that is not a letter, count the words, and train for 200 merges. The first merges will be the letter pairs English is made of, th, er, in, an and the like, followed by short common words; a word the page repeats often ends as a single entry, and a proper noun that appears once comes back in several pieces. Count those pieces. That count is how many integers the network would receive for the name, and it is the number to have in your head the next time a model gets a name's spelling wrong.
 
 *Sources: the LLM Engineering course (Ed Donner, Udemy), lectures 1.29 to 1.32 and 3.11 to 3.14, and the Mistral course (Udemy), lecture 3.2, paraphrased as study material; Uday Kamath et al., Large Language Models: A Deep Dive, §2.3.3 and §2.4.2.5; Sennrich, Haddow and Birch, Neural Machine Translation of Rare Words with Subword Units, arXiv:1508.07909, §3.2.*

@@ -1,0 +1,66 @@
+[
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "## Exercise: build the table and read a word off it",
+    "finding": "Toured, not explained. The catalog specifies the mechanism as 'Byte-pair merges map text to integer IDs from a fixed table', and paragraph 2 asserts that 'The essay builds one [table]'. However, the exercise code only returns the merge list from train() and outputs tuples of string subword chunks from encode(). The step constructing the vocabulary table mapping each token to an integer ID—and the lookup step in encode() mapping subwords to those integers—is completely omitted from the implementation.",
+    "evidence": "Inspected essays/tokens-not-characters.md lines 93–128. train() returns merges, and encode() returns tuple(out) containing string pieces like ('sung',) or ('g', 'un'). In workspace/tokens-not-characters/exercise.py line 45, the author originally computed vocab = sorted(set(''.join(corpus)) | {a + b for a, b in merges}), but omitted table construction and integer ID lookup from the essay's listing.",
+    "fix": "Build the vocabulary table in the exercise code (e.g. vocab = sorted(set(''.join(words)) | {a + b for a, b in merges}) and token_to_id = {t: i for i, t in enumerate(vocab)}), and update encode() to look up and return the integer IDs from that table."
+  },
+  {
+    "priority": 2,
+    "severity": "low",
+    "location": "takes about thirty lines to write",
+    "finding": "A number without a receipt. The count 'thirty lines' is an unreceipted casual figure in the prose. Under CONTEXT.md §4 ('Numbers or nothing. A number in the prose is either derived on the page, in a receipt, or absent. No numbers from memory.'), casual line estimates violate the rule (matching the 'twenty lines' finding accepted in model-is-a-learned-function).",
+    "evidence": "Checked corpus/tokens-not-characters/receipts.tsv; none of the 24 claims registers 'thirty lines'. Counting the code block in essays/tokens-not-characters.md lines 91–128 yields 38 total lines, 32 non-empty lines, and 28 lines of core logic.",
+    "fix": "Replace 'takes about thirty lines to write' with 'takes a single screen of code to write' or register the line count in receipts.tsv."
+  },
+  {
+    "priority": 2,
+    "severity": "low",
+    "location": "a 1994 compression trick",
+    "finding": "A number without a receipt. The historical year '1994' appears in the prose without an entry in receipts.tsv.",
+    "evidence": "Checked corpus/tokens-not-characters/receipts.tsv; '1994' does not appear anywhere in the file. While notes/essays/tokens-not-characters.md line 41 attributes the figure to Gage 1994 cited in arXiv:1508.07909 §3.2, claim tokens-17 omitted the year from its paraphrase.",
+    "fix": "Add Philip Gage's 1994 algorithm to the paraphrase of claim tokens-17 in corpus/tokens-not-characters/receipts.tsv, or change the prose to 'a classic compression trick'."
+  },
+  {
+    "priority": 3,
+    "severity": "medium",
+    "location": "A tokenizer does two things. It cuts text into chunks, and it looks each chunk up in a fixed table that maps every chunk it holds to an integer. The chunk is the token; the integer is the token ID; in practice people say \"token\" for both. Only the integers go forward. The vectors you may have heard of are produced later, inside the network, from those integers; they are not the input.",
+    "finding": "Close paraphrase of lecture 03-11. The prose closely tracks the instructor's sequence of concepts, terminology distinctions, and conversational aside regarding vectors.",
+    "evidence": "Compare essays/tokens-not-characters.md line 9 with resources/udemy-subs/course-6100015/03-11-day-3-tokenizers-how-llms-convert-text-to-numbers.txt lines 18–42 ('there are actually two steps to this job... A tokenizer first turns this into a bunch of things called tokens, which are these little chunks of words... And then a tokenizer turns that into a number... mapped to a number which is sometimes called the token ID... The token is the chunk, the ID is the number. People often say token when they mean token ID... strictly speaking the token is the chunk, the ID is the number') and lines 121–136 ('confusion to some people that have already heard about vectors... vectors come from deeper within the neural network... What comes in is token IDs for all models').",
+    "fix": "Rewrite the explanation to state the mechanical transformation into discrete table indices directly without following the transcript's conversational progression and 'vectors you may have heard of' framing."
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "best = max(pairs, key=lambda p: (pairs[p], p))   # ties broken alphabetically",
+    "finding": "Flawed code logic / misleading comment. The comment asserts that ties are broken alphabetically, but Python's max() evaluates tuple keys by selecting the largest element. When pair frequencies are equal, max() chooses the lexicographically greatest symbol pair ('z' over 'a'), breaking ties in reverse alphabetical order.",
+    "evidence": "Tested in Python 3.12: pairs = Counter({('a', 'b'): 1, ('z', 'a'): 1}); max(pairs, key=lambda p: (pairs[p], p)) returns ('z', 'a'). A reader implementing alphabetical tie-breaking as stated in the comment will diverge from this script on any dataset containing frequency ties.",
+    "fix": "Change the comment to '# ties broken in reverse alphabetical order', or adjust the key to sort alphabetically on tie-break, e.g. min(pairs, key=lambda p: (-pairs[p], p))."
+  },
+  {
+    "priority": 4,
+    "severity": "high",
+    "location": "Run on an earlier draft of this essay, about 1,800 words, the first eight merges were th, the, er, in, or, an, un and en, and \"and\" was the fourteenth entry; \"strawberry\" came back as seven pieces, st, ra, w, b, er, r, y, and \"snug\" as three, while \"sung\", which the page repeats often, was one entry.",
+    "finding": "Incorrect arithmetic and out-of-sync expected result. When recomputed on the essay's clean text for 200 merges, 'strawberry' encodes into six pieces ('st', 'ra', 'w', 'b', 'er', 'ry'), not seven pieces ('st', 'ra', 'w', 'b', 'er', 'r', 'y'). The pair ('r', 'y') is merged at step 129 because words such as 'every', 'vocabulary', and 'dictionary' appear frequently. Furthermore, the clean text contains 1,787 words (470 distinct), contradicting the 1,791 words (469 distinct) reported in receipts.tsv (tokens-24) and corpus/tokens-not-characters/run.log. The prose's hedge ('Run on an earlier draft of this essay') admits the divergence from the page.",
+    "evidence": "Recomputed 200 merges using workspace/tokens-not-characters/exercise.py on essays/tokens-not-characters.md with code blocks, tables, and source line excluded. The text contains exactly 1,787 words and 470 distinct words. Merge 129 is ('r', 'y'). encode('strawberry', merges) produces ('st', 'ra', 'w', 'b', 'er', 'ry') (6 tokens).",
+    "fix": "Re-run the trainer on the final essay prose, update the expected result in the prose to reflect the actual six pieces ('st, ra, w, b, er, ry') and current merge indices, and update corpus/tokens-not-characters/run.log and receipts.tsv claim tokens-24."
+  },
+  {
+    "priority": 5,
+    "severity": "low",
+    "location": "Real tables are also large: the course reports 128,256 entries for one open model's table, of which 256 are reserved.",
+    "finding": "Product claim stated without naming the model or bounding currency with an 'as of'. The figure 128,256 is the vocabulary size of Meta's Llama 3/3.1 (lecture 03-13). Stating it anonymously as 'one open model's table' without an 'as of' date leaves catalog.mjs caution unpopulated and violates CONTEXT.md §4 and §8.",
+    "evidence": "Checked resources/udemy-subs/course-6100015/03-13-day-3-how-chat-templates-work-llama-tokenizers-and-special-t.txt lines 17–20 ('128,256... That is the total size of llamas. Tokenizer'). Checked site/catalog.mjs: caution field is empty. notes/essays/tokens-not-characters.md line 76 acknowledges: 'caution: the 128,256 vocabulary and the four-characters rule are the course's figures as of its recording; the essay does not name the model family for the rule.'",
+    "fix": "Name and date the model in the prose ('Meta's Llama 3.1 table, as of 2024, has 128,256 entries, of which 256 are reserved special tokens'), and populate the caution field in site/catalog.mjs."
+  },
+  {
+    "priority": 9,
+    "severity": "medium",
+    "location": "The course this essay draws on gives about four characters per token, or about three quarters of a word, as the rule of thumb for English prose, and reports one sentence of 61 characters and 12 words arriving as 15 tokens; it also shows a long decimal split into three-digit chunks",
+    "finding": "Voice violation. The prose uses 'The course this essay draws on', violating CONTEXT.md §4 ('Courses are named study sources, in the receipts and the credit line, not in the prose'). In model-is-a-learned-function, the exact same issue was reviewed and accepted ('\"the course\" phrasing removed').",
+    "evidence": "CONTEXT.md §4: 'Courses are named study sources, in the receipts and the credit line, not in the prose... the essay names the course once where a figure is the course's, reported receipts carry the lecture numbers, and the source credit at the end lists them.' notes/essays/model-is-a-learned-function.md line 39 confirms: '\"the course\" phrasing removed'.",
+    "fix": "Remove 'The course this essay draws on gives... and reports' and present the figures directly: 'A common rule of thumb for English prose is about four characters per token, or about three quarters of a word; one standard benchmark sentence of 61 characters and 12 words arrives as 15 tokens. Long decimal expansions are split into three-digit chunks...'"
+  }
+]
