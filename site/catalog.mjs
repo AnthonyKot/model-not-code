@@ -53,7 +53,7 @@ export const essays = [
     [C("4735368", "03-05", "03-06", "03-07", "03-08", "03-09"), B("geron-pytorch")]),
   E("tokens-not-characters", "I", "Why the Model Cannot Count the Letters in “Strawberry”",
     "Byte-pair merges map text to integer IDs from a fixed table; tokens, not characters, are the unit of cost, context length and many errors.",
-    [C("6100015", "01-29", "01-30", "01-31", "01-32", "03-11", "03-12", "03-13", "03-14"), C("6538601", "03-02"), B("llm-deep-dive")]  // 01-24..01-27 held no tokenizer material (pitch note 2026-09-12)),
+    [C("6100015", "01-29", "01-30", "01-31", "01-32", "03-11", "03-12", "03-13", "03-14"), C("6538601", "03-02"), B("llm-deep-dive")]),  // 01-24..01-27 held no tokenizer material (pitch note 2026-09-12)
   E("attention-is-a-soft-lookup", "I", "Attention Is a Dictionary Lookup That Returns a Weighted Mix",
     "Scaled query·key scores, softmaxed, weight the values; a causal mask hides the future.",
     [C("6538601", "02-02"), C("6100015", "03-18"), C("4735368", "28-02"), B("raschka-qai")]),
@@ -73,7 +73,7 @@ export const essays = [
     [C("4735368", "08-03", "08-05", "11-04"), B("geron-pytorch")]),  // 08-02 and 08-04 have no captions on Udemy
   E("input-pipeline-is-the-bottleneck", "II", "Your GPU Is Waiting on Your JPEG Decoder",
     "Serialise once, read sequentially, map in parallel, prefetch: the producer–consumer pattern applied to training.",
-    [C("4735368", "11-05", "03-11"), B("dist-ml-patterns")]  // 10-04 is hyperparameter tuning; dropped (pitch note)),
+    [C("4735368", "11-05", "03-11"), B("dist-ml-patterns")]),  // 10-04 is hyperparameter tuning; dropped (pitch note)
   E("transfer-learning-freeze-then-thaw", "II", "Borrow the Eyes, Retrain the Judgement",
     "Freeze a pretrained backbone, train a new head, then unfreeze with a small learning rate.",
     [C("4735368", "13-01", "13-02", "12-03", "12-05"), B("geron-pytorch"), B("raschka-qai")]),
