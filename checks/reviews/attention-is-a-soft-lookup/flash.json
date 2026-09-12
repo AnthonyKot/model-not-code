@@ -1,0 +1,42 @@
+[
+  {
+    "priority": 1,
+    "severity": "high",
+    "location": "That parallelism is the training pass. One pass over S tokens produces S output rows, each scored against the next token in the document; the loss averages −log P(x<sub>i</sub> | x<sub>&lt;i</sub>) over every position i. One document, one pass, S predictions. Now read the table with that loss in mind. Row 3 is supposed to predict token 4, but column 4 of row 3 holds token 3's query scored against token 4's key, and token 4's value is in row 3's mix.",
+    "finding": "Toured, not explained. The explanation of the training pass mechanism contains a notation and indexing conflict between the sequence position and the predicted target. If row i represents token i's query and mixes representations up to position i, scoring row i against the next token means row i predicts token i + 1 (e.g. row 3 predicts token 4), so the loss term for row i is −log P(x_{i+1} | x_{≤i}). Stating the loss as '−log P(x_i | x_<i) over every position i' conflates row index i with target token index i. If position i in that formula were the row index, row i would be predicting token x_i from tokens preceding x_i; because causal masking includes the diagonal (column i), row i already contains token i's value in its mix, which would constitute cheating. Additionally, an input sequence of S tokens has only S − 1 subsequent tokens within that sequence; producing S next-token predictions requires an (S + 1)-token sequence or explicit start-token shifting.",
+    "evidence": "Checked essays/attention-is-a-soft-lookup.md lines 24–27 against corpus/attention-is-a-soft-lookup/receipts.tsv claim attention-15 and workspace/attention-is-a-soft-lookup/pages/llm-deep-dive-p81.txt eq. 2.21 (where i indexes targets across sequence x). In the essay's worked example, row 1 sees token 1 to predict token 2, row 2 sees tokens 1–2 to predict token 3, and row 3 sees tokens 1–3 to predict token 4.",
+    "fix": "Disambiguate the row index from the target token index: state that row i mixes tokens 1 through i to predict target token i + 1 with loss term −log P(x_{i+1} | x_{≤i}), and clarify that scoring S output rows against next tokens requires an (S + 1)-token document slice where target tokens are shifted by one."
+  },
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "Append a fourth token with key (0, 1, 0, 2), value (0, 2) and query (1, 0, 1, 1). Its column's scaled scores against rows 1 to 3 are 0.5, 1 and 0, none small enough to vanish on its own. With the mask, all three become −∞ and rows 1 to 3 come out bit for bit as before; row 4 has weights 0.297, 0.109, 0.297, 0.297 and output (0.594, 1.000).",
+    "finding": "Toured, not explained. A step is missing to recompute row 4's weights from the page. While the text details column 4's scaled scores against rows 1 to 3 (0.5, 1, 0), it omits the scaled scores for row 4 itself across keys 1 to 4. The prose jumps directly from the fourth token's vector definitions to its softmax weights (0.297, 0.109, 0.297, 0.297), skipping the raw dot products (2, 0, 2, 2), the scaled scores (1, 0, 1, 1), and the softmax denominator (e^1 + e^0 + e^1 + e^1 ≈ 9.155) that were explicitly shown for rows 1 to 3.",
+    "evidence": "Checked essays/attention-is-a-soft-lookup.md lines 48–64. Scaled scores for rows 1–3 are fully displayed in the table on line 50. For row 4, query (1, 0, 1, 1) dotted with keys (2,0,0,0), (0,2,0,0), (1,0,1,0), (0,1,0,2) yields dot products (2, 0, 2, 2) and scaled scores (1, 0, 1, 1); softmax is (2.718, 1.0, 2.718, 2.718) / 9.155 = (0.297, 0.109, 0.297, 0.297).",
+    "fix": "Provide row 4's scaled scores and softmax calculation before stating the weights: 'Row 4 scores query (1, 0, 1, 1) against keys 1 to 4 to get scaled scores (1, 0, 1, 1); softmax over (1, 0, 1, 1) gives weights 0.297, 0.109, 0.297, 0.297 and output (0.594, 1.000).'"
+  },
+  {
+    "priority": 2,
+    "severity": "medium",
+    "location": "Finally, this is one head. Real layers run several such lookups side by side on narrower projections and concatenate the results, for instance eight heads of width 64 in a 512-wide model; the mask is the same in every head.",
+    "finding": "A reported figure presented as the book's finding without source attribution. The architecture configuration 'eight heads of width 64 in a 512-wide model' is a reported figure from course-4735368 lecture 28-02 (the 2017 Transformer-base paper), registered with label 'reported' under claim attention-10 in receipts.tsv. In the prose it is stated as an uncredited anonymous example. CONTEXT.md §4 requires that 'the essay names the course once where a figure is the course's, reported receipts carry the lecture numbers, and the source credit at the end lists them,' and CONTEXT.md §5 specifies that reported figures must stay in the lecturer's mouth. Furthermore, notes/essays/attention-is-a-soft-lookup.md line 53 explicitly planned for this figure to be 'named as the course's report in the prose per the 2026-09-13 rule', but the drafting omitted the attribution.",
+    "evidence": "Checked essays/attention-is-a-soft-lookup.md line 80; neither the course nor the paper is named in the prose. Checked corpus/attention-is-a-soft-lookup/receipts.tsv claim attention-10 (label: reported, source: course-4735368 28-02). Checked notes/essays/attention-is-a-soft-lookup.md lines 53–54 and 82.",
+    "fix": "Attribute the configuration to the study source in the prose: 'for instance eight heads of width 64 in a 512-wide model, as reported in the TensorFlow course from the original Transformer; the mask is the same in every head.'"
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "Row 2, unmasked. Keep column 3: the softmax over (0, 2, 0) is 1, 7.389, 1 over 9.389, which is 0.107, 0.787, 0.107, and the output is 0.107 × (1, 0) + 0.787 × (0, 1) + 0.107 × (1, 1) = (0.213, 0.893).",
+    "finding": "Arithmetic that is wrong. The linear combination of the rounded weights printed on the page evaluates to (0.214, 0.894), not (0.213, 0.893). Evaluating the printed expression directly gives coordinate 1: 0.107 × 1 + 0.787 × 0 + 0.107 × 1 = 0.214, and coordinate 2: 0.107 × 0 + 0.787 × 1 + 0.107 × 1 = 0.894. The printed output (0.213, 0.893) was computed in Python from unrounded floating-point weights (w1 ≈ 0.106507, w2 ≈ 0.786986, w3 ≈ 0.106507) and rounded afterward, but asserting equality between the rounded expression and (0.213, 0.893) creates an arithmetic error when checked on the page.",
+    "evidence": "Recomputed by hand: 0.107 + 0.107 = 0.214; 0.787 + 0.107 = 0.894. Recomputed in Python 3.12: unrounded output is [2 / (2 + math.exp(2)), (math.exp(2) + 1) / (2 + math.exp(2))] = [0.2130139..., 0.893493...], which rounds to (0.213, 0.893), but the rounded weights evaluate to (0.214, 0.894).",
+    "fix": "Update the result of the printed linear combination to match the rounded weights: '0.107 × (1, 0) + 0.787 × (0, 1) + 0.107 × (1, 1) = (0.214, 0.894)', or clarify that (0.213, 0.893) is obtained using the unrounded weights (0.1065, 0.7870, 0.1065)."
+  },
+  {
+    "priority": 6,
+    "severity": "low",
+    "location": "The masked three-token rows print (1, 0), (0.119, 0.881) and (0.910, 0.335); after the append they print the same numbers and the first assertion passes, and row 4 prints (0.594, 1.000).",
+    "finding": "The exercise expected result specifies floating-point formats that diverge from the actual console output produced by the Python script. In Python 3.12, `[round(x, 3) for x in o]` strips trailing zeros from floating-point values and formats lists with brackets: row 1 prints `[1.0, 0.0]`, row 3 prints `[0.91, 0.335]` (not `(0.910, 0.335)`), and row 4 prints `[0.594, 1.0]` (not `(0.594, 1.000)`). A reader verifying output verbatim will encounter trailing zero and delimiter mismatches.",
+    "evidence": "Checked corpus/attention-is-a-soft-lookup/run.log lines 6, 8, and 20; executed essays/attention-is-a-soft-lookup.md lines 88–148 with Python 3.12.3.",
+    "fix": "Adjust the expected result description to match the script's actual printed representation: '`[1.0, 0.0]`, `[0.119, 0.881]` and `[0.91, 0.335]`; after the append they print the same numbers and the first assertion passes, and row 4 prints `[0.594, 1.0]`.'"
+  }
+]

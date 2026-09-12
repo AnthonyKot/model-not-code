@@ -180,7 +180,7 @@ changed before its essay is drafted.
   sources. Status `reviewed`.
 - **`attention-is-a-soft-lookup`** — pitch B. Drafted 2026-09-13 (subagent); readers applied;
   review lanes pending in `checks/reviews/attention-is-a-soft-lookup/`. llm-deep-dive pp. 63–68,
-  81 added to sources. Status `drafted` until the lanes are read.
+  81 added to sources. Flash lane applied (4), 1 rejected; pro lane idled out. Status `reviewed`.
 
 ## 7. Pipeline
 

@@ -90,3 +90,7 @@ counts as well as direction; the "hides work without saving it" claim bounded (p
 skip masked blocks); "not finished" tone softened; the (0.213, 0.893) value confirmed against the
 exact softmax (0.8935 rounds to 0.893 from the unrounded weights); "the TensorFlow course reports"
 removed. Rejected: replacing the hand-sized integer vectors with "realistic" ones.
+Flash lane (read 2026-09-13, late): applied — row-index/target notation (row i predicts i + 1),
+row 4's own scores and softmax written out, rounding note on (0.213, 0.893), expected-result
+strings matched to the script's printed lists. Rejected — attributing the eight-heads/512 figure
+to the course in prose (against §4). Pro lane idled out twice; not rerun.

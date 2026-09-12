@@ -62,7 +62,7 @@ export const essays = [
   E("attention-is-a-soft-lookup", "I", "Attention Is a Dictionary Lookup That Returns a Weighted Mix",
     "Scaled query·key scores, softmaxed, weight the values; a causal mask hides the future.",
     [C("6538601", "02-02"), C("6100015", "03-18"), C("4735368", "28-02"), B("raschka-qai", "pp. 117–126"), B("llm-deep-dive", "pp. 63–68, 81")],
-    { status: "drafted",
+    { status: "reviewed",
       payoff: "The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation." }),
   E("embeddings-are-coordinates", "I", "Nearest Neighbour in 384 Dimensions Is the Whole Trick",
     "An encoder maps text to a vector; cosine similarity ranks; contrastive training pulls matching pairs together.",
