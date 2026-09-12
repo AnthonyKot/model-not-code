@@ -45,7 +45,7 @@ Four things follow from that one line.
 
 **The scale s is set by a second hyperparameter, alpha.** Every LoRA configuration carries two numbers: r, the rank you have just met, and alpha. Alpha does not appear in the formula as itself. The scale that multiplies the correction is alpha divided by r, so the same alpha means a smaller scale at a larger rank. The reason for the division is that B·(A·x) is a sum of r terms, one per column of B, and would tend to grow as r grows; dividing by r keeps the correction's size roughly independent of the rank, so that a learning rate tuned at one r still works at another. Two consequences are worth keeping in mind when you copy settings from somewhere else. With alpha = 16, an adapter of rank 8 is applied at scale 16/8 = 2, and the same adapter at rank 64 at scale 16/64 = 0.25, an eightfold difference from one changed number. And the common rule of thumb alpha = 2r keeps the scale at exactly 2 whatever r you pick: 64/32 and 512/256 both give 2. Descriptions that call alpha "a multiplier" are shorthand for all of this.
 
-**The diff has rank at most r.** Write B·A out and it is the sum of r outer products: the first column of B times the first row of A, plus the second column times the second row, and so on. Each outer product is a rank-1 matrix, so their sum can express at most r independent directions of change. This is the bet LoRA makes: that the change your task needs is closer to a few directions than to an arbitrary matrix. The exercise at the end lets you see both cases.
+**The diff has rank at most r.** Write B·A out and it is the sum of r outer products: the first column of B times the first row of A, plus the second column times the second row, and so on. Each outer product is a rank-1 matrix, so their sum can express at most r independent directions of change. This is the bet LoRA makes: that the change your task needs is closer to a few directions than to an arbitrary matrix.
 
 ## Worked example: a diff of rank 1 you can write out, then the real sizes
 
@@ -113,47 +113,109 @@ Both files come out of one rule: for each target matrix, add its two widths and 
 
 ## What the rank cannot do
 
-Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it; the exercise shows this directly. Raising r raises the ceiling and the file size together, which is the trade behind the two configurations above: the heavier one was chosen when the training set grew from 20,000 rows to 800,000. There is no formula for the right r; target modules, r and alpha are found by trial against your evaluation metric.
+Rank is a ceiling, not a promise. If the change your task needs is spread across more independent directions than r, the adapter fits what it can and leaves the rest, and no number of training steps recovers it. Raising r raises the ceiling and the file size together, which is the trade behind the two configurations above: the heavier one was chosen when the training set grew from 20,000 rows to 800,000. There is no formula for the right r; target modules, r and alpha are found by trial against your evaluation metric.
 
 A diff of rank r is not a full fine-tune with fewer parameters. It is a different function class. Two runs with different r or different alpha are two different experiments, and the alpha convention above means a setting copied from one codebase may not mean the same thing in another.
 
 Finally, LoRA is only half of QLoRA. The other half, holding the frozen base in four-bit precision while the adapters stay in full precision, is why a 2.2 GB base plus a 73 MB adapter fits on the free card. How those four bits are chosen is the subject of a separate essay in Part IV. What matters here is that the quantisation is applied to the base and never to the diff.
 
 <!--mission-->
-## Exercise: see what a rank-4 diff can and cannot express
+## Exercise: the same mechanism in PyTorch
 
-You need Python with numpy and nothing else; no GPU, no model, no download. The script freezes a random 64 × 64 matrix W, attaches an adapter of rank 4 with A random and B zero, and trains A and B alone by gradient descent so that W + B·A approaches W + T. It does this for two targets T: one that is a single outer product, so it has rank 1, and one that is fully random. Real training never sees a target update; the gradient arrives through the task loss. The exercise removes that layer on purpose so that one question is left: what can a product of rank r express?
+This is what a LoRA layer is in real code, stripped of the library that usually hides it. It runs on a CPU in seconds; PyTorch is the only dependency.
 
 ```python
-import numpy as np
+import torch
+import torch.nn as nn
 
-rng = np.random.default_rng(0)
-d, r, steps, lr = 64, 4, 3000, 1e-3
+torch.manual_seed(0)
+d_in, d_out, r, alpha = 64, 64, 4, 8
 
-W = rng.standard_normal((d, d))          # the frozen base weight; never updated
-u, v = rng.standard_normal(d), rng.standard_normal(d)
-targets = {
-    "rank-1 target": np.outer(u, v),      # one column times one row
-    "random target": rng.standard_normal((d, d)),
-}
 
-for name, T in targets.items():
-    A = 0.1 * rng.standard_normal((r, d))  # random start, as in the paper
-    B = np.zeros((d, r))                   # zero start: B @ A == 0, so training begins at W
-    assert np.all(W + B @ A == W)
-    for _ in range(steps):
-        R = (W + B @ A) - (W + T)          # how far the adapted weight is from the target weight
-        gB, gA = 2 * R @ A.T, 2 * B.T @ R  # gradients of sum(R**2), both taken from the same R
-        B -= lr * gB
-        A -= lr * gA
-    S = np.linalg.svd(T, compute_uv=False) # singular values, largest first
-    best = (S[r:] ** 2).sum() / (S ** 2).sum()  # what the best rank-r matrix would leave
-    remaining = (R ** 2).sum() / (T ** 2).sum()
-    print(f"{name}: left unexplained after {steps} steps = {remaining:.3f}; best any rank-{r} matrix can do = {best:.3f}")
+class LoRALinear(nn.Module):
+    """A frozen nn.Linear with a trainable low-rank diff beside it."""
+
+    def __init__(self, base: nn.Linear, r: int, alpha: float):
+        super().__init__()
+        self.base = base
+        for p in self.base.parameters():
+            p.requires_grad = False                                   # freeze W (and its bias)
+        self.A = nn.Parameter(0.01 * torch.randn(r, base.in_features))  # r x d_in, random start
+        self.B = nn.Parameter(torch.zeros(base.out_features, r))        # d_out x r, zero start
+        self.scale = alpha / r
+
+    def forward(self, x):
+        return self.base(x) + self.scale * (x @ self.A.T @ self.B.T)  # W·x + s · B·(A·x)
+
+    def merge(self):
+        with torch.no_grad():
+            self.base.weight += self.scale * (self.B @ self.A)        # fold the diff into W
+        return self.base
+
+
+base = nn.Linear(d_in, d_out)
+layer = LoRALinear(base, r, alpha)
+
+trainable = sum(p.numel() for p in layer.parameters() if p.requires_grad)
+frozen = sum(p.numel() for p in layer.parameters() if not p.requires_grad)
+print(f"trainable {trainable}, frozen {frozen}")
+
+# The behaviour we want: the base layer plus a rank-1 change. The adapter has to learn the change.
+u, v = torch.randn(d_out, 1), torch.randn(1, d_in)
+with torch.no_grad():
+    W_target = base.weight + u @ v
+target = nn.Linear(d_in, d_out)
+with torch.no_grad():
+    target.weight.copy_(W_target)
+    target.bias.copy_(base.bias)
+
+opt = torch.optim.Adam([p for p in layer.parameters() if p.requires_grad], lr=1e-2)
+for step in range(1, 501):
+    x = torch.randn(32, d_in)
+    loss = ((layer(x) - target(x)) ** 2).mean()
+    opt.zero_grad()
+    loss.backward()
+    opt.step()
+    if step in (1, 10, 100, 500):
+        print(f"step {step:3d}: loss {loss.item():.4f}   W.grad is None: {base.weight.grad is None}")
+
+adapter = {k: v for k, v in layer.state_dict().items() if not k.startswith("base.")}
+print("adapter file holds:", {k: tuple(v.shape) for k, v in adapter.items()},
+      "=", sum(v.numel() for v in adapter.values()) * 4, "bytes")
+
+x = torch.randn(8, d_in)
+with torch.no_grad():
+    before = layer(x)
+    merged = layer.merge()
+    print(f"max difference between adapter and merged outputs: {(merged(x) - before).abs().max().item():.2e}")
 ```
 
-**Expected result.** This script was run with numpy 2.5.3 and seed 0 (the output is in the essay's corpus). The rank-1 target is fitted to 0.000 remaining: a rank-4 adapter contains a rank-1 change with room to spare. The random target stalls at 0.780 remaining, and no extra steps move it. The last two lines of the loop say why. The squared singular values of T add up to its total squared size, and the best rank-r matrix keeps the r largest, so the fraction any rank-4 matrix must leave behind is the sum of the squared singular values from the fifth onward over the sum of all of them. For this random matrix that is 0.780, the same number gradient descent reached. The adapter found the ceiling, and the ceiling is r.
+What each part does:
 
-Two things to try once that matches. First, confirm the assertion before the loop is doing real work by changing B's start to random and checking that W + B·A no longer equals W at step zero. Second, raise r to 8 and 16 for the random target and record the remaining fraction each time. It falls, and each doubling of r doubles the adapter's 2 × 64 × r numbers, which is the trade the rest of the essay was about.
+- **`for p in self.base.parameters(): p.requires_grad = False`** is the freeze. Autograd will still run through the base layer, because the adapter's gradient needs the layer's input, but it will not allocate or store a gradient for W or its bias. The printout confirms it on every step: `W.grad is None: True`.
+- **`self.A` and `self.B`** are the two adapter matrices, with the starting values the mechanism requires: A small and random, B all zeros, so that B·A is zero and the first forward pass is the untouched layer.
+- **`self.scale = alpha / r`** is the scale s from the formula, computed once from the two hyperparameters.
+- **`forward`** is the formula line for line: the base layer's output plus s times the input pushed through A and then B. The order of the matrix products matters for cost: `x @ self.A.T` produces r numbers per row of x before `@ self.B.T` stretches them back out, so the d<sub>out</sub> × d<sub>in</sub> diff is never built.
+- **The parameter count** prints as 512 trainable against 4,160 frozen: (64 + 64) × 4 for the adapter, 64 × 64 + 64 for the base weight and bias. That is the (d<sub>in</sub> + d<sub>out</sub>) × r rule on a layer small enough to check.
+- **The optimiser** is handed only the parameters with `requires_grad` set, so its running state, the memory that a full fine-tune pays for every weight, exists for the 512 adapter numbers and nothing else.
+- **The training loop** is an ordinary loop. The target here is the base layer plus a rank-1 change, built on purpose so that a rank-4 adapter can represent it exactly; the loss falls from about 70 to 0.0000 by step 500. Replace the target with an arbitrary matrix and the loss flattens above zero at whatever a rank-4 diff can reach, which is the ceiling the essay described.
+- **The adapter file** is the state dict with the base's entries removed: two tensors, shapes (4, 64) and (64, 4), 2,048 bytes at four bytes a number. This is the object that a fine-tuning run saves and a serving system loads beside the base.
+- **`merge`** folds the diff into W with one in-place addition, s·B·A, for serving without the extra matrix products; the maximum difference between the merged layer's output and the adapter's is about 10<sup>−5</sup>, floating-point noise. Merging is one-way: keep the adapter file if you want to remove the change later.
+
+**Expected result.** Run with PyTorch 2.14 on a CPU, seed 0; the full output is in the essay's corpus. Trainable 512, frozen 4,160; `W.grad is None: True` on every printed step; the loss reaches 0.0000 by step 500; the adapter holds A (4, 64) and B (64, 4), 2,048 bytes; the merged and unmerged outputs differ by less than 10<sup>−5</sup>.
+
+In a training library the same three moves, freeze, attach, train the attachment, are one configuration object. With the Hugging Face PEFT library, the configuration for the rank-32 attention-only setup from the tables above is:
+
+```python
+# illustrative, not executed; API as of the course's library versions
+from peft import LoraConfig, get_peft_model
+
+config = LoraConfig(r=32, lora_alpha=64, lora_dropout=0.1,
+                    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])
+model = get_peft_model(base_model, config)
+model.print_trainable_parameters()
+```
+
+Every field maps onto something in the snippet above: `r` and `lora_alpha` set the shapes and the scale, `target_modules` names which linear layers get wrapped, and `lora_dropout` drops a fraction of the adapter's input during training. The number `print_trainable_parameters` reports for that configuration is the 18,350,080 the essay computed.
 
 *Sources: the LLM Engineering course (Ed Donner, Udemy), lectures 7.2 to 7.6, 7.11, 7.12 and 7.20, paraphrased as study material; Sebastian Raschka, Machine Learning Q and AI, Leanpub edition of 2023-05-21, pp. 141–142; Hu et al., LoRA: Low-Rank Adaptation of Large Language Models, arXiv:2106.09685, §4.1 and §4.2.*

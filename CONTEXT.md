@@ -167,6 +167,11 @@ changed before its essay is drafted.
   more than three terms goes in a table, and a shape or flow gets a picture.
   (6) "What Q&A book, let's stop referencing. We are the source of truth for the reader" — the
   Raschka-error paragraph is cut; no essay discusses a source's mistakes; the receipts keep them.
+  (7) The numpy exercise was not the code the reader wants to see — "insert a real PyTorch
+  snippet and explain what happens in real code". Replaced by a from-scratch LoRA layer in
+  PyTorch, run on CPU, explained line by line, plus the PEFT config as an illustrative snippet.
+  Lesson for the contract: the exercise shows the mechanism in the code a practitioner would
+  actually write (PyTorch by default), still CPU-only, still run with its output in the corpus.
 
 ## 7. Pipeline
 

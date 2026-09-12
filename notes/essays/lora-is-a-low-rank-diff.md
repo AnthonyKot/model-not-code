@@ -85,3 +85,9 @@ mechanism and may cite 07-03/07-05 for the 4-bit levels; this essay uses only th
 6. "What Q&A book, let's stop referencing. We are the source of truth for the reader." Applied:
    the paragraph about the Raschka page's 25 × 50 error is cut; receipt lora-16 stays `disputed`
    for the record; the credit line still names the book.
+7. "I love to see some code, but not this example. Let's insert a real PyTorch snippet and
+   explain what happens in real code." Applied: the numpy rank-ceiling exercise is replaced by a
+   from-scratch `LoRALinear` in PyTorch (freeze, attach A and B, scale, optimiser on the adapter
+   only, adapter state dict, merge), run on CPU (PyTorch 2.14, `workspace/…/lora_torch.py`,
+   output in run.log), walked through line by line, followed by the equivalent PEFT
+   configuration captioned illustrative. Receipt lora-18 rewritten, lora-23 added.

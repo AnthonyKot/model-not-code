@@ -1,2 +1,7 @@
-rank-1 target: left unexplained after 3000 steps = 0.000; best any rank-4 matrix can do = 0.000
-random target: left unexplained after 3000 steps = 0.780; best any rank-4 matrix can do = 0.780
+trainable 512, frozen 4160
+step   1: loss 69.5679   W.grad is None: True
+step  10: loss 62.8472   W.grad is None: True
+step 100: loss 0.3258   W.grad is None: True
+step 500: loss 0.0000   W.grad is None: True
+adapter file holds: {'A': (4, 64), 'B': (64, 4)} = 2048 bytes
+max difference between adapter and merged outputs: 9.54e-06
