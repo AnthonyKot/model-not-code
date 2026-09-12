@@ -1,6 +1,7 @@
 # Source books and full-text extraction workspaces are local-only.
 resources/*
 !resources/README.md
+!resources/MANIFEST.tsv
 workspace/*
 !workspace/README.md
 

@@ -175,6 +175,18 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   8.5 instead. Section 33 of the TensorFlow course is lecture-for-lecture the same as the
   Mistral course; cite `6538601` as primary.
 
+- **2026-09-12 (late)** — Pitch gate run for Parts I and II (12 slugs × 3 pitches in
+  `notes/pitches/`, agents' picks in `notes/pitches/PICKS-I-II.md`; the author has not picked yet).
+  Catalog corrected from the pitch writers' source notes: `tokens-not-characters` cites 01-29..01-32
+  (01-24..01-27 held no tokenizer material); `input-pipeline-is-the-bottleneck` drops 10-04. Other
+  notes to carry into drafting: no cited lecture explains the BPE merge procedure (source it from
+  `llm-deep-dive`); only 4735368/28-02 carries the causal mask with shapes; LoRA lectures describe
+  alpha as a plain multiplier where the paper uses alpha/r (follow the paper, say so), and 07-06's
+  "17MB" is a slip for ~70MB; none of the PPO lectures mentions RLHF (rests on arXiv:2203.02155
+  §3.5); the RL lectures show formulas only on slides, so Lapan's pages are needed for the written
+  updates. codex was unavailable (usage limit); the phase-0 port was done by a Sonnet agent
+  (`notes/codex/phase0-report.md`); review.sh/readers.sh are ported but not yet exercised.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

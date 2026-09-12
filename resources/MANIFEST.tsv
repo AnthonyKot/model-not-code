@@ -1,0 +1,23 @@
+key	kind	path	size_mb	pages	title	edition_note
+huyen-dmls	book	downloads/ABUIABA9GAAghIK0ugYowM2h3QY.pdf	6	339	Designing Machine Learning Systems	-
+geron-pytorch	book	books/hands.on.machine.learning.with.scikit.learn.and.pytorch.pdf	66	878	Hands-On Machine Learning with Scikit-Learn and PyTorch	-
+geron-keras	book	books/_Hands_On_Machine_Learning_with_Scikit_Learn,_Keras,_and_TensorFlow.pdf	21	1351	Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow	earlier edition of the Géron book (Keras/TensorFlow, not PyTorch)
+raschka-qai	book	books/machine.learning.q.and.ai.pdf	13	231	Machine Learning Q and AI	-
+burkov-mle	book	books/Machine Learning Engineering (Andriy Burkov) (2).pdf	39	274	Machine Learning Engineering	no embedded PDF title; from filename
+lapan-drl	book	books/Deep_Reinforcement_Learning_Hands_On,_3rd_Edition_Maxim_Lapan (2).epub	96	unknown	Deep Reinforcement Learning Hands-On	3rd edition; EPUB, page count unknown
+dist-ml-patterns	book	books/Manning.Distributed.Machine.Learning.Patterns (2).pdf	10	248	Distributed Machine Learning Patterns	-
+inference-eng	book	books/Inference Engineering.pdf	24	259	Inference Engineering	-
+llm-serving	book	books/hands.on.llm.serving.and.optimization (2).epub	11	unknown	Hands-On LLM Serving and Optimization	EPUB, page count unknown
+building-llm-apps	book	books/building.llm.powered.applications.pdf	23	343	Building LLM Powered Applications	-
+stats-programmers	book	books/statistics.every.programmer.Needs.pdf	48	450	Statistics Every Programmer Needs	-
+quant-ru	book	books/Введение в Квантизацию.pdf	7	72	Введение в Квантизацию	Russian-language
+llm-deep-dive	book	books/Large_Language_Models_A_Deep_Dive_Bridging_Theory_and_Practice_Uday.pdf	31	496	Large Language Models: A Deep Dive — Bridging Theory and Practice	no embedded PDF title; from filename
+owasp-llm	book	books/owasp.top.10.for.llms.pdf	9	45	OWASP Top 10 for LLMs	no embedded PDF title; from filename
+llm-security-playbook	book	books/the.developers.playbook.for.llm.security.pdf	5	200	The Developer's Playbook for Large Language Model Security	-
+staff-eng-path	book	books/the.staff.engineer's.path.pdf	9	359	The Staff Engineer's Path	-
+ml-system-design	book	books/machine.learning.system.design (2).epub	15	unknown	Machine Learning System Design	EPUB, page count unknown
+acing-sdi	book	books/Manning.Acing.the.System.Design.Interview.pdf	13	473	Acing the System Design Interview	-
+ds-hard-parts	book	books/data_science_the_hard_parts_techniques_for_excelling_at_data_scie.pdf	9	257	Data Science: The Hard Parts	-
+ts-foundation	book	books/time.series.forecasting.using.foundation.models.pdf	19	258	Time Series Forecasting Using Foundation Models	-
+smol-playbook-ru	book	books/SMOL_секреты_создания_LLM_мирового_класса_Перевод_t_me_aivkube.pdf	15	200	SMOL: секреты создания LLM мирового класса	Russian translation of the Hugging Face Smol training playbook; no embedded PDF title
+instructgpt	paper	books/2203.02155v1.pdf	2	68	Training language models to follow instructions with human feedback	arXiv:2203.02155; no embedded PDF title
