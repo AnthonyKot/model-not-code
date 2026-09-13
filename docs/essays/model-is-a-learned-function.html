@@ -102,7 +102,7 @@
       <h1 class="essay-title">The Program Is Now a Table of Numbers, and Training Is the Compile Step</h1>
       <p class="essay-payoff">The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong.</p>
     </header>
-    <nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> <a href="model-is-a-learned-function.html" aria-current="page">Current version</a> · <a href="model-is-a-learned-function--previous.html">Previous version</a></nav>
+    
     <article class="prose"><p>A model is a function whose parameters, the numbers that control its output, are fitted to data. You choose the function&#39;s form and how to measure its errors. Training repeatedly changes the parameters to reduce those errors. The resulting values determine the predictions when you run the model. In that sense training plays the part a compiler plays in ordinary software: it turns what you specified, a function&#39;s form, a loss and a dataset, into the artifact you ship, which is a table of numbers rather than machine code.</p>
 <h2 id="three-points-and-a-starting-loss">Three points and a starting loss</h2>
 <p>Take the example points (1, 2), (2, 4) and (3, 6). Each pair contains an input x and its known answer y. A straight-line model predicts m·x + c: m is the <strong>weight</strong>, which multiplies the input, and c is the <strong>bias</strong>, which adds a fixed offset. Here m is the line&#39;s slope and c its intercept. The points lie on y = 2x, so m = 2 and c = 0 would fit them exactly.</p>

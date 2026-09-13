@@ -102,7 +102,7 @@
       <h1 class="essay-title">Why the Model Cannot Count the Letters in “Strawberry”</h1>
       <p class="essay-payoff">How a tokenizer's table is built by counting, why a common word reaches the network as one integer, and what that does to any question about its letters.</p>
     </header>
-    <nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> <a href="tokens-not-characters.html" aria-current="page">Current version</a> · <a href="tokens-not-characters--previous.html">Previous version</a></nav>
+    
     <article class="prose"><p>A <strong>tokenizer</strong> cuts your text into fragments and replaces each fragment with an integer from a fixed table. Each fragment is a <strong>token</strong>; its integer is a <strong>token ID</strong>. The language model receives those IDs. A question about a word&#39;s letters therefore need not arrive as a sequence of individual letters.</p>
 <p>The model uses each ID to select an <strong>embedding</strong>, a row of learned numbers representing that token inside the network. The tokenizer&#39;s table maps text to IDs; the embedding table maps IDs to numbers used in computation. Only the latter is adjusted during model training.</p>
 <p>Here is the whole path for one word, using the eight-entry table this essay builds below and a four-number embedding table initialised with a fixed random seed:</p>

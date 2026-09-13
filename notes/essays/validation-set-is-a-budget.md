@@ -74,3 +74,5 @@ readers) — it is the installed version, 2.14.0+cpu; "stop calling sampling err
 sceptic) — the essay defines the term on first use; independent equal candidates as "artificial" —
 the limits section and the correlated-checkpoint run already measure the realistic case.
 Receipt valid-14 (12.81) withdrawn.
+
+**Author's pick (2026-09-13 evening):** the codex tight rewrite is now the essay; the previous version is in git history only.

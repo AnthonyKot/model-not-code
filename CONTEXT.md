@@ -314,6 +314,12 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   tighter register published *alongside* the current versions so they can compare and choose per
   essay; Parts III–IV wait until Parts I–II are final.
 
+- **2026-09-13 (evening)** — Versions picked for essays 1–5; one page per essay, comparison variants
+  removed (older versions stay in git history). Essay 1: the codex rewrite. Essay 2: the shorter
+  rewrite plus trace. Essay 3: the shorter version rewritten as one story. Essay 4: the original (the
+  codex variant was rejected; two passages await a practitioner-register redo). Essay 5: the codex
+  tight rewrite.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this
