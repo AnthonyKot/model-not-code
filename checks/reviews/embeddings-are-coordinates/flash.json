@@ -1,0 +1,58 @@
+[
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "both are renormalised onto the circle.",
+    "finding": "The caption asserts that both document vectors are renormalised onto the circle after the update step, but Table 2 leaves the updated vectors unnormalised with lengths 1.0602 and 1.0343, and calculates the new cosine by dividing the dot product with q by those lengths. The vectors themselves were never renormalised in the worked example.",
+    "evidence": "Table 2 gives lengths 1.0602 and 1.0343 and computes new cosines via 0.8819 / 1.0602 = 0.832 and 0.6415 / 1.0343 = 0.620. The exercise code confirms `docs -= 0.05 * docs.grad` is not normalised in place.",
+    "fix": "Reword the caption to clarify that only their directions are projected onto the circle for the diagram, e.g.: 'The match rotates towards the query and the negative away from it; their directions are plotted on the circle (lengths after the step are 1.0602 and 1.0343).'"
+  },
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "| after a step of 0.05: d − 0.05 × gradient |",
+    "finding": "The step size (learning rate) 0.05 is introduced abruptly in the table row header without introduction or explanation in the prose. The reader cannot recompute why or how the update equation d - 0.05 * gradient is chosen without having gradient descent and its step size defined.",
+    "evidence": "Inspected lines 35–57 of essays/embeddings-are-coordinates.md. The hyperparameter 0.05 is not mentioned anywhere in the prose before appearing in the table row header.",
+    "fix": "Add a sentence before Table 2 introducing gradient descent with a chosen learning rate, e.g.: 'Take a gradient step with learning rate 0.05: update each document vector by subtracting 0.05 times its loss gradient.'"
+  },
+  {
+    "priority": 4,
+    "severity": "high",
+    "location": "| loss gradient per unit of cosine | (0.119 − 1)/0.1 = −8.808 | 0.881/0.1 = +8.808 |",
+    "finding": "Arithmetic contradiction on the page: evaluating the displayed expressions yields (0.119 - 1)/0.1 = -0.881 / 0.1 = -8.810 (not -8.808) and 0.881 / 0.1 = +8.810 (not +8.808). The printed values -8.808 and +8.808 require using four-decimal softmax probabilities (0.1192 and 0.8808), but the preceding table row displays three-decimal values (0.119 and 0.881).",
+    "evidence": "Recomputed: (0.119 - 1) / 0.1 = -8.810; 0.881 / 0.1 = 8.810. With 1 / (1 + e^2) = 0.1192029..., (0.1192 - 1) / 0.1 = -8.808 and 0.8808 / 0.1 = +8.808.",
+    "fix": "Display four decimal places for the softmax probabilities in the table: change 0.119 to 0.1192 and 0.881 to 0.8808, and write (0.1192 − 1)/0.1 = −8.808 and 0.8808/0.1 = +8.808."
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "The loss is −ln 0.119 = 2.127.",
+    "finding": "Arithmetic error: -ln(0.119) evaluates to 2.1286 (which rounds to 2.129), not 2.127. The value 2.127 is -ln(0.1192).",
+    "evidence": "Recomputed: -math.log(0.119) = 2.12863..., whereas -math.log(0.1192) = 2.12695... which rounds to 2.127.",
+    "fix": "Change to 'The loss is −ln 0.1192 = 2.127.'"
+  },
+  {
+    "priority": 5,
+    "severity": "low",
+    "location": "in one family of sentence encoders \"multi\" means multiple sources, not multiple languages.",
+    "finding": "A specific model library's historical naming convention (the sentence-transformers multi-qa checkpoints) is presented as a general rule without naming the library or bounding it with an 'as of'.",
+    "evidence": "Checked course-4735368 lecture 34-04 lines 858–875 and corpus/embeddings-are-coordinates/receipts.tsv entry embeddings-14 ('as of the course recording; the sentence-transformers naming (multi-qa vs multilingual)').",
+    "fix": "Name the model family and date the claim: 'in the Sentence Transformers family of models as of 2024, \"multi\" indicates multiple training sources (such as multi-qa), not multiple languages.'"
+  },
+  {
+    "priority": 8,
+    "severity": "low",
+    "location": "training never stops pushing.",
+    "finding": "Anthropomorphism that hides the mechanism: 'training' does not 'push'; rather, the gradient of the loss with respect to the cosines remains non-zero even with extreme cosine differences at temperature 1.",
+    "evidence": "Re-read line 27 of essays/embeddings-are-coordinates.md.",
+    "fix": "Replace with 'the loss gradient never vanishes' or 'the loss continues to produce non-zero gradients on every step'."
+  },
+  {
+    "priority": 8,
+    "severity": "low",
+    "location": "The loss is satisfied once the true pair beats the others by enough",
+    "finding": "Anthropomorphism that hides the mechanism: a loss function cannot be 'satisfied'; the mechanism is that the gradient of the cross-entropy loss with respect to the logits approaches zero once the logit margin is large enough.",
+    "evidence": "Re-read line 99 of essays/embeddings-are-coordinates.md.",
+    "fix": "Replace with 'The loss gradient approaches zero once the true pair beats the others by enough' or 'The loss flattens once the true pair score exceeds the others by enough'."
+  }
+]

@@ -74,3 +74,5 @@ and source line excluded); 1,728 with headings and the three formula lines also 
 **Owed to other essays.** The storage-side fix (record files, shards) is pitch B's territory and is
 one sentence here; caching a frozen backbone's outputs is pitch C / `transfer-learning-freeze-then-thaw`;
 "a cached random augmentation stops being random" touches `augmentation-declares-invariance`.
+
+**Review (2026-09-13):** codex consolidation (Gemini flash + pro lanes) and reader personas. Applied by the main session (Opus 5) after codex hit its usage limit — four findings: the Epoch column is relabelled a steady-state estimate with startup and drain excluded; the DataLoader-defaults section now opens "As of PyTorch 2.14"; the PyTorch 2.14 dataloader source and Python multiprocessing docs added to catalog sources with a dated caution; "before the loop feels it" → the result queue empties and the training loop blocks.

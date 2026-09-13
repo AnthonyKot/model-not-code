@@ -1,5 +1,5 @@
-old 0.30 new 0.60 A +1: r 2.000  objective +1.200  d loss/d logp +0.000
-old 0.30 new 0.60 A -1: r 2.000  objective -2.000  d loss/d logp +2.000
+old 0.25 new 0.50 A +1: r 2.000  objective +1.200  d loss/d logp +0.000
+old 0.25 new 0.50 A -1: r 2.000  objective -2.000  d loss/d logp +2.000
 old 0.50 new 0.35 A -1: r 0.700  objective -0.800  d loss/d logp +0.000
 old 0.50 new 0.35 A +1: r 0.700  objective +0.700  d loss/d logp -0.700
 pi_old [0.122, 0.547, 0.331]

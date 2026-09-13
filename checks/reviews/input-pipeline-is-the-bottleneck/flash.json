@@ -1,0 +1,34 @@
+[
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "| one worker, overlapped | max(256, 80) | 256 | 31.3% | 40.2 s |",
+    "finding": "Toured, not explained: missing step in epoch duration derivation. Line 21 introduces the total time over n steps as 'n × max(L, C) + min(L, C): one extra copy of the shorter stage, paid at the start or the end of the run.' When a reader applies this formula to the worked example's 157-step epoch for one worker (L = 256 ms, C = 80 ms), the result is 157 × 256 + 80 = 40,272 ms = 40.272 s, which rounds to 40.3 s, not the printed 40.2 s. For two workers, 157 × 128 + 80 = 20,176 ms = 20.176 s, which rounds to 20.2 s, not 20.1 s. The table calculates steady-state epoch duration (157 × step) rather than the total run formula, omitting the warm-up term min(L, C). Because the prose does not explain that the table drops the one-off boundary term as negligible over 157 steps, the worked example numbers cannot be cleanly recomputed from the formula on the page.",
+    "evidence": "Checked essays/input-pipeline-is-the-bottleneck.md lines 21, 60, and 67–73. Recomputed: 157 × 256 ms + 80 ms = 40,272 ms = 40.272 s (40.3 s vs printed 40.2 s); 157 × 128 ms + 80 ms = 20,176 ms = 20.176 s (20.2 s vs printed 20.1 s). Checked corpus/input-pipeline-is-the-bottleneck/receipts.tsv claim pipe-07 (showing 157 × 0.256 = 40.192 -> 40.2 s) and notes/essays/input-pipeline-is-the-bottleneck.md line 50 ('Added: the one-off n·max + min term (the pitch's per-step view omits the warm-up edge)').",
+    "fix": "Clarify in the paragraph introducing the table or in the table column header that the epoch column calculates the steady-state total (157 × step), noting that over 157 steps the initial warm-up cost (at most 80–256 ms) represents less than 0.2% of the epoch and is omitted from the table; or update the table figures to 40.3 s and 20.2 s."
+  },
+  {
+    "priority": 5,
+    "severity": "medium",
+    "location": "## What the data loader does with these knobs",
+    "finding": "Framework defaults and API claims stated without version or 'as of' bounding. The section describes PyTorch DataLoader arguments and behaviors—such as num_workers defaulting to 0, prefetch_factor defaulting to 2 when num_workers > 0, pin_memory=True, and persistent_workers=True—as universal properties without dating them in the text. In addition, the catalog entry in site/catalog.mjs line 98 omits any version bounding in its caution field (unlike other essays, such as class-imbalance-changes-the-loss, which specifies 'PyTorch loss arguments as of 2.14'), violating CONTEXT.md §8 ('product and API currency (bounded with \"as of\" in the caution field; tools are examples)').",
+    "evidence": "Checked CONTEXT.md §4, §8, and site/catalog.mjs line 98 (caution field specifies only steady state and CPU cores). Checked essays/input-pipeline-is-the-bottleneck.md lines 81–90.",
+    "fix": "Add version qualification to the section (e.g. 'In PyTorch (as of version 2.14)...') and update the caution field in site/catalog.mjs line 98 to include 'PyTorch DataLoader arguments and defaults as of 2.14'."
+  },
+  {
+    "priority": 5,
+    "severity": "low",
+    "location": "*Sources: the Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.11, 11.4 and 11.5, paraphrased as study material; Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, chapter 10, the data loader section; Yuan Tang, Distributed Machine Learning Patterns, the work-queue and caching patterns; the PyTorch 2.14 `torch.utils.data` source.*",
+    "finding": "Incomplete source register in catalog. The source credit line cites the PyTorch 2.14 torch.utils.data source, and receipts.tsv registers claims pipe-12, pipe-13, and pipe-14 against https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py. However, this source is missing from sources[] in site/catalog.mjs.",
+    "evidence": "Checked site/catalog.mjs line 95: sources[] contains only C(\"4735368\", ...), B(\"geron-pytorch\", ...), and B(\"dist-ml-patterns\", ...). Checked notes/essays/input-pipeline-is-the-bottleneck.md line 71, which noted adding the PyTorch source to the catalog.",
+    "fix": "Add P(\"https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py\", \"DataLoader and _MultiProcessingDataLoaderIter\") to sources[] for input-pipeline-is-the-bottleneck in site/catalog.mjs."
+  },
+  {
+    "priority": 8,
+    "severity": "low",
+    "location": "The depth decides how large a burst of slow batches is absorbed before the loop feels it, and how much RAM waiting batches occupy.",
+    "finding": "Anthropomorphism that hides the mechanism. 'decides' is an anthropomorphic verb explicitly banned by CONTEXT.md §4 and flagged by consistency checks, used here without a following clause explaining what it stands for mechanically. Furthermore, 'before the loop feels it' attributes sensory feeling to a software loop; mechanically, the training loop blocks or starves when the result queue is empty.",
+    "evidence": "Checked checks/consistency.mjs line 111 (which emits 'WARN: input-pipeline-is-the-bottleneck anthropomorphism — decides:1') and CONTEXT.md §4 ('No anthropomorphism that hides the mechanism... The word is allowed only when the next clause says what it stands for').",
+    "fix": "Replace 'The depth decides how large a burst of slow batches is absorbed before the loop feels it' with 'The queue depth determines how large a burst of slow batches is absorbed before the training loop blocks'."
+  }
+]

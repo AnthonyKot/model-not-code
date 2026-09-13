@@ -10,7 +10,7 @@ A pretrained image network splits into a backbone, everything from the input up 
 
 The new head starts random, so its early loss gradients are large. They flow back into the backbone and can wreck weights that took a long pretraining run to reach. So the first stage freezes the backbone: with `requires_grad = False` autograd computes no gradient for its parameters and the optimiser has nothing to apply.
 
-Once the head is sensible, the second stage thaws the backbone and trains everything, the backbone with a smaller learning rate. The learning rate is the step size: each update moves a weight by the rate times its gradient. A smaller rate lets the backbone adjust to your data without overwriting what it already computes; dividing the head's rate by 10 is a common start, and some setups go to 100. Adapter methods such as LoRA, in a later essay, keep the freeze and replace the thaw with a small trained diff.
+After the head-only training stage, thaw the backbone and train everything, the backbone with a smaller learning rate. The learning rate is the step size: each update moves a weight by the rate times its gradient. A smaller rate lets the backbone adjust to your data without overwriting what it already computes; dividing the head's rate by 10 is a common start, and some setups go to 100. Adapter methods such as LoRA, in a later essay, keep the freeze and replace the thaw with a small trained diff.
 
 ## A layer has two kinds of state
 
@@ -94,7 +94,7 @@ The thaw needs two learning rates, and PyTorch's mechanism for that is parameter
 
 Freezing the statistics has a cost. In the exercise, letting the buffers follow the new data gave the new head 98.5%; keeping them frozen gave 80.6%, and a thaw at a tenth of the head's rate raised that to 89.4%. Normalised with the old statistics, the shifted inputs land far from the values the pretrained layers were fitted on, and re-estimating the statistics on the new domain is itself a form of adaptation.
 
-What it cannot be is an accident. The same run took the old task from 99.4% to 53.4%. If the backbone is shared with another head, cached, or compared across runs, a drifted backbone is a different model under the same weights file. Choose which you want, set the BatchNorm mode to match, and measure both tasks. The exercise's shift is deliberately extreme; on real data the gaps will be smaller and may reverse, which is why they are measured rather than assumed.
+What it cannot be is an accident. Letting the buffers follow the new data—option A—took the old task from 99.4% to 53.4%. If the backbone is shared with another head, cached, or compared across runs, a drifted backbone is a different model under the same weights file. Choose which you want, set the BatchNorm mode to match, and measure both tasks. The exercise's shift is deliberately extreme; on real data the gaps will be smaller and may reverse, which is why they are measured rather than assumed.
 
 <!--mission-->
 ## Exercise: freeze three ways, then thaw

@@ -1,0 +1,42 @@
+[
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "ε, epsilon, is a hyperparameter you choose: the fraction by which a sample's action probability may grow or shrink before that sample stops pushing.",
+    "finding": "The clipping mechanism is incorrectly described as symmetric. Defining ε as the fraction by which an action probability may grow or shrink before the sample stops pushing misrepresents how L^CLIP works. A sample does not stop pushing when moving opposite to the advantage: if advantage is positive and probability shrinks (Row 4), or if advantage is negative and probability grows (Row 2), the gradient remains live regardless of how far ratio r moves outside [1 − ε, 1 + ε]. The sample stops pushing only when it moves in the direction that improves the objective.",
+    "evidence": "Examined table rows 2 and 4 in essays/ppo-clips-the-step.md and Equation 7 in arXiv:1707.06347 §3. In Row 2 (A = −1), probability grows from 0.30 to 0.60 (r = 2.0 > 1.2), yet the gradient is live (+2.000). In Row 4 (A = +1), probability shrinks from 0.50 to 0.35 (r = 0.70 < 0.8), yet the gradient is live (−0.700).",
+    "fix": "Clarify that the cutoff applies only in the direction favored by the advantage: 'ε, epsilon, is a hyperparameter you choose: the fraction by which a sample's action probability may move in the direction favored by the advantage before that sample stops pushing.'"
+  },
+  {
+    "priority": 5,
+    "severity": "low",
+    "location": "One PyTorch implementation, for scale, collects 2,049 steps, normalises their advantages to mean 0 and standard deviation 1, and runs 10 epochs over them in minibatches of 64.",
+    "finding": "A framework is presented as the source of implementation hyperparameters. PyTorch does not provide a native PPO implementation. The specific hyperparameters (2,049 steps, 10 epochs, minibatches of 64) originate from Maxim Lapan's textbook implementation in Deep Reinforcement Learning Hands-On (Chapter 16, receipt ppo-12), where 2,049 is an idiosyncratic buffer size chosen to compute 2,048 transitions rather than an official PyTorch framework default.",
+    "evidence": "Checked corpus/ppo-clips-the-step/receipts.tsv row ppo-12 (citing lapan-drl); verified Lapan EPUB Chapter 16 listing 427 (TRAJECTORY_SIZE = 2049, PPO_EPOCHES = 10, PPO_BATCH_SIZE = 64); verified PyTorch standard library has no native PPO algorithm; verified Schulman et al. Table 3 uses standard horizon T = 2048.",
+    "fix": "Rephrase to state the textbook provenance: 'One reference implementation in PyTorch, for scale, collects 2,049 steps...' or 'A textbook implementation in PyTorch, for scale,...'."
+  },
+  {
+    "priority": 7,
+    "severity": "high",
+    "location": "The numbers are the book's own and invented. Two stored samples, each looked at once with a positive and once with a negative advantage, ε = 0.2. The first had probability 0.30 at collection and 0.60 now, so r = 0.60 / 0.30 = 2, clipped to 1.2.",
+    "finding": "A real source case is attributed wrongly as the book's own invented example. The first sample's numbers (0.30 at collection, 0.60 now, ratio 2, 'twice as likely') are taken verbatim from Lecture 12-01 of course 4635836. Furthermore, receipt ppo-06 in receipts.tsv and the drafting note in notes/essays/ppo-clips-the-step.md explicitly claim that the lecture's '30% to 60%' example was 'not used in the prose'. Under CONTEXT.md §5b, worked examples must use the book's own re-derived numbers.",
+    "evidence": "Checked resources/udemy-subs/course-4635836/12-01-proximal-policy-optimization.txt lines 54–60 ('When we collected it was 30%... after the changes that we applied is 60%, 60%, over 30%. Our ratio draw will be two. Now selecting these action is twice as likely as when we started learning'); corpus/ppo-clips-the-step/receipts.tsv row ppo-06 note ('lecture example 30% to 60% gives ratio 2 with eps 0.3; not used in the prose'); notes/essays/ppo-clips-the-step.md line 35 ('The lecture's ε = 0.3 and 30% → 60% example is not used').",
+    "fix": "Replace the first sample with numbers genuinely original to the book (e.g. 0.25 at collection and 0.50 now for r = 2.0, or 0.20 → 0.50 for r = 2.5), update the worked example table, text, exercise cases, and corpus/ppo-clips-the-step/run.log, and remove the contradictory disclaimer from receipt ppo-06 and the drafting note."
+  },
+  {
+    "priority": 8,
+    "severity": "medium",
+    "location": "The clip bites in rows 1 and 3, where the policy has already moved the way the advantage wanted by more than ε.",
+    "finding": "Anthropomorphism that hides the mechanism. The text attributes intent/desire to the advantage ('the way the advantage wanted') without explaining what 'wanted' stands for in the next clause. The advantage is a scalar whose sign indicates whether an action beat baseline expectations; it has no agency or desire.",
+    "evidence": "CONTEXT.md §4 ('No anthropomorphism that hides the mechanism... A model does not \"understand\", \"know\", \"want\" or \"decide\"... The word is allowed only when the next clause says what it stands for'). Also see line 67 caption ('the side the advantage asked for').",
+    "fix": "Replace with mechanistic phrasing: 'where the policy has already moved in the direction indicated by the advantage's sign by more than ε' or 'where the action probability has already increased (for positive advantage) or decreased (for negative advantage) by more than ε'."
+  },
+  {
+    "priority": 8,
+    "severity": "medium",
+    "location": "the clip only decides which samples are still pushing.",
+    "finding": "Anthropomorphism that hides the mechanism. The clipping operator is described as 'deciding' which samples push, attributing cognitive choice to an arithmetic operation without explaining what 'decides' stands for in the next clause. This triggers a warning under checks/consistency.mjs.",
+    "evidence": "checks/consistency.mjs line 111 (flags 'WARN: ppo-clips-the-step anthropomorphism — decides:1'); CONTEXT.md §4 ('A model does not \"understand\", \"know\", \"want\" or \"decide\"').",
+    "fix": "Replace with mechanistic phrasing: 'the clip only zeros the gradient of samples that have moved past the threshold in the advantage's direction' or 'the clip only determines which samples still contribute gradient'."
+  }
+]

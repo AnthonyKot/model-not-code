@@ -25,7 +25,7 @@ excluded; 1,814 with headings).
 
 ## Provenance of every number
 
-- Table (0.30→0.60, 0.50→0.35, A = ±1, ε = 0.2; r = 2 / 0.7; clipped 1.2 / 0.8; terms and mins):
+- Table (0.25→0.50, formerly 0.30→0.60, 0.50→0.35, A = ±1, ε = 0.2; r = 2 / 0.7; clipped 1.2 / 0.8; terms and mins):
   book's own, derived on the page, identical to run.log lines 1–4 (ppo-16..19). Pitch arithmetic
   verified correct.
 - Gradients +2.000 / −0.700 / 0: derived on the page (d r / d log π = r) and printed (ppo-20).
@@ -64,3 +64,5 @@ excluded; 1,814 with headings).
 - Nothing to other essays. `learn-the-action-or-learn-its-worth` (essay 11) presumably introduces
   the advantage and value network; this essay re-defines the advantage in one sentence so it stands
   alone.
+
+**Review (2026-09-13):** codex consolidation (Gemini flash + pro lanes) and reader personas. Applied by the main session (Opus 5) after codex hit its usage limit — three findings: the 0.30 → 0.60 example matched a lecture, so it is now 0.25 → 0.50 in prose, table, script, receipt and note (same ratio 2, identical printed results, rerun); "the way the advantage wanted" / "asked for" → "indicated by the advantage's sign"; "the clip only decides which samples are still pushing" → "determines which samples still contribute gradient".

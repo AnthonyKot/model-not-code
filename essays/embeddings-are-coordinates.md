@@ -6,7 +6,7 @@ The search itself is not the problem. Ranking is a few lines of arithmetic that 
 
 ## The search step: encode once, compare by angle
 
-An encoder is a model that turns a whole text into one fixed-length list of numbers, a vector. A transformer encoder produces one vector per token; a common way to get one vector for the whole text is to average them, leaving padding out of the average. A small sentence encoder of about 22 million parameters produces 384 numbers per text.
+An encoder is a model that turns a whole text into one fixed-length list of numbers, a vector. A transformer encoder produces one vector per token; a common way to get one vector for the whole text is to average them, leaving padding out of the average. A small MiniLM sentence-encoder checkpoint had about 22 million parameters and emitted 384 numbers per text.
 
 The reason to want vectors is cost. A model that scores a query and a title together has to run once per catalogue item for every query. An encoder runs once per item when it is stored and once per query when it arrives; ranking then compares vectors without consulting the model. The comparison is cosine similarity:
 
@@ -24,7 +24,7 @@ An embedding model for search is trained on pairs: a query and a title that matc
 
 A common way to train is to take a batch of B pairs, encode all B queries and B titles, and compute the B × B table of cosines. Entry (i, j) compares query i with title j. The diagonal holds the true pairs; every other entry compares a query with some other pair's title, which serves as a negative for free. Each row is then treated as a classification over B titles whose correct answer is the diagonal one.
 
-One more quantity is needed first. Cosines lie between −1 and 1, too close together for a softmax to become confident. With two documents, even a perfect +1 against −1 gives the right one a probability of only 1/(1 + e<sup>−2</sup>) = 0.881, so the loss can never drop below −ln 0.881 = 0.127 and training never stops pushing. The *temperature* τ fixes the scale: every cosine is divided by τ before the softmax, and a τ below 1 stretches the range. Some systems learn τ during training; the example here fixes it at 0.1. The loss for row i is:
+One more quantity is needed first. Cosines lie between −1 and 1, too close together for a softmax to become confident. With two documents, even a perfect +1 against −1 gives the right one a probability of only 1/(1 + e<sup>−2</sup>) = 0.881, so even at the largest possible cosine margin the loss stays at −ln 0.881 = 0.127. The *temperature* τ fixes the scale: every cosine is divided by τ before the softmax, and a τ below 1 stretches the range. Some systems learn τ during training; the example here fixes it at 0.1. The loss for row i is:
 
 <p class="formula">L<sub>i</sub> = −ln [ e<sup>s<sub>ii</sub>/τ</sup> / Σ<sub>j</sub> e<sup>s<sub>ij</sub>/τ</sup> ]</p>
 
@@ -40,10 +40,10 @@ Keep q, d<sub>1</sub> and d<sub>2</sub>, with d<sub>1</sub> as q's true title an
 |---|---|---|
 | cosine | 0.6 | 0.8 |
 | score, cosine / 0.1 | 6 | 8 |
-| softmax, e<sup>6</sup>/(e<sup>6</sup> + e<sup>8</sup>) = 1/(1 + e<sup>2</sup>) = 1/(1 + 7.389) | 0.119 | 0.881 |
-| loss gradient per unit of cosine | (0.119 − 1)/0.1 = −8.808 | 0.881/0.1 = +8.808 |
+| softmax, e<sup>6</sup>/(e<sup>6</sup> + e<sup>8</sup>) = 1/(1 + e<sup>2</sup>) = 1/(1 + 7.389) | 0.1192 | 0.8808 |
+| loss gradient per unit of cosine | (0.1192 − 1)/0.1 = −8.808 | 0.8808/0.1 = +8.808 |
 
-The loss is −ln 0.119 = 2.127.
+The loss is −ln 0.1192 = 2.127.
 
 Next, how a cosine changes when a document vector moves. For unit vectors, stretching d along its own direction leaves the angle unchanged, so only movement across d counts, and the gradient of the cosine with respect to d is q minus the cosine times d:
 
@@ -98,7 +98,7 @@ In a transformer encoder the weights are shared, so untrained pairings do move, 
 
 A second consequence comes from the temperature. The loss is satisfied once the true pair beats the others by enough, and at τ = 0.1 a small gap is enough: in the exercise the loss falls to 0.0061 while one matching cosine is still 0.33. A threshold such as "above 0.8 means relevant" belongs to one model and its training temperature, not to another model.
 
-The opening problem becomes questions you can answer. Read the training-data section of the model card and ask whether your pair type is in it; names mislead, and in one family of sentence encoders "multi" means multiple sources, not multiple languages. Build a few hundred of your own query–title pairs and measure how often the right title ranks first. If it does not, the remedy is pairs of your type: fine-tuning on target-domain data with the same loss. Measuring retrieval properly is a separate essay in Part III.
+The opening problem becomes questions you can answer. Read the training-data section of the model card and ask whether your pair type is in it; names mislead: in the Sentence Transformers checkpoint name `multi-qa-MiniLM`, "multi" denoted question–answer pairs from many sources, while multilingual checkpoints said `multilingual` explicitly. Build a few hundred of your own query–title pairs and measure how often the right title ranks first. If it does not, the remedy is pairs of your type: fine-tuning on target-domain data with the same loss. Measuring retrieval properly is a separate essay in Part III.
 
 <!--mission-->
 ## Exercise: train a tiny encoder and leave a pair type out

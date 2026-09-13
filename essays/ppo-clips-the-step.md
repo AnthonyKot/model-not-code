@@ -64,21 +64,21 @@ The min gives the clip a direction. Take a positive advantage. While r is below 
     <text x="320" y="232" text-anchor="middle">solid: L<tspan baseline-shift="super" font-size="9">CLIP</tspan>; dashed: r·A where they differ</text>
   </g>
 </svg>
-<figcaption>One sample's term of L<sup>CLIP</sup> as a function of r, at ε = 0.2 and A = ±1. A flat stretch has zero slope, so a sample sitting on it contributes no gradient. The flat stretch is always on the side the advantage asked for.</figcaption>
+<figcaption>One sample's term of L<sup>CLIP</sup> as a function of r, at ε = 0.2 and A = ±1. A flat stretch has zero slope, so a sample sitting on it contributes no gradient. The flat stretch is always on the side indicated by the advantage's sign.</figcaption>
 </figure>
 
 ## Worked example: four samples, one ε
 
-The numbers are the book's own and invented. Two stored samples, each looked at once with a positive and once with a negative advantage, ε = 0.2. The first had probability 0.30 at collection and 0.60 now, so r = 0.60 / 0.30 = 2, clipped to 1.2. The second had 0.50 and now 0.35, so r = 0.35 / 0.50 = 0.7, clipped to 0.8.
+The numbers are the book's own and invented. Two stored samples, each looked at once with a positive and once with a negative advantage, ε = 0.2. The first had probability 0.25 at collection and 0.50 now, so r = 0.50 / 0.25 = 2, clipped to 1.2. The second had 0.50 and now 0.35, so r = 0.35 / 0.50 = 0.7, clipped to 0.8.
 
 | Row | π<sub>old</sub> → π<sub>θ</sub> | A | r·A | clip(r)·A | min | Gradient |
 |---|---|---|---|---|---|---|
-| 1 | 0.30 → 0.60 | +1 | 2 | 1.2 | 1.2 (clipped) | zero |
-| 2 | 0.30 → 0.60 | −1 | −2 | −1.2 | −2 (uncapped) | live |
+| 1 | 0.25 → 0.50 | +1 | 2 | 1.2 | 1.2 (clipped) | zero |
+| 2 | 0.25 → 0.50 | −1 | −2 | −1.2 | −2 (uncapped) | live |
 | 3 | 0.50 → 0.35 | −1 | −0.7 | −0.8 | −0.8 (clipped) | zero |
 | 4 | 0.50 → 0.35 | +1 | 0.7 | 0.8 | 0.7 (uncapped) | live |
 
-The clip bites in rows 1 and 3, where the policy has already moved the way the advantage wanted by more than ε. In row 2 the action became twice as likely despite a negative advantage; the min charges the full −2 rather than a softened −1.2, and the sample keeps pulling. Row 4 is the mirror: a good action lost probability, and the sample keeps pushing. A sample whose r is still inside [0.8, 1.2] has equal terms and a live gradient either way.
+The clip bites in rows 1 and 3, where the policy has already moved in the direction indicated by the advantage's sign by more than ε. In row 2 the action became twice as likely despite a negative advantage; the min charges the full −2 rather than a softened −1.2, and the sample keeps pulling. Row 4 is the mirror: a good action lost probability, and the sample keeps pushing. A sample whose r is still inside [0.8, 1.2] has equal terms and a live gradient either way.
 
 How large is the live gradient? Implementations store log-probabilities, so r is computed as e raised to (log π<sub>θ</sub> − log π<sub>old</sub>). The derivative of that with respect to log π<sub>θ</sub> is r itself, so the derivative of r·A is A·r. Row 2: −1 × 2 = −2, so raising the log-probability lowers the objective and the optimiser lowers the probability. Row 4: +1 × 0.7 = 0.7. The loss is the negative objective, so its gradients are +2 and −0.7, as the exercise prints.
 
@@ -88,7 +88,7 @@ The clip removes a sample's incentive to move further. It is not a limit on how 
 
 Two things carry the policy past the edge. The first is step size: the gradient is computed at the current r, and one step with a large learning rate can carry r from 1 to nearly 4, as the exercise shows. There the sample sits on a flat stretch and nothing pulls it back. The second is shared parameters. A zero gradient does not freeze a sample's probability; the other samples still move the same weights, and in a softmax, lowering one action raises the others. In the exercise below, action 0's two positive-advantage samples stop pushing once its ratio passes 1.2, yet the negative-advantage samples of action 1 keep raising it, and it ends at 1.299. An action with no advantage at all ends at 1.248.
 
-So the number of epochs, the steps within each and the learning rate still bound the real move; the clip only decides which samples are still pushing. One PyTorch implementation, for scale, collects 2,049 steps, normalises their advantages to mean 0 and standard deviation 1, and runs 10 epochs over them in minibatches of 64. After the epochs, the updated policy becomes the new old policy, every ratio resets to 1, and the next batch can move it again: the clip bounds the incentive per batch, not the distance over training.
+So the number of epochs, the steps within each and the learning rate still bound the real move; the clip only determines which samples still contribute gradient. One PyTorch implementation, for scale, collects 2,049 steps, normalises their advantages to mean 0 and standard deviation 1, and runs 10 epochs over them in minibatches of 64. After the epochs, the updated policy becomes the new old policy, every ratio resets to 1, and the next batch can move it again: the clip bounds the incentive per batch, not the distance over training.
 
 Finally, the clip takes its direction from the sign of A. An advantage estimate with the wrong sign sends its sample the wrong way, and the clip limits that move exactly as it would limit a right one.
 
@@ -107,8 +107,8 @@ eps = 0.2
 
 # Part 1: one sample at a time, the four cells of the table.
 cases = [  # (pi_old, pi_new, advantage)
-    (0.30, 0.60, +1.0),
-    (0.30, 0.60, -1.0),
+    (0.25, 0.50, +1.0),
+    (0.25, 0.50, -1.0),
     (0.50, 0.35, -1.0),
     (0.50, 0.35, +1.0),
 ]

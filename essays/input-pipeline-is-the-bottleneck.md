@@ -64,7 +64,7 @@ In sequence, three steps of 2 + 1 take 9. Overlapped, the consumer starts its fi
 
 Now a realistic batch. Each image takes 4 ms to decode and augment on one core, and a batch is 64 images, so L = 64 × 4 = 256 ms. The training step on the accelerator takes C = 80 ms. The training set is 10,000 images, which is 156 full batches and one short one; count the short one as full, 157 steps per epoch.
 
-| Configuration | Step formula | Step (ms) | Busy = C / step | Epoch (157 steps) |
+| Configuration | Step formula | Step (ms) | Busy = C / step | Steady-state estimate, 157 × step (startup and drain excluded) |
 |---|---|---|---|---|
 | one process, in sequence | 256 + 80 | 336 | 23.8% | 52.8 s |
 | one worker, overlapped | max(256, 80) | 256 | 31.3% | 40.2 s |
@@ -82,9 +82,9 @@ To get L and C for your own job, time two things in the plain sequential loop: t
 
 In PyTorch the producer is a `DataLoader` over a `Dataset`, and the three arguments that matter here map directly onto the formula.
 
-`num_workers` is W. With the default of 0 there are no workers: the loop's call for the next batch runs `__getitem__` once per index and stacks the results in the training process itself, which is the L + C schedule. With W greater than 0 the loader starts W processes, each with its own copy of the dataset object. The main process deals out one batch's list of indices to each worker in turn; the worker calls `__getitem__` for every index, stacks the batch with the collate function and puts it on a shared result queue, and your loop receives batches in the order they were requested. Being processes rather than threads, the workers run Python decoding code in parallel instead of taking turns on one interpreter lock.
+As of PyTorch 2.14, `num_workers` is W. With the default of 0 there are no workers: the loop's call for the next batch runs `__getitem__` once per index and stacks the results in the training process itself, which is the L + C schedule. With W greater than 0 the loader starts W processes, each with its own copy of the dataset object. The main process deals out one batch's list of indices to each worker in turn; the worker calls `__getitem__` for every index, stacks the batch with the collate function and puts it on a shared result queue, and your loop receives batches in the order they were requested. Being processes rather than threads, the workers run Python decoding code in parallel instead of taking turns on one interpreter lock.
 
-`prefetch_factor` is the depth of the queue: each worker may have that many batches outstanding, so the loader holds at most `prefetch_factor × num_workers` batches ahead of the loop, 2 × W by default. It is not a speed setting: the steady-state step is the max whatever the depth. The depth decides how large a burst of slow batches is absorbed before the loop feels it, and how much RAM waiting batches occupy.
+`prefetch_factor` is the depth of the queue: each worker may have that many batches outstanding, so the loader holds at most `prefetch_factor × num_workers` batches ahead of the loop, 2 × W by default. It is not a speed setting: the steady-state step is the max whatever the depth. The queue depth determines how many slow batches can be absorbed before the result queue empties and the training loop blocks, and how much RAM waiting batches occupy.
 
 `pin_memory=True` adds a thread in the main process that copies each finished batch into page-locked RAM, memory the operating system may not swap out or move. The copy to the accelerator can then read that memory directly without an intermediate copy, and `.to(device, non_blocking=True)` lets the copy proceed while the CPU carries on. That shortens the transfer at the front of C.
 
