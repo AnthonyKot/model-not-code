@@ -28,7 +28,7 @@ Take two checkpoints whose true accuracy is exactly 0.5 and a validation set of 
 
 The expected reported accuracy is 0 × 1/16 + 0.5 × 8/16 + 1 × 7/16 = 11/16 = 0.6875. Neither checkpoint is better than a coin. Score the winner on two fresh items and its expected accuracy is 0.5, because the two fresh items were drawn after the choice and have no connection to it. The 0.1875 between the two numbers was produced entirely by the choice.
 
-Scale it up once. Six checkpoints, all truly 0.5, on twenty items. A single checkpoint scores 13 or more with probability 137,980 / 1,048,576 = 0.1316: the ways to get 13 to 20 heads in 20 tosses, over all 2<sup>20</sup> outcomes. The chance that none of six does is 0.8684<sup>6</sup> = 0.4289, so the chance the best of six reports 65% or better is 1 − 0.4289 = 0.5711. More often than not, a set of coin-toss checkpoints produces a "65% on validation" headline. The expected best score is 12.81 out of 20, 0.6405, and the same winner on twenty fresh items is expected to return 10.
+Scale it up once. Six checkpoints, all truly 0.5, on twenty items. A single checkpoint scores 13 or more with probability 137,980 / 1,048,576 = 0.1316: the ways to get 13 to 20 heads in 20 tosses, over all 2<sup>20</sup> outcomes. The chance that none of six does is 0.8684<sup>6</sup> = 0.4289, so the chance the best of six reports 65% or better is 1 − 0.4289 = 0.5711. More often than not, a set of coin-toss checkpoints produces a "65% on validation" headline. Whichever checkpoint wins, the same checkpoint on twenty fresh items is expected to return 10 of 20, because nothing about the fresh items was involved in picking it.
 
 The mechanism, stated once: a validation score is true accuracy plus a noise term, and taking the maximum over candidates selects for large noise terms as much as for high true accuracy. The winner's score is therefore not a measurement of the winner. A score on data that played no part in the choice has noise independent of the choice, and so it is an unbiased estimate. That is what the third split is for.
 
@@ -68,7 +68,7 @@ The test split is spent once, on the final number. If you look at it, dislike th
 
 ## Early stopping is best-of-N you run every day
 
-Hyperparameter searches make the selection obvious. Early stopping hides it. Halting a run once the validation loss stops improving, and its everyday companion, keeping the checkpoint with the lowest validation loss, both take the best of however many evaluations the run made. A checkpoint callback set to save only the best weights does exactly this, overwriting its file whenever a new lowest loss appears; fine-tuning runs save periodic checkpoints so that the best step can be picked afterwards. That is a sound procedure, and it means the lowest validation loss in the log is a best-of-N number. The training loss beside it is no help: a falling training loss does not imply a falling validation loss.
+Hyperparameter searches make the selection obvious. Early stopping hides it. Halting a run once the validation loss stops improving, and its everyday companion, keeping the checkpoint with the lowest validation loss, both take the best of however many evaluations the run made. A checkpoint callback set to save only the best weights does exactly this, overwriting its file whenever a new lowest loss appears; fine-tuning runs save periodic checkpoints so that the best step can be picked afterwards. That is a sound procedure, and it means the lowest validation loss in the log is a best-of-N number. The training loss beside it is no help: a falling training loss does not imply a falling validation loss. The mechanism does not depend on the metric being accuracy: validation loss is also an average over a finite set of items, so it carries the same kind of sampling error, and taking its minimum over checkpoints selects for favourable error just as taking the maximum accuracy does. The simulation below uses accuracy only because a count of correct items is easy to draw.
 
 Two things make the everyday case milder than the coin-toss example. Consecutive checkpoints of one run get mostly the same items right, so their noise terms are correlated and the maximum has less to select from. And they genuinely differ in true accuracy, so part of what the selection finds is real. Both are measured in the exercise. Neither removes the bias, and a hyperparameter search multiplies it: twenty configurations each choosing its own best checkpoint is a best-of-twenty over numbers that were already maxima.
 
@@ -82,7 +82,7 @@ The simulation below measures the inflation for candidates whose true accuracy i
 | 20 | 0.0517 | 0.0165 | 1.83 to 1.85 |
 | 100 | 0.0680 | 0.0221 | 2.40 to 2.47 |
 
-Divided by the standard error, the inflation depends on N alone: about 1.2 standard errors for five candidates, 1.8 for twenty, 2.4 for a hundred. Growing n tenfold shrinks it by the same √10 as the standard error: 0.0517 / 0.0165 = 3.13. Both levers work: cutting the candidates from 100 to 5 halves the inflation, and ten times the validation data cuts it by about three.
+Divided by the standard error, the inflation depends on N alone: about 1.2 standard errors for five candidates, 1.8 for twenty, 2.4 for a hundred. Those are close to the average largest value among N independent draws from a standard normal distribution, 1.16, 1.87 and 2.51, because each candidate's measured score is its true accuracy plus a roughly normal sampling error of one standard error. The maximum of N such errors grows, but slowly: going from 20 candidates to 100 adds less than one standard error. Growing n tenfold shrinks it by the same √10 as the standard error: 0.0517 / 0.0165 = 3.13. Both levers work: cutting the candidates from 100 to 5 halves the inflation, and ten times the validation data cuts it by about three.
 
 Limits. The table assumes independent candidates of equal quality, the case in which the selection has nothing but noise to find. When candidates really differ, the run shows twenty models spread evenly from 0.78 to 0.80 on 2,000 items: the winner reports 0.8103, its true accuracy averages 0.7959, and the truly best model is picked in 18.6% of trials. The test score is unbiased but not exact; it still carries its own standard error. And a validation set is not free: when labels are scarce, every row held out for choosing is a row the model did not train on.
 
@@ -154,6 +154,29 @@ What each part does:
 
 **Expected result.** Run with PyTorch 2.14 on a CPU, seed 0; the full output is in the essay's corpus. The N = 1 rows show no inflation (`-0.0003`, `-0.0000`). At n_val 200 the reported best is `0.8325`, `0.8514`, `0.8679` for N = 5, 20, 100, while every test column stays within `0.7997` to `0.8002`; at n_val 2000 the reported best is `0.8104`, `0.8165`, `0.8222`. The correlated checkpoints print `+0.0166`, `+0.0120`, `+0.0072`, `+0.0032` for churn 1.00 down to 0.02. The spread case prints `reported 0.8103 winner's true 0.7959 test 0.796 picked the truly best 0.186`.
 
-Then change two things, keeping N = 20. Set `n_test` to 50: the winner's test score still averages 0.80 (`0.8003` in the book's run), but its spread across trials is `0.0562`, matching the standard error √(0.16 / 50) = 0.0566. Unbiased is not the same as precise. Then let the test scores into the choice, `winner = (val + test).argmax(dim=1)`, and score the winner on a third fresh draw: the old test number now reports `0.8367` at n = 200 and `0.8118` at n = 2,000, and the third draw returns `0.8001`. The test set inflated like a validation set because it had become one.
+Two further experiments, each a separate script that reuses the imports, `TRIALS` and `p` from above and starts from `torch.manual_seed(0)`. First, a small test set: the winner's test score stays unbiased but becomes imprecise.
+
+```python
+torch.manual_seed(0)
+val = Binomial(total_count=2000, probs=torch.full((TRIALS, 20), p)).sample() / 2000
+test = Binomial(total_count=50, probs=torch.full((TRIALS, 20), p)).sample() / 50
+retest = test.gather(1, val.argmax(1, keepdim=True)).squeeze(1)
+print("test mean", round(retest.mean().item(), 4), "spread", round(retest.std().item(), 4))
+```
+
+It prints `test mean 0.8003 spread 0.0562`; the spread matches the standard error √(0.16 / 50) = 0.0566. Unbiased is not the same as precise.
+
+Second, let the test set take part in the choice, then score the winner on a third draw that played no part:
+
+```python
+torch.manual_seed(0)
+for n in (200, 2000):
+    draw = lambda: Binomial(total_count=n, probs=torch.full((TRIALS, 20), p)).sample() / n
+    val, test, third = draw(), draw(), draw()
+    winner = (val + test).argmax(1, keepdim=True)          # the test set now helps choose
+    print(n, round(test.gather(1, winner).mean().item(), 4), round(third.gather(1, winner).mean().item(), 4))
+```
+
+It prints `200 0.8364 0.8001` and `2000 0.8118 0.8001`. The old test number inflated like a validation score because it had become one; only the untouched third draw still reads 0.80.
 
 *Sources: the Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9 and 7.4, and the LLM Engineering course (Ed Donner, Udemy), lectures 7.19 and 7.20, paraphrased as study material; Chip Huyen, Designing Machine Learning Systems, physical pp. 116, 164–166 and 223.*

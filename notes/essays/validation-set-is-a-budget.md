@@ -59,3 +59,16 @@ qualitatively, not measured.
 
 **Owed to other essays:** `benchmark-is-a-claim-about-a-test-set` (Part III) for public benchmarks and
 contamination; leakage through fitted preprocessing is only touched.
+
+**Review (2026-09-13):** codex consolidation (flash 2 confirmed, pro lane empty) and three reader
+personas. Accepted and applied: the 12.81 expected best was unexplained (report + hiring-manager) —
+removed in favour of the fully derived 57% and the fresh-items 10/20; the two exercise variations
+were not reproducible from the stated edits (report + hiring-manager) — now two explicit seeded
+snippets, run as printed (0.8364 replaces 0.8367 because the snippet reseeds); the 1.2/1.8/2.4
+standard-error pattern was an unexplained empirical claim (hiring-manager) — tied to the mean
+maximum of N standard normals (receipt valid-19); loss versus accuracy (working-mle) — a sentence
+that the mechanism holds for any averaged metric. Rejected: "PyTorch 2.14 does not exist" (two
+readers) — it is the installed version, 2.14.0+cpu; "stop calling sampling error noise" (stats
+sceptic) — the essay defines the term on first use; independent equal candidates as "artificial" —
+the limits section and the correlated-checkpoint run already measure the realistic case.
+Receipt valid-14 (12.81) withdrawn.

@@ -75,7 +75,7 @@ export const essays = [
   E("validation-set-is-a-budget", "II", "You Only Get to Look at the Test Set Once",
     "Train, validation and test are three budgets; the validation curve picks the checkpoint, and every look at the test set spends it.",
     [C("4735368", "03-09", "07-04"), C("6100015", "07-19", "07-20"), B("huyen-dmls", "pp. 116, 164–166, 223")],
-    { status: "drafted",
+    { status: "reviewed",
       payoff: "The best validation score out of many tries is inflated by the trying: how much, what it depends on, and why the test set is scored once.",
       caution: "Scores are simulated rather than trained; real checkpoints are correlated and differ in quality, which shrinks but does not remove the inflation." }),
   E("class-imbalance-changes-the-loss", "II", "95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result",

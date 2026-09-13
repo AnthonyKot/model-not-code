@@ -21,3 +21,8 @@ reported 0.8103 winner's true 0.7959 test 0.796 picked the truly best 0.186
 n_test 50: test mean 0.8003 test std 0.0562 SE 0.0566
 n 200 test after peeking 0.8367 fresh third 0.8001
 n 2000 test after peeking 0.8118 fresh third 0.8001
+
+# essay variants as printed in the essay (variants_essay.py, each block seeded 0)
+test mean 0.8003 spread 0.0562
+200 0.8364 0.8001
+2000 0.8118 0.8001
