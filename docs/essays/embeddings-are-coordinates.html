@@ -102,7 +102,7 @@
       <h1 class="essay-title">Similar Means Whatever the Training Pairs Said</h1>
       <p class="essay-payoff">How an embedding model comes to put matching texts close together, worked through one training step by hand, and why queries of a kind it never trained on can come back as noise.</p>
     </header>
-    <nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> <a href="embeddings-are-coordinates.html" aria-current="page">Current version</a> · <a href="embeddings-are-coordinates--tight.html">Tighter rewrite</a></nav>
+    
     <article class="prose"><p>You have put an off-the-shelf embedding model in front of a product catalogue. English queries find the right items, including queries that share no word with the title they match. Then the Spanish queries arrive, or the queries written in your industry&#39;s part numbers and abbreviations, and the top results are noise. You want to know what would fix it, and you cannot say, because you do not know what the model was trained to do.</p>
 <p>The search itself is not the problem. Ranking is a few lines of arithmetic that treat every query alike. Which texts count as near each other was fixed earlier, by the pairs the model was trained on. This essay computes one training step by hand to show how a pair moves two vectors together, then shows what happens to a pair type the training never contained.</p>
 <h2 id="the-search-step-encode-once-compare-by-angle">The search step: encode once, compare by angle</h2>

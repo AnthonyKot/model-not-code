@@ -125,3 +125,9 @@ an encoder on domain pairs is mentioned as the remedy without mechanics; LoRA/tr
 not cover encoders specifically. Masked mean pooling (Pitch C) is one clause.
 
 **Review (2026-09-13):** codex consolidation (Gemini flash + pro lanes) and reader personas. Applied by the main session (Opus 5) after codex hit its usage limit — four findings: probabilities shown to four places (0.1192 / 0.8808) so the gradient and loss equalities recompute; the 22-million-parameter, 384-number encoder stated as a named MiniLM checkpoint in the past tense; the "multi" naming claim tied to the `multi-qa-MiniLM` checkpoint name; "training never stops pushing" → the loss floor stated directly.
+
+**Author's read of the codex tight variant (2026-09-13):** rejected and withdrawn. It defined loss,
+softmax, e, ln and gradient inline while keeping the derivation as the spine — the "define every word"
+instruction in the tight-rewrite brief caused it. The essay itself still has the two passages the author
+flagged (the MiniLM sentence; the temperature derivation) and is to be redone in the practitioner
+register (rule to be added to the briefs and CONTEXT §4) before any other essay is touched.
