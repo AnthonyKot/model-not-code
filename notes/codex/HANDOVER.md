@@ -4,16 +4,28 @@ Read `CONTEXT.md` (constitution; §4 has tonight's prose rules), `AGENT.md` (who
 then this file. Codex does mechanical work only (AGENT.md "Who does what"); the main Claude session
 drafts, reviews and commits. Run with `-s workspace-write`; do not commit.
 
-## What exists
+## What exists (updated 2026-09-13, ~10:30)
 
-- Published: `lora-is-a-low-rank-diff` (Part II pilot) — on Pages, revised through seven of the
-  author's read notes (`notes/essays/lora-is-a-low-rank-diff.md`, "Author's read").
-- Reviewed, unpublished: `model-is-a-learned-function`, `tokens-not-characters`,
-  `attention-is-a-soft-lookup` (Part I, essays 1–3). Preview with `BUILD_ALL=1 npm run build`.
-- Picks for Parts I–II: CONTEXT §6 / `notes/pitches/PICKS-I-II.md`. Not started: essay 4
-  `embeddings-are-coordinates` (pitch B) and Part II essays 5–9, 11–12.
-- Parts III–VI: `notes/research/outline-audit-2026-09-13.md` — a recommendation only. **The author
-  has not decided.** Do not change the catalog for Parts III–VI until CONTEXT §9 records a decision.
+- Published (5): `lora-is-a-low-rank-diff`, `model-is-a-learned-function` (codex rewrite accepted),
+  `tokens-not-characters`, `attention-is-a-soft-lookup`, and nothing else yet.
+- Drafted, not published (8, all Part I–II): `embeddings-are-coordinates` (retitled "Similar Means
+  Whatever the Training Pairs Said"), `validation-set-is-a-budget` (reviewed + fixes applied),
+  `class-imbalance-changes-the-loss`, `augmentation-declares-invariance`,
+  `input-pipeline-is-the-bottleneck`, `transfer-learning-freeze-then-thaw`,
+  `learn-the-action-or-learn-its-worth` (retitled "Measure the Return, or Guess It From the Next
+  State"), `ppo-clips-the-step`.
+- Review status of those: reports exist and are NOT yet applied for `class-imbalance-changes-the-loss`
+  and `augmentation-declares-invariance` (`checks/reviews/<slug>/report.md`, `checks/readers/<slug>/`).
+  The other five had review jobs queued in the main session at wrap-up; if their `report.md` is
+  missing or empty, rerun `scripts/review.sh <slug>` and `scripts/readers.sh <slug>` one essay at a
+  time. After applying findings: `python3 scripts/register.py <slug> reviewed`, then publish all eight
+  together (`published`) on the author's say (the author asked for Parts I–II to be finished).
+- Parts III–VI: the author's decisions are in CONTEXT §9 (2026-09-13 morning). Catalog reshaping for
+  III–VI is the next mechanical job once the eight reviews above are applied (the catalog is edited
+  by the review step, so do not reshape concurrently).
+- Manifest: four books added (data-contracts, dedp, kubeflow-cml, openshift-mlops).
+- The accepted rewrite prompt is `notes/codex/codex.md`; the author may want the same register
+  applied to other essays.
 
 ## Mechanical jobs codex may take when asked
 

@@ -1,0 +1,42 @@
+[
+  {
+    "priority": 1,
+    "severity": "high",
+    "location": "<text x=\"420\" y=\"195\">facing task: left</text>",
+    "finding": "The worked example SVG diagram, aria-label, and caption contradict the core mechanism of data augmentation explained on the page. In lines 9–13, data augmentation is defined as (x, y) → (T(x), y), where the label y is unchanged and 'goes straight to the loss'. In the facing task, the horizontal flip T turns a right-facing hook into a left-facing glyph, but the pair handed to the loss remains (flipped hook, 'right') — which line 56 confirms ('the flip hands it to the loss labelled \"right\"'). However, the diagram displays 'facing task: left' under the flipped glyph, the aria-label explicitly claims each caption is 'the label it gets in the shape task and in the facing task', and the figcaption asserts that 'what the flip does to the label depends only on what the label means'. The flip does nothing to the label; displaying 'facing task: left' under the flipped glyph asserts that augmentation changed the label to match the flipped orientation, which would produce a correct training pair and would not impair model training.",
+    "evidence": "Checked against the mechanism definition in line 11 ((x, y) → (T(x), y)), line 13 ('y is the label, and it appears unchanged on both sides of the arrow... Nothing checks the statement; the pair goes straight to the loss'), line 56, and exercise.py line 143 where random_hflip flips x and leaves y untouched.",
+    "fix": "In the SVG diagram under the flipped glyph, display the label handed to the loss alongside the true orientation (e.g. 'facing task: right (true: left)'). In the aria-label, distinguish the assigned training label from true orientation. In the figcaption, change 'what the flip does to the label depends only on what the label means' to 'the flip leaves the label untouched; whether that label remains true for the flipped pixels depends on what the label means.'"
+  },
+  {
+    "priority": 1,
+    "severity": "medium",
+    "location": "In the facing task the label says which way the glyph points.",
+    "finding": "A necessary step in the worked example derivation is missing. Line 56 asserts that in the facing task, 'With p = 0.5 both directions arrive under both labels equally often, and nothing is left to separate them.' However, line 54 established the premise that 'training photos happened to show every hook facing right'. If training data only contains right-facing hooks, then unaugmented pairs are (right, 'right') and augmented pairs are (left, 'right'), meaning the label 'left' is never presented to the loss at all. For both directions to arrive under both labels equally often, the training set must already contain both left-facing and right-facing glyphs in equal numbers (as implemented in dataset() in exercise.py: facing_left = torch.rand(n) < 0.5). Without stating this premise, the worked example cannot be recomputed from the page.",
+    "evidence": "Recomputed joint presentation distributions: with 100% right-facing originals, P(label='left') = 0. Equal arrival under both labels (25% for each of the four combinations of {left, right} × {'left', 'right'}) requires an initial balanced 50/50 distribution of orientations in the training set.",
+    "fix": "Add a sentence explaining that for the facing task, the training set begins with an equal mix of left- and right-facing hooks, so flipping half of each orientation causes both directions to appear under both labels with equal 25% frequency."
+  },
+  {
+    "priority": 1,
+    "severity": "low",
+    "location": "Mixing transforms such as mixup and cutmix make a different declaration altogether",
+    "finding": "The declared mechanism in site/catalog.mjs line 85 states: 'Label-preserving transforms enlarge the training distribution; mixup and cutmix mix the labels too.' While label-preserving transforms are detailed step by step, mixup and cutmix are only toured in a single descriptive sentence in the Limits section without defining the blending parameter λ, the formula for mixing inputs and labels, or a worked example.",
+    "evidence": "Checked site/catalog.mjs line 85 vs essays/augmentation-declares-invariance.md line 93 and notes/essays/augmentation-declares-invariance.md line 34 (which acknowledges that the current catalog mechanism line mentions mixup/cutmix while the essay only names them).",
+    "fix": "Either state the mathematical mechanism of mixup in line 93 (e.g. x' = λx₁ + (1−λ)x₂ and y' = λy₁ + (1−λ)y₂), or update site/catalog.mjs to align with Pitch A by removing mixup and cutmix from the catalog mechanism line."
+  },
+  {
+    "priority": 4,
+    "severity": "medium",
+    "location": "| Presentations carrying any one transform | 20,000 × 0.5 | 10,000 |",
+    "finding": "The worked example table row label 'Presentations carrying any one transform' is mathematically ambiguous and conflicts with the calculation 20,000 × 0.5 = 10,000. In standard probabilistic usage, 'any one transform' denotes either the union (carrying at least one transform: 1 − 0.5³ = 0.875, or 17,500 presentations, already given in the preceding row as 'Variants') or the partition carrying exactly one transform (3 × 0.5 × 0.5² = 0.375, or 7,500 presentations). The product 20,000 × 0.5 = 10,000 calculates presentations carrying a specific, given transform (as line 68 describes: 'each single transform touches half of everything').",
+    "evidence": "Recomputation of Bernoulli trials: P(at least one) = 17,500; P(exactly one) = 7,500; P(specific transform i) = 10,000.",
+    "fix": "Rename the table row from 'Presentations carrying any one transform' to 'Presentations carrying a given transform' or 'Presentations carrying each single transform'."
+  },
+  {
+    "priority": 2,
+    "severity": "low",
+    "location": "*Sources: the Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 8.3, 8.5, 11.2 and 11.4, paraphrased as study material; Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, chapter 12, the data augmentation sidebar and the transfer-learning section (printed pp. 438 and 462–463); torchvision documentation for RandomRotation, as of 2026-09-13.*",
+    "finding": "The source credit line cites 'torchvision documentation for RandomRotation, as of 2026-09-13', which is verified by claim aug-23 in corpus/augmentation-declares-invariance/receipts.tsv, but this source is missing from sources[] in site/catalog.mjs.",
+    "evidence": "Checked site/catalog.mjs line 86 ([C(\"4735368\", \"08-03\", \"08-05\", \"11-02\", \"11-04\"), B(\"geron-pytorch\", \"pp. 468–469, 492–493\")]) against corpus/augmentation-declares-invariance/receipts.tsv row aug-23 and notes/essays/augmentation-declares-invariance.md line 35.",
+    "fix": "Add P(\"https://docs.pytorch.org/vision/stable/generated/torchvision.transforms.v2.RandomRotation.html\", \"degrees parameter\") to sources[] for augmentation-declares-invariance in site/catalog.mjs."
+  }
+]
