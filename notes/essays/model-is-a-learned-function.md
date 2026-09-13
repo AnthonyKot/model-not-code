@@ -1,5 +1,7 @@
 # model-is-a-learned-function — essay note
 
+**Drafted by:** Claude Fable 5.1, main session (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** A (the diff you cannot read: the four-step loop, one hand-computed step, divergence),
 author's pick 2026-09-13. **Drafted:** 2026-09-13 by the main session, receipts first.
 

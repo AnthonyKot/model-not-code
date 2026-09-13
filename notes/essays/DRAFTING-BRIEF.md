@@ -79,7 +79,7 @@ every step is on the page. They will not tolerate a formula they cannot read ter
    slug's lines (other agents are drafting in parallel; do NOT run `npm run build` or anything that
    writes `docs/`). Fix every twelve-word failure and reword eight-word warnings unless the phrase is
    a generic technical term.
-6. Write `notes/essays/<slug>.md`: pitch letter; sources actually used with locators; word counts
+6. Write `notes/essays/<slug>.md`, starting with a line `**Drafted by:** <model name>, subagent (<date>)`; then pitch letter; sources actually used with locators; word counts
    (file and prose); provenance of every number; where you deviated from the pitch and why (if the
    pitch's arithmetic is wrong, the essay uses your verified numbers and the note says so);
    suggested catalog `payoff`, `caution`, title and `sources[]`; anything the essay owes another.

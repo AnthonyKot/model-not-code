@@ -53,5 +53,5 @@ Before a sentence with a number or a source claim is written, its row exists in
 ## Checks before handing back
 
 `npm run build && npm run check` green; the receipts file non-empty; word count noted in
-`notes/essays/<slug>.md` with the pitch letter, the sources actually used, and anything the
+`notes/essays/<slug>.md` with a `**Drafted by:**` line naming the model and session (main or subagent), the pitch letter, the sources actually used, and anything the
 essay owes.

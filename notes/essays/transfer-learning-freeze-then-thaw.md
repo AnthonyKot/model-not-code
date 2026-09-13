@@ -1,5 +1,7 @@
 # transfer-learning-freeze-then-thaw — drafting note (2026-09-13)
 
+**Drafted by:** Claude Opus 5, subagent (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** B, "frozen stops the gradient, not the statistics". Drafted by a subagent under `notes/essays/DRAFTING-BRIEF.md`.
 
 ## Sources actually used

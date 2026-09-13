@@ -1,5 +1,7 @@
 # attention-is-a-soft-lookup — essay note
 
+**Drafted by:** Claude Fable 5.1, subagent; review fixes applied by the main session (Fable 5.1) (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** B (the causal mask; row invariance when a token is appended), picked by the author
 2026-09-13. The opening two steps borrow Pitch A's soft-lookup framing on the same toy keys and
 values; row 3 of the worked table is Pitch A's lookup (0.665 / 0.090 / 0.245 → (0.910, 0.335)),

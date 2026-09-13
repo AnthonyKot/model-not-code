@@ -1,5 +1,7 @@
 # ppo-clips-the-step — drafting note (2026-09-13, subagent)
 
+**Drafted by:** Claude Opus 5, subagent (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** A (the ratio is the leash, the clip is where it goes taut).
 
 **Word count:** 2,618 in the file; 1,782 prose (code, table, figure, headings and source line

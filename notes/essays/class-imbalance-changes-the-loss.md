@@ -1,5 +1,7 @@
 # class-imbalance-changes-the-loss — essay note
 
+**Drafted by:** Claude Opus 5, subagent (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** A (the loss is a sum and the majority class owns the sum), picked 2026-09-13.
 **Drafted:** 2026-09-13 by a subagent, receipts first. Status to set: `drafted`.
 

@@ -1,5 +1,7 @@
 # learn-the-action-or-learn-its-worth — essay note
 
+**Drafted by:** Claude Opus 5, subagent (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** B (one family measures the return, the other bootstraps it), author's pick 2026-09-13.
 **Drafted:** 2026-09-13 by a subagent, receipts before prose, exercise run before the Expected result.
 

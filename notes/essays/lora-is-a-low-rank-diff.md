@@ -1,5 +1,7 @@
 # lora-is-a-low-rank-diff — essay note
 
+**Drafted by:** Claude Fable 5.1, main session; revised through the author's read notes by Fable 5.1 (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** A (the adapter is a diff of rank r; parameter count = (d_in + d_out) × r), picked by
 the author 2026-09-13. **Drafted:** 2026-09-13 by the main session, receipts first.
 

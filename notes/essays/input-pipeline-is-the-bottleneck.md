@@ -1,5 +1,7 @@
 # input-pipeline-is-the-bottleneck — essay note
 
+**Drafted by:** Claude Opus 5, subagent (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+
 **Pitch:** A (a training step is max(producer, consumer) once they overlap), picked by the author
 2026-09-13. **Drafted:** 2026-09-13 by a subagent, receipts first. Status: drafted, not reviewed.
 
