@@ -4,26 +4,23 @@ Read `CONTEXT.md` (constitution; §4 has tonight's prose rules), `AGENT.md` (who
 then this file. Codex does mechanical work only (AGENT.md "Who does what"); the main Claude session
 drafts, reviews and commits. Run with `-s workspace-write`; do not commit.
 
-## What exists (updated 2026-09-13, ~10:30)
+## What exists (updated 2026-09-13, afternoon)
 
-- Published (5): `lora-is-a-low-rank-diff`, `model-is-a-learned-function` (codex rewrite accepted),
-  `tokens-not-characters`, `attention-is-a-soft-lookup`, and nothing else yet.
-- Drafted, not published (8, all Part I–II): `embeddings-are-coordinates` (retitled "Similar Means
-  Whatever the Training Pairs Said"), `validation-set-is-a-budget` (reviewed + fixes applied),
-  `class-imbalance-changes-the-loss`, `augmentation-declares-invariance`,
-  `input-pipeline-is-the-bottleneck`, `transfer-learning-freeze-then-thaw`,
-  `learn-the-action-or-learn-its-worth` (retitled "Measure the Return, or Guess It From the Next
-  State"), `ppo-clips-the-step`.
-- Review status: all eight are `reviewed` (findings applied 2026-09-13; logs in each essay note). They are
-  waiting only for the author's say to publish (`python3 scripts/register.py <slug> published`, then
-  `npm run build`, commit docs/). Codex hit its usage limit at ~11:30 (resets 14:32) while applying
-  reports; the main session finished the application.
-- Parts III–VI: the author's decisions are in CONTEXT §9 (2026-09-13 morning). Catalog reshaping for
-  III–VI is the next mechanical job once the eight reviews above are applied (the catalog is edited
-  by the review step, so do not reshape concurrently).
-- Manifest: four books added (data-contracts, dedp, kubeflow-cml, openshift-mlops).
-- The accepted rewrite prompt is `notes/codex/codex.md`; the author may want the same register
-  applied to other essays.
+- **All twelve Part I–II essays are published.**
+- **Version comparison:** `essays/variants/<slug>.<label>.md` builds to `docs/essays/<slug>--<label>.html`
+  with a "Compare versions" bar. Live comparisons: essay 1 (`--previous`, the pre-rewrite text),
+  `tokens-not-characters--tight`, `attention-is-a-soft-lookup--tight`, `embeddings-are-coordinates--tight`;
+  `validation-set-is-a-budget.tight.md` was being written when the author stopped the chain (quota) —
+  verify and publish it with `scripts/publish-variant.sh validation-set-is-a-budget` if the file exists.
+- **Not rewritten (author stopped new rewrites to save quota):** class-imbalance, augmentation,
+  input-pipeline, transfer, LoRA, learn-the-action, PPO. Resume only on the author's say, one essay per
+  run: `codex exec … "Follow notes/codex/tight-rewrite-brief.md exactly with SLUG=<slug>."`, then
+  `scripts/publish-variant.sh <slug>`.
+- **Author's pending choice:** for each compared essay, keep the current text or adopt the tight one
+  (adopted text → `essays/<slug>.md`; the other → `essays/variants/<slug>.previous.md` or deleted).
+- **Parts III–VI:** decided (CONTEXT §9); the author wants Parts I–II final first. Then: reshape the
+  catalog (job 2), pitches for III–IV, the two pilots.
+- Manifest has the four new books. Prompts that worked: `notes/codex/codex.md`.
 
 ## Mechanical jobs codex may take when asked
 
