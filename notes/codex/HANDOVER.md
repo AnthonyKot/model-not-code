@@ -14,12 +14,10 @@ drafts, reviews and commits. Run with `-s workspace-write`; do not commit.
   `input-pipeline-is-the-bottleneck`, `transfer-learning-freeze-then-thaw`,
   `learn-the-action-or-learn-its-worth` (retitled "Measure the Return, or Guess It From the Next
   State"), `ppo-clips-the-step`.
-- Review status of those: reports exist and are NOT yet applied for `class-imbalance-changes-the-loss`
-  and `augmentation-declares-invariance` (`checks/reviews/<slug>/report.md`, `checks/readers/<slug>/`).
-  The other five had review jobs queued in the main session at wrap-up; if their `report.md` is
-  missing or empty, rerun `scripts/review.sh <slug>` and `scripts/readers.sh <slug>` one essay at a
-  time. After applying findings: `python3 scripts/register.py <slug> reviewed`, then publish all eight
-  together (`published`) on the author's say (the author asked for Parts I–II to be finished).
+- Review status: all eight are `reviewed` (findings applied 2026-09-13; logs in each essay note). They are
+  waiting only for the author's say to publish (`python3 scripts/register.py <slug> published`, then
+  `npm run build`, commit docs/). Codex hit its usage limit at ~11:30 (resets 14:32) while applying
+  reports; the main session finished the application.
 - Parts III–VI: the author's decisions are in CONTEXT §9 (2026-09-13 morning). Catalog reshaping for
   III–VI is the next mechanical job once the eight reviews above are applied (the catalog is edited
   by the review step, so do not reshape concurrently).
