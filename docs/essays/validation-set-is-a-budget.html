@@ -102,6 +102,7 @@
       <h1 class="essay-title">You Only Get to Look at the Test Set Once</h1>
       <p class="essay-payoff">The best validation score out of many tries is inflated by the trying: how much, what it depends on, and why the test set is scored once.</p>
     </header>
+    
     <article class="prose"><p>You trained twenty configurations, kept the checkpoint with the lowest validation loss from each, and wrote the best validation accuracy of the lot into the pull request. Then the chosen model was scored on rows that played no part in any of that, and the number came back lower. Nothing broke between the two measurements. The first number was never an estimate of the model&#39;s accuracy. It was the largest of twenty noisy measurements, and the largest of several noisy measurements is biased upward by construction.</p>
 <p>That bias is the winner&#39;s curse, and it is why a dataset is cut into three parts rather than two. Below it is enumerated on tiny numbers, measured in a simulation, and then found where it hides in everyday training.</p>
 <h2 id="a-score-on-a-finite-set-is-a-draw">A score on a finite set is a draw</h2>

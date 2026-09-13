@@ -102,6 +102,7 @@
       <h1 class="essay-title">Measure the Return, or Guess It From the Next State</h1>
       <p class="essay-payoff">Why a Q-learning network chases a target that moves as it learns, and why waiting for the whole episode avoids that at the price of noisier, slower updates.</p>
     </header>
+    
     <article class="prose"><p>You move a small network from a supervised task to a reinforcement-learning one. The optimiser and the mean squared error are the same, but the loss that fell smoothly before now wanders and the predictions drift. The network is not the problem; the labels are. In a supervised dataset each target is fixed on disk. In this loop each target is computed from the network&#39;s own output, so every step toward the target moves the target.</p>
 <p>That is a deliberate choice, and it separates the two families of reinforcement learning. A policy-gradient method learns what to do: it outputs a probability per action and shifts them. A value method learns what each action is worth: it outputs an estimated return per action and takes the largest. Both need a number saying how good an action turned out to be. REINFORCE, the simplest policy-gradient method, waits for the episode to end and measures it. Q-learning, the simplest value method, guesses it from its own estimate of the next state. That difference decides when learning happens, how errors travel, and why deep Q-learning needs machinery REINFORCE does without.</p>
 <h2 id="the-quantity-both-families-need">The quantity both families need</h2>

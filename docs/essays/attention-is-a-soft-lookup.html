@@ -102,6 +102,7 @@
       <h1 class="essay-title">Attention Is a Dictionary Lookup That Returns a Weighted Mix</h1>
       <p class="essay-payoff">The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.</p>
     </header>
+    
     <article class="prose"><p>You are told two things about the language model you are about to serve. It was trained on whole documents, every token present, including the ones it was being asked to predict. And at serving time it produces one token at a time, each appended to the prompt before the next. Read as a programmer, the two do not match: either training let the model read the token it was predicting, which is cheating, or serving runs a different program from the one that was trained and the loss you measured says nothing about the thing you deployed.</p>
 <p>Both worries resolve in one place: a mask applied to one table inside every attention layer. This essay builds the table, applies the mask, and shows what the mask buys: the numbers computed for the tokens already in the sequence do not change when a new token is appended, and that invariance is what makes the training pass and the generation loop the same computation.</p>
 <h2 id="a-lookup-whose-equality-test-is-a-score">A lookup whose equality test is a score</h2>

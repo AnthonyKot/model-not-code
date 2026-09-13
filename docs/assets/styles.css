@@ -243,3 +243,9 @@ button { font: inherit; }
 /* Display formulas inside essays: a centred serif line, not a code box. */
 .prose .formula { margin: 1.6rem 0; text-align: center; font-size: 1.15em; letter-spacing: .02em; font-variant-numeric: lining-nums; }
 .prose sub { font-size: .72em; line-height: 0; }
+
+/* Version comparison banner shown when essays/variants/ holds another version of an essay. */
+.compare-banner { margin: 0 0 1.5rem; padding: .7rem 1rem; font-family: var(--sans); font-size: .85rem; background: var(--paper-deep); border-left: 3px solid var(--amber); }
+.compare-banner span { color: var(--muted); margin-right: .35rem; }
+.compare-banner a { color: var(--forest); font-weight: 700; }
+.compare-banner a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 800; }

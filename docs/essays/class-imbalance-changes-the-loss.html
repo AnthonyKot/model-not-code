@@ -102,6 +102,7 @@
       <h1 class="essay-title">95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</h1>
       <p class="essay-payoff">When one class is 95% of your rows the training loss is mostly written by that class; a class weight changes what the model is trained to predict, and the confusion matrix shows what that costs.</p>
     </header>
+    
     <article class="prose"><p>You train a classifier to flag the rare case: a fraudulent payment, a failing part. In your data 95 rows in every 100 are the ordinary case. The first run reports 95% accuracy, which is exactly what a function returning <code>false</code> for every input scores. Accuracy counts a missed positive and a false alarm as one error each, so on a 95/5 split it says nothing about the 5.</p>
 <p>The metric is the visible half. The other half is in training: the loss the optimiser minimises is a sum over rows, and 95 of every 100 terms belong to one class. This essay shows, on numbers you can check by hand, what answer that sum prefers and how a class weight changes it.</p>
 <h2 id="the-loss-is-a-sum-and-the-majority-writes-most-of-it">The loss is a sum, and the majority writes most of it</h2>

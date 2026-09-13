@@ -102,6 +102,7 @@
       <h1 class="essay-title">PPO: Reuse the Samples, But Not Too Much</h1>
       <p class="essay-payoff">Why training a reinforcement-learning policy on the same batch for several epochs can wreck it, and how PPO's clipped ratio switches off each sample's gradient once the policy has moved far enough on its account.</p>
     </header>
+    
     <article class="prose"><p>You are training a policy: a network that takes the state of an environment and outputs a probability for each action. Experience costs slow environment steps, so you train on each collected batch for several epochs instead of one. The reward curve rises for a while, then drops and does not come back.</p>
 <p>It does not come back for a reason specific to reinforcement learning. In supervised learning a bad update leaves the data untouched. Here the next batch is collected by the policy you now have. A policy fitted too closely to one batch picks bad actions elsewhere, those actions lead to states where nothing good happens, and the data gathered there teaches it little that would get it out. The policy has collapsed, and it feeds itself the evidence that keeps it there.</p>
 <p>Using each batch once avoids this and wastes most of what the samples could teach. Proximal policy optimisation, PPO, takes a middle path: reuse the batch for many epochs, but stop each sample from pushing once the policy has moved far enough on its account. One ratio and one clip do that; this essay is about both, and about what they do not do.</p>

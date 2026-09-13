@@ -102,6 +102,7 @@
       <h1 class="essay-title">Why the Model Cannot Count the Letters in “Strawberry”</h1>
       <p class="essay-payoff">How a tokenizer's table is built by counting, why a common word reaches the network as one integer, and what that does to any question about its letters.</p>
     </header>
+    
     <article class="prose"><p>You ask a language model how many times a letter appears in a word, it answers with the wrong number, and you file the result under &quot;not as clever as advertised&quot;. The filing is aimed at the wrong component. The network that produced the answer never received the word. It received a short list of integers, and the letters you were asking about are not in that list. Whether they can be recovered from it is a separate question, and the answer is &quot;only indirectly&quot;, for a reason that this essay derives on the page.</p>
 <p>The component that turned your text into integers is the tokenizer, and it is the one part of the system that is not learned by gradient descent. It is a table, built once before training by a counting procedure that fits on one screen. The essay builds one.</p>
 <h2 id="text-becomes-integers-before-anything-else-happens">Text becomes integers before anything else happens</h2>

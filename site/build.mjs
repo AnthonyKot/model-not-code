@@ -184,8 +184,25 @@ function shell({ title, description, prefix = "", activeSlug = "", body, pageCla
 </html>`;
 }
 
-function essayPage(essay, index) {
-  const source = fs.readFileSync(path.join(root, "essays", `${essay.slug}.md`), "utf8");
+// Comparison variants: essays/variants/<slug>.<label>.md, built to essays/<slug>--<label>.html.
+// Labels: "tight" = codex rewrite in the essay-1 register; "previous" = the version before a rewrite.
+const VARIANT_NAMES = { tight: "Tighter rewrite", previous: "Previous version" };
+function variantsOf(slug) {
+  const dir = path.join(root, "essays", "variants");
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.startsWith(`${slug}.`) && f.endsWith(".md"))
+    .map((f) => ({ label: f.slice(slug.length + 1, -3), file: path.join(dir, f) }));
+}
+function compareBanner(essay, current) {
+  const variants = variantsOf(essay.slug);
+  if (!variants.length) return "";
+  const links = [`<a href="${essay.slug}.html"${current === "" ? ' aria-current="page"' : ""}>Current version</a>`]
+    .concat(variants.map((v) => `<a href="${essay.slug}--${v.label}.html"${current === v.label ? ' aria-current="page"' : ""}>${escapeHtml(VARIANT_NAMES[v.label] || v.label)}</a>`));
+  return `<nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> ${links.join(" · ")}</nav>`;
+}
+
+function essayPage(essay, index, variant = null) {
+  const source = variant ? fs.readFileSync(variant.file, "utf8") : fs.readFileSync(path.join(root, "essays", `${essay.slug}.md`), "utf8");
   let article = renderMarkdown(source);
   article = article.replace(/^<h1[^>]*>.*?<\/h1>\s*/s, "");
   const missionLabel = essay.missionLabel || "Try the exercise";
@@ -207,6 +224,7 @@ function essayPage(essay, index) {
       <h1 class="essay-title">${escapeHtml(essay.title)}</h1>
       <p class="essay-payoff">${escapeHtml(essay.payoff || essay.mechanism)}</p>
     </header>
+    ${compareBanner(essay, variant ? variant.label : "")}
     <article class="prose">${article}</article>
     <div class="mission-action" data-mission-action="${essay.slug}">
       <div><strong>Check your understanding.</strong><span>Try the exercise and compare your reasoning with the explanation.</span></div>
@@ -293,7 +311,12 @@ function aboutPage() {
 
 fs.writeFileSync(path.join(out, "index.html"), homePage());
 fs.writeFileSync(path.join(out, "about.html"), aboutPage());
-builtEssays.forEach((essay, index) => fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), essayPage(essay, index)));
+builtEssays.forEach((essay, index) => {
+  fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), essayPage(essay, index));
+  for (const variant of variantsOf(essay.slug)) {
+    fs.writeFileSync(path.join(out, "essays", `${essay.slug}--${variant.label}.html`), essayPage(essay, index, variant));
+  }
+});
 skips.forEach((item) => fs.writeFileSync(path.join(out, "reviews", `${item.slug}.html`), skipReviewPage(item)));
 for (const asset of ["styles.css", "app.js"]) fs.copyFileSync(path.join(here, asset), path.join(out, "assets", asset));
 fs.writeFileSync(path.join(out, ".nojekyll"), "");

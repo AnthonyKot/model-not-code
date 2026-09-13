@@ -102,6 +102,7 @@
       <h1 class="essay-title">Your GPU Is Waiting on Your JPEG Decoder</h1>
       <p class="essay-payoff">Why a faster GPU often leaves training no faster, and how two timings of your own loop tell you what more data-loader workers, prefetching or a new card would actually buy.</p>
     </header>
+    
     <article class="prose"><p>Your training job runs, the loss falls, and the accelerator&#39;s utilisation graph sits at about 31%. The proposal on the table is a faster card. If the job is shaped like this essay&#39;s example, the faster card leaves the time per step where it is and pushes utilisation lower, because the step is not waiting on the card. It is waiting on the CPU work that turns files on disk into a batch of tensors.</p>
 <p>The shape is familiar from systems work: a producer, a consumer and a queue between them. What is worth having is the arithmetic, because two measured numbers forecast what any fix will buy before you make it.</p>
 <h2 id="two-stages-and-how-they-are-scheduled">Two stages, and how they are scheduled</h2>

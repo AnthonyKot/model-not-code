@@ -106,3 +106,19 @@ corpus/SLUG/, notes/essays/SLUG.md and workspace/SLUG/. Do not commit. Finish by
 node checks/receipts.mjs | grep SLUG and node checks/paraphrase.mjs --all | grep SLUG (0 failures required), then report
 what changed per finding and the catalog changes requested.
 ```
+
+---
+
+## 3. Tight rewrite as a comparison variant (2026-09-13)
+
+The author wants rewrites published *beside* the current essays to compare and choose. Brief:
+`notes/codex/tight-rewrite-brief.md` (generic form of §1). Output: `essays/variants/<slug>.tight.md`,
+built by `npm run build` to `docs/essays/<slug>--tight.html` with a "Compare versions" bar on both pages.
+
+```bash
+timeout 1800 codex exec --skip-git-repo-check -s workspace-write -C /home/diablo/book20 \
+  "Follow notes/codex/tight-rewrite-brief.md exactly with SLUG=<slug>." < /dev/null > checks/codex-tight-<slug>.log 2>&1
+```
+
+When the author picks a version, the chosen text becomes `essays/<slug>.md` and the other is kept as
+`essays/variants/<slug>.previous.md` (or deleted on the author's say).

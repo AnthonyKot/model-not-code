@@ -102,6 +102,7 @@
       <h1 class="essay-title">Fine-Tuning Without Touching the Weights</h1>
       <p class="essay-payoff">What a LoRA adapter actually is, why it is so much smaller than the model it changes, and how to work out its size before you train.</p>
     </header>
+    
     <article class="prose"><p>You have a model whose behaviour you need to change on your task, and it has about three billion weights. A full fine-tune updates every one of them, which means every one needs its value, its gradient and whatever the optimiser keeps per weight, all resident on the GPU at once. A Llama 3.2 base of that size takes about 13 GB of GPU memory just to hold at 32-bit precision, before training starts. The card you actually have is the free one in a notebook. The full fine-tune does not fit, and it would not fit with twice the card either.</p>
 <p>The way out is not to make the model smaller. It is to stop treating the model as the thing you edit. You leave every weight where it is and train a separate, much smaller object that is added to the model&#39;s output. That object is a diff, and this essay is about why a diff of a particular shape is so much cheaper than the weights it changes.</p>
 <h2 id="a-weight-update-is-a-matrix-and-a-matrix-can-be-factored">A weight update is a matrix, and a matrix can be factored</h2>

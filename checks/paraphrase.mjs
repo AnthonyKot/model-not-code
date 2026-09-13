@@ -88,9 +88,21 @@ function courseIdsFor(essay) {
 let totalFailures = 0;
 let totalWarnings = 0;
 
+// Each essay plus any comparison variants in essays/variants/<slug>.<label>.md is checked.
+const variantDir = path.join(root, "essays", "variants");
+const targets = [];
 for (const essay of essays) {
-  const essayPath = path.join(root, "essays", `${essay.slug}.md`);
-  if (!fs.existsSync(essayPath)) continue;
+  const main = path.join(root, "essays", `${essay.slug}.md`);
+  if (fs.existsSync(main)) targets.push({ essay, label: essay.slug, file: main });
+  if (fs.existsSync(variantDir)) {
+    for (const f of fs.readdirSync(variantDir).filter((f) => f.startsWith(`${essay.slug}.`) && f.endsWith(".md"))) {
+      targets.push({ essay: { ...essay, slug: essay.slug }, label: f.replace(/\.md$/, ""), file: path.join(variantDir, f) });
+    }
+  }
+}
+
+for (const { essay: baseEssay, label, file: essayPath } of targets) {
+  const essay = { ...baseEssay, slug: label, _allowSlug: baseEssay.slug };
   const raw = fs.readFileSync(essayPath, "utf8");
   const words = normalizeWords(raw);
   const courseIds = courseIdsFor(essay);
@@ -100,7 +112,7 @@ for (const essay of essays) {
   }
 
   const quoted = quotedPhrases(raw);
-  const allowed = allowedPhrasesFor(essay.slug);
+  const allowed = allowedPhrasesFor(essay._allowSlug);
 
   const combinedTwelve = new Map();
   const combinedEight = new Map();
