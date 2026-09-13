@@ -1,0 +1,10 @@
+# 2026-09-13T07:34Z PyTorch 2.14.0+cpu, CPU, 16 logical cores, Linux (WSL2)
+measured L = 269 ms per batch, C = 80 ms per step
+num_workers prefetch forecast measured
+          0     None      349      348
+          1        2      269      271
+          2        2      134      137
+          4        2       80       83
+          8        2       80       84
+          4        1       80       84
+# wall 22.64 s

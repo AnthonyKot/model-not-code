@@ -88,8 +88,11 @@ export const essays = [
       payoff: "Why adding a standard flip or rotation can lower validation accuracy, and how to check which transforms your labels actually allow before you train.",
       caution: "The audit table is a starting judgement, not a rule; the exercise data is synthetic." }),
   E("input-pipeline-is-the-bottleneck", "II", "Your GPU Is Waiting on Your JPEG Decoder",
-    "Serialise once, read sequentially, map in parallel, prefetch: the producer–consumer pattern applied to training.",
-    [C("4735368", "11-05", "03-11"), B("dist-ml-patterns")]),  // 10-04 is hyperparameter tuning; dropped (pitch note)
+    "Once loading overlaps compute, a step costs max(load, compute), not their sum; parallel workers divide the load term.",
+    [C("4735368", "03-11", "11-04", "11-05"), B("geron-pytorch", "p. 367"), B("dist-ml-patterns", "pp. 29, 59–60")],  // 10-04 is hyperparameter tuning; dropped (pitch note)
+    { status: "drafted",
+      payoff: "Why a faster GPU often leaves training no faster, and how two timings of your own loop tell you what more data-loader workers, prefetching or a new card would actually buy.",
+      caution: "The forecast is for steady state and assumes a free CPU core per worker; storage throughput and variable decode times are outside it." }),
   E("transfer-learning-freeze-then-thaw", "II", "Borrow the Eyes, Retrain the Judgement",
     "requires_grad=False stops gradients but not BatchNorm's running statistics; eval() on those layers freezes them, and parameter groups give the thawed backbone a smaller learning rate.",
     [C("4735368", "13-01", "13-02", "12-03"), B("geron-pytorch", "pp. 406–409, 413–416, 436, 492–493"), B("raschka-qai", "pp. 132–133")],
