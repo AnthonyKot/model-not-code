@@ -299,6 +299,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   non-technical reader can follow (prose ~1,800 → ~1,080 words). If the author likes it, this register
   becomes the target for the rest of the book.
 
+- **2026-09-13 (afternoon)** — The eight reviewed Part I–II essays published on the author's say; all
+  twelve Part I–II essays are live. The author wants codex rewrites of the ready essays in essay 1's
+  tighter register published *alongside* the current versions so they can compare and choose per
+  essay; Parts III–IV wait until Parts I–II are final.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

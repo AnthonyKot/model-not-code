@@ -23,7 +23,7 @@
     </a>
     <div class="header-actions">
       <a href="about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 12 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
@@ -31,7 +31,7 @@
     <aside class="book-nav" id="book-navigation" data-book-nav>
       <div class="book-nav__intro">
         <a href="index.html">The shelf</a>
-        <p>4 essays. Worked examples and exercises included.</p>
+        <p>12 essays. Worked examples and exercises included.</p>
       </div>
       <nav aria-label="Book contents">
     <a class="book-nav__item" href="essays/model-is-a-learned-function.html" data-mission-link="model-is-a-learned-function">
@@ -49,9 +49,49 @@
       <span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <a class="book-nav__item" href="essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+    <a class="book-nav__item" href="essays/embeddings-are-coordinates.html" data-mission-link="embeddings-are-coordinates">
       <span class="book-nav__number">04</span>
+      <span>Similar Means Whatever the Training Pairs Said</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/validation-set-is-a-budget.html" data-mission-link="validation-set-is-a-budget">
+      <span class="book-nav__number">05</span>
+      <span>You Only Get to Look at the Test Set Once</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/class-imbalance-changes-the-loss.html" data-mission-link="class-imbalance-changes-the-loss">
+      <span class="book-nav__number">06</span>
+      <span>95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/augmentation-declares-invariance.html" data-mission-link="augmentation-declares-invariance">
+      <span class="book-nav__number">07</span>
+      <span>Augmentation Is Telling the Model What Does Not Matter</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/input-pipeline-is-the-bottleneck.html" data-mission-link="input-pipeline-is-the-bottleneck">
+      <span class="book-nav__number">08</span>
+      <span>Your GPU Is Waiting on Your JPEG Decoder</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/transfer-learning-freeze-then-thaw.html" data-mission-link="transfer-learning-freeze-then-thaw">
+      <span class="book-nav__number">09</span>
+      <span>Borrow the Eyes, Retrain the Judgement</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+      <span class="book-nav__number">10</span>
       <span>Fine-Tuning Without Touching the Weights</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/learn-the-action-or-learn-its-worth.html" data-mission-link="learn-the-action-or-learn-its-worth">
+      <span class="book-nav__number">11</span>
+      <span>Measure the Return, or Guess It From the Next State</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/ppo-clips-the-step.html" data-mission-link="ppo-clips-the-step">
+      <span class="book-nav__number">12</span>
+      <span>PPO: Reuse the Samples, But Not Too Much</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a></nav>
       
@@ -60,12 +100,12 @@
     <section class="home-hero">
       <div class="home-hero__eyebrow">Standalone essays for a senior developer moving into ML and AI engineering</div>
       <h1>The Program Is Now a Model</h1>
-      <p>4 standalone essays. Each explains one mechanism with a worked example you can recompute, and closes with an exercise you can do without a GPU, a paid API, or the source.</p>
+      <p>12 standalone essays. Each explains one mechanism with a worked example you can recompute, and closes with an exercise you can do without a GPU, a paid API, or the source.</p>
       <div class="home-hero__actions">
         <a class="button button--primary" href="essays/lora-is-a-low-rank-diff.html">Read the recommended start</a>
         <a class="button button--quiet" href="#the-shelf">Browse the shelf</a>
       </div>
-      <div class="home-proof"><span><strong>4</strong> essays published</span></div>
+      <div class="home-proof"><span><strong>12</strong> essays published</span></div>
     </section>
     <section class="shelf-section" id="the-shelf">
       <div class="section-heading"><div><span class="section-label">The shelf</span><h2>Reading order</h2></div><p>Each essay is standalone; read in any order.</p></div>
@@ -85,11 +125,51 @@
     <h3><a href="essays/attention-is-a-soft-lookup.html">Attention Is a Dictionary Lookup That Returns a Weighted Mix</a></h3>
     <p>The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.</p>
     <a class="shelf-card__action" href="essays/attention-is-a-soft-lookup.html">Read the essay <span>→</span></a>
-  </article></div></section><section class="shelf-section" id="part-ii"><div class="section-heading"><div><span class="section-label">Part II</span><h2>Data and training</h2></div></div><div class="shelf-grid"><article class="shelf-card shelf-card--recommended" data-mission-card="lora-is-a-low-rank-diff">
+  </article><article class="shelf-card" data-mission-card="embeddings-are-coordinates">
     <div class="shelf-card__top"><span>04</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/embeddings-are-coordinates.html">Similar Means Whatever the Training Pairs Said</a></h3>
+    <p>How an embedding model comes to put matching texts close together, worked through one training step by hand, and why queries of a kind it never trained on can come back as noise.</p>
+    <a class="shelf-card__action" href="essays/embeddings-are-coordinates.html">Read the essay <span>→</span></a>
+  </article></div></section><section class="shelf-section" id="part-ii"><div class="section-heading"><div><span class="section-label">Part II</span><h2>Data and training</h2></div></div><div class="shelf-grid"><article class="shelf-card" data-mission-card="validation-set-is-a-budget">
+    <div class="shelf-card__top"><span>05</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/validation-set-is-a-budget.html">You Only Get to Look at the Test Set Once</a></h3>
+    <p>The best validation score out of many tries is inflated by the trying: how much, what it depends on, and why the test set is scored once.</p>
+    <a class="shelf-card__action" href="essays/validation-set-is-a-budget.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="class-imbalance-changes-the-loss">
+    <div class="shelf-card__top"><span>06</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/class-imbalance-changes-the-loss.html">95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</a></h3>
+    <p>When one class is 95% of your rows the training loss is mostly written by that class; a class weight changes what the model is trained to predict, and the confusion matrix shows what that costs.</p>
+    <a class="shelf-card__action" href="essays/class-imbalance-changes-the-loss.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="augmentation-declares-invariance">
+    <div class="shelf-card__top"><span>07</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/augmentation-declares-invariance.html">Augmentation Is Telling the Model What Does Not Matter</a></h3>
+    <p>Why adding a standard flip or rotation can lower validation accuracy, and how to check which transforms your labels actually allow before you train.</p>
+    <a class="shelf-card__action" href="essays/augmentation-declares-invariance.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="input-pipeline-is-the-bottleneck">
+    <div class="shelf-card__top"><span>08</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/input-pipeline-is-the-bottleneck.html">Your GPU Is Waiting on Your JPEG Decoder</a></h3>
+    <p>Why a faster GPU often leaves training no faster, and how two timings of your own loop tell you what more data-loader workers, prefetching or a new card would actually buy.</p>
+    <a class="shelf-card__action" href="essays/input-pipeline-is-the-bottleneck.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="transfer-learning-freeze-then-thaw">
+    <div class="shelf-card__top"><span>09</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/transfer-learning-freeze-then-thaw.html">Borrow the Eyes, Retrain the Judgement</a></h3>
+    <p>Why a backbone you froze with requires_grad=False can still change during training, and how to freeze, train a new head and thaw without that happening by accident.</p>
+    <a class="shelf-card__action" href="essays/transfer-learning-freeze-then-thaw.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card shelf-card--recommended" data-mission-card="lora-is-a-low-rank-diff">
+    <div class="shelf-card__top"><span>10</span><span class="shelf-card__status">Unread</span></div>
     <h3><a href="essays/lora-is-a-low-rank-diff.html">Fine-Tuning Without Touching the Weights</a></h3>
     <p>What a LoRA adapter actually is, why it is so much smaller than the model it changes, and how to work out its size before you train.</p>
     <a class="shelf-card__action" href="essays/lora-is-a-low-rank-diff.html">Start here <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="learn-the-action-or-learn-its-worth">
+    <div class="shelf-card__top"><span>11</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/learn-the-action-or-learn-its-worth.html">Measure the Return, or Guess It From the Next State</a></h3>
+    <p>Why a Q-learning network chases a target that moves as it learns, and why waiting for the whole episode avoids that at the price of noisier, slower updates.</p>
+    <a class="shelf-card__action" href="essays/learn-the-action-or-learn-its-worth.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="ppo-clips-the-step">
+    <div class="shelf-card__top"><span>12</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/ppo-clips-the-step.html">PPO: Reuse the Samples, But Not Too Much</a></h3>
+    <p>Why training a reinforcement-learning policy on the same batch for several epochs can wreck it, and how PPO's clipped ratio switches off each sample's gradient once the policy has moved far enough on its account.</p>
+    <a class="shelf-card__action" href="essays/ppo-clips-the-step.html">Read the essay <span>→</span></a>
   </article></div></section><section class="shelf-section" id="part-iii"><div class="section-heading"><div><span class="section-label">Part III</span><h2>Evaluation and monitoring</h2></div></div><p class="part-empty">No essays published yet.</p></section><section class="shelf-section" id="part-iv"><div class="section-heading"><div><span class="section-label">Part IV</span><h2>Serving and inference</h2></div></div><p class="part-empty">No essays published yet.</p></section><section class="shelf-section" id="part-v"><div class="section-heading"><div><span class="section-label">Part V</span><h2>LLM systems: retrieval, fine-tuning, agents</h2></div></div><p class="part-empty">No essays published yet.</p></section><section class="shelf-section" id="part-vi"><div class="section-heading"><div><span class="section-label">Part VI</span><h2>The job</h2></div></div><p class="part-empty">No essays published yet.</p></section>
     
     <footer class="home-footer"><div><strong>The Program Is Now a Model</strong><p>Standalone essays for a senior developer moving into ML and AI engineering</p></div><p><a href="https://github.com/AnthonyKot/model-not-code">Source on GitHub</a></p></footer>
