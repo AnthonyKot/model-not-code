@@ -332,6 +332,13 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   malaria cell classifier, reward-trained agent), awaiting the author's approval. Parts III–VI are
   planned as chapters 5–8 in the same form.
 
+- **2026-09-13 (later)** — Codex reviewed the chapter plan against the sources; five remarks, all
+  adopted (generation was never introduced before the serving chapter; LoRA goes on the language
+  model; chapters 2/5 split before/after release; temperature and the RLHF bridge stated precisely;
+  chapter 8 closes as a project decision). The author chose to run the image classifier on the
+  shop's product photos, so the book follows **one shop**; the assistant chapter now precedes serving.
+  Plan revision 2 in `notes/chapters/CHAPTER-PLAN.md`, awaiting approval; chapter 1 is the pilot.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

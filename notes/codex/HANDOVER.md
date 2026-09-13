@@ -3,6 +3,8 @@
 > **2026-09-13 night — read first:** the book is being restructured from standalone essays into
 > project chapters; plan in `notes/chapters/CHAPTER-PLAN.md`, awaiting the author's approval. Do not
 > rewrite or draft essays until it is approved. Chapters 1–5 have one page each (variants removed).
+> Revision 2 of the plan (2026-09-13, later) applies codex's five review remarks and moves the image
+> classifier onto the shop's product photos (one project for the whole book); assistant chapter before serving.
 
 
 Read `CONTEXT.md` (constitution; §4 has tonight's prose rules), `AGENT.md` (who does what), `PLAN.md`,
