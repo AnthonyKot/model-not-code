@@ -1,6 +1,6 @@
 # model-is-a-learned-function — essay note
 
-**Drafted by:** Claude Fable 5.1, main session (2026-09-13). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
+**Drafted by:** Claude Fable 5.1, main session (2026-09-13); **rewritten by codex gpt-5.6-sol** (2026-09-13, brief in workspace/model-is-a-learned-function/CODEX-REWRITE.md) after the author found it "a bit plump"; two fixes by the main session (Opus 5). Review lanes: Gemini 3.8 flash and Gemini 3.1 pro via agy; consolidation and one reader persona: codex gpt-5.6-sol (when not rate-limited).
 
 **Pitch:** A (the diff you cannot read: the four-step loop, one hand-computed step, divergence),
 author's pick 2026-09-13. **Drafted:** 2026-09-13 by the main session, receipts first.
@@ -43,3 +43,11 @@ explicitly deferred to the validation essay. Rejected: the pull-request opening 
 "manufactured scene" (second person, the reader's situation, is what BRIEF asks for); replacing
 the collinear worked example with noisy points (the outlier exercise shows the non-zero floor;
 the collinear case keeps the hand arithmetic exact).
+
+**Author's read (2026-09-13):** "a bit plump". Rewritten by codex to a serious technical register a
+curious non-technical reader can follow: prose 1,771 → 1,042 words (1,080 after the main session
+restored one sentence tying the opening to the title's compile-step idea and repaired a truncated
+sentence); the pull-request scene, reviewer framing and repeated commentary cut; the worked example
+moved first and every calculation put in a table; both formulas glossed term by term; every number
+unchanged and still receipted; script unchanged, output now quoted in full. Previous version kept
+at workspace/model-is-a-learned-function/essay-before-codex.md.

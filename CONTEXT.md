@@ -294,6 +294,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   `which-feature-moved-the-prediction`, `position-is-a-rotation`, `predict-the-time-left`). Total
   stays 30. Catalog reshaping for III–VI is queued; the author asked to finish Parts I and II first.
 
+- **2026-09-13** — Essay 1 (`model-is-a-learned-function`) read by the author as "a bit plump";
+  rewritten by codex from a written brief into a tighter technical register that a curious
+  non-technical reader can follow (prose ~1,800 → ~1,080 words). If the author likes it, this register
+  becomes the target for the rest of the book.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

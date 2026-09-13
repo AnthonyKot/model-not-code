@@ -1,67 +1,90 @@
 # The Program Is Now a Table of Numbers, and Training Is the Compile Step
 
-You are asked to review a change that alters what the system does. The pull request touches no logic. It replaces one binary file of floating-point numbers with another, and the description says the new file "performs better on the holdout set". Your instinct is to read the code and find the branch that changed. There is no branch. The behaviour lives in the numbers, and nothing in the file tells you which number does what.
+A model is a function whose parameters, the numbers that control its output, are fitted to data. You choose the function's form and how to measure its errors. Training repeatedly changes the parameters to reduce those errors. The resulting values determine the predictions when you run the model. In that sense training plays the part a compiler plays in ordinary software: it turns what you specified, a function's form, a loss and a dataset, into the artifact you ship, which is a table of numbers rather than machine code.
 
-This is the first thing that changes when the program you ship is a model. The artefact is not source that a person wrote; it is the output of a loop that a person configured. To review the change you have to understand the loop, because the loop is the only place where the numbers were set. This essay walks that loop once, on numbers small enough to check with a pencil, and then shows the two ways it commonly goes wrong.
+## Three points and a starting loss
 
-## The loop that produced the numbers
+Take the example points (1, 2), (2, 4) and (3, 6). Each pair contains an input x and its known answer y. A straight-line model predicts m·x + c: m is the **weight**, which multiplies the input, and c is the **bias**, which adds a fixed offset. Here m is the line's slope and c its intercept. The points lie on y = 2x, so m = 2 and c = 0 would fit them exactly.
 
-Start with the simplest model there is: a straight line, y = m·x + c. It has two parameters, the slope m and the intercept c. In the usual vocabulary m is a weight and c a bias, and it is worth holding on to that: a model with billions of parameters is billions of these, and the same four steps fill all of them. Scale changes how the derivative is computed and how the data is fed in; it does not change what a step is.
+Start with m = c = 0. Every prediction is zero. A **loss** is a single number measuring prediction error; smaller means a better fit according to that measure. Use mean squared error: square each prediction minus its answer, then average.
 
-The loop has four steps, repeated.
+| Input x | Answer y | Prediction | Error | Squared error |
+|---|---|---|---|---|
+| 1 | 2 | 0 | −2 | 4 |
+| 2 | 4 | 0 | −4 | 16 |
+| 3 | 6 | 0 | −6 | 36 |
+| Total | | | | 4 + 16 + 36 = 56 |
+| Mean | | | | 56/3 ≈ 18.667 |
 
-**1. Predict.** For every training row, run the model with its current parameters and record what it outputs. At the start the parameters are arbitrary. Set them to zero and the model predicts zero for everything.
+For any number of rows, the same calculation is:
 
-**2. Score.** Compare each prediction with the known answer and reduce the comparison to one number, the loss. Mean squared error is the usual choice for a regression: take each difference, square it, and average over the rows. Squaring makes every error positive and makes a large error count much more than a small one.
+<p class="formula">L = (1/n) ∑<sub>i=1</sub><sup>n</sup> (m·x<sub>i</sub> + c − y<sub>i</sub>)<sup>2</sup></p>
 
-**3. Differentiate.** For each parameter, ask how the loss would change if that parameter moved a little. That question has an exact answer, the loss's partial derivative taken along that one parameter, and the collection of those answers over all parameters is the gradient. The gradient points in the direction that makes the loss larger. For a squared error (prediction − answer)² the chain rule gives 2 × (prediction − answer) × the derivative of the prediction; the prediction m·x + c changes by x per unit of m and by 1 per unit of c, which is where the formulas in the worked example come from.
+L is the loss and n the number of rows. The symbol ∑ adds the expression for each row i, from the first through the nth. x<sub>i</sub> is that row's input, y<sub>i</sub> its answer, and m·x<sub>i</sub> + c its prediction using weight m and bias c. Subtracting the answer gives the error; the superscript 2 squares it; dividing by n gives the mean.
 
-**4. Step.** Move every parameter a small distance against its gradient:
+Squaring prevents positive and negative errors from cancelling. It also makes large errors count disproportionately: an error of 10 contributes 100, while an error of 3 contributes 9. Choosing this formula therefore affects which line training produces.
+
+## From loss to gradient to step
+
+A **derivative** measures how fast a quantity changes as another changes. A **partial derivative** measures that rate for one parameter while holding the others fixed. The **gradient** collects the loss's partial derivatives for all parameters. Its direction is uphill: towards increasing loss.
+
+For one row, changing m changes the prediction at rate x; changing c changes it at rate 1. Squaring the error contributes a factor of twice the error. Multiplying these rates gives each row's contribution to the loss derivative, then averaging gives the gradient:
+
+| Row | Contribution for m: 2 × error × x | Contribution for c: 2 × error |
+|---|---|---|
+| (1, 2) | 2 × (−2) × 1 = −4 | 2 × (−2) = −4 |
+| (2, 4) | 2 × (−4) × 2 = −16 | 2 × (−4) = −8 |
+| (3, 6) | 2 × (−6) × 3 = −36 | 2 × (−6) = −12 |
+| Mean | (−4 − 16 − 36)/3 = −56/3 ≈ −18.667 | (−4 − 8 − 12)/3 = −8 |
+
+Both derivatives are negative, so increasing either parameter slightly reduces the loss at this starting point. **Gradient descent** repeatedly moves the parameters against the gradient. The **learning rate**, η, is the multiplier you choose to control the size of each move:
 
 <p class="formula">m ← m − η · ∂L/∂m,&nbsp;&nbsp;&nbsp; c ← c − η · ∂L/∂c</p>
 
-The number η is the learning rate: the step size you choose, which decides how far each parameter moves along its gradient.
+m and c are the weight and bias; each arrow replaces the old value with the expression on its right. L is the loss. ∂L/∂m and ∂L/∂c are its partial derivatives for the weight and bias, respectively. η multiplies each derivative, and subtraction moves downhill locally. Compute both derivatives from the same old parameters before updating either.
 
-Then go back to step 1 with the new parameters. Stop when the loss stops falling, or when you run out of patience or budget. What remains is a table of numbers that was never typed by anyone.
+With η = 0.05, m becomes 0 − 0.05 × (−56/3) ≈ 0.933 and c becomes 0 − 0.05 × (−8) = 0.4. Score the new line:
 
-## Worked example: three points, two parameters, one step
+| Input | Prediction, rounded | Error, rounded |
+|---|---|---|
+| 1 | 0.933 + 0.4 ≈ 1.333 | −0.667 |
+| 2 | 0.933 × 2 + 0.4 ≈ 2.267 | −1.733 |
+| 3 | 0.933 × 3 + 0.4 ≈ 3.2 | −2.8 |
+| Mean squared error | | ((−0.667)² + (−1.733)² + (−2.8)²)/3 ≈ 3.763 |
 
-The numbers below are the book's own. Take three training rows, (1, 2), (2, 4) and (3, 6). They lie on the line y = 2x, so the answer the loop should find is m = 2, c = 0. Start at m = 0, c = 0.
+Keep unrounded values during calculation; the table displays approximations. One step reduces loss from 18.667 to 3.763. Repeat prediction, loss, gradient and step 200 times: m ≈ 1.971, c ≈ 0.066 and loss ≈ 0.00062.
 
-**Predict.** Every prediction is 0.
+The fall is fast initially, then slower. Here the gradient approaches zero as the line approaches the best fit. Multiplying a shrinking gradient by a fixed learning rate produces smaller steps. More steps bring the parameters closer to (2, 0), with progressively smaller improvements.
 
-**Score.** The differences from the answers are −2, −4 and −6. Squared: 4, 16 and 36. Their sum is 56, and the mean over three rows is 56/3 = 18.667. That is the starting loss.
+## Too far or too slowly
 
-**Differentiate.** For mean squared error the derivative with respect to m is the average over rows of 2 × (prediction − answer) × x, and with respect to c it is the average of 2 × (prediction − answer). Row by row, the first is 2 × (−2) × 1 = −4, 2 × (−4) × 2 = −16 and 2 × (−6) × 3 = −36, which average to −56/3 = −18.667. The second is −4, −8 and −12, averaging −8. So the gradient is (−18.667, −8). Both components are negative: the loss falls if either parameter goes up.
+Restart at zero with η = 0.5, ten times larger. The first update gives m = 0 − 0.5 × (−56/3) ≈ 9.333 and c = 0 − 0.5 × (−8) = 4.
 
-**Step.** Take η = 0.05. Then m becomes 0 − 0.05 × (−18.667) = 0.933 and c becomes 0 − 0.05 × (−8) = 0.4.
+| Input | Prediction, rounded | Squared error |
+|---|---|---|
+| 1 | 9.333 + 4 ≈ 13.333 | (13.333 − 2)² |
+| 2 | 9.333 × 2 + 4 ≈ 22.667 | (22.667 − 4)² |
+| 3 | 9.333 × 3 + 4 ≈ 32.0 | (32.0 − 6)² |
+| Mean squared error | | ((13.333 − 2)² + (22.667 − 4)² + (32.0 − 6)²)/3 ≈ 384.3 |
 
-Score again with the new parameters. The predictions are 1.333, 2.267 and 3.2; the differences from the answers are −0.667, −1.733 and −2.8; squared and averaged, 3.763. One step took the loss from 18.667 to 3.763.
+The step overshoots the fit. The new gradient reverses direction and grows; the next update sends m to −32.9 and loss to 7,942. The third sends m to 159.3 and loss to 164,200. Loss exceeds a million at step 4. This is **divergence**: successive updates move farther from the solution.
 
-Run the same four steps 200 times and the loss reaches 0.00062, with m = 1.971 and c = 0.066. It is not exactly (2, 0). It is near it, and it gets nearer with more steps, more slowly each time. That slowing is not a defect; it is the mechanism. The gradient is proportional to the error, so as the fit improves the gradient shrinks, and a fixed η times a shrinking gradient is a shrinking step. The loss curve you will see in every training log, a steep fall and then a long flat tail, is this arithmetic drawn out.
+For these points, squared-error loss forms a bowl with a single bottom over the possible values of m and c. A sufficiently small step descends towards it; a large one can cross the bowl and land higher on the opposite side. Too small a learning rate makes progress slow enough that your run ends well short of the best fit.
 
-## What the learning rate does
+## What else determines the result
 
-The learning rate is where most first training runs go wrong, and the failure has a shape you can recognise.
+The loss formula sets the error penalties and therefore the gradients. Mean absolute error averages error magnitudes without squaring them, reducing the influence of large errors. Changing the loss can change the fitted parameters even with identical data.
 
-Start again from (0, 0) with the same three points but η = 0.5, ten times larger. The first step is ten times longer: m becomes 0 − 0.5 × (−18.667) = 9.333 and c becomes 4. The slope was meant to end up at 2 and has overshot to 9. Score it: the predictions are 13.333, 22.667 and 32.0, the loss is 384.3. It went up, from 18.667 to 384.3. The gradient at the new point is large and positive, so the next step swings the parameters far the other way, to m = −32.9, and the loss becomes 7,942. The third step lands at m = 159.3 and a loss of 164,200. By the fourth the loss is past a million and each step is worse than the one before.
+**Preprocessing** transforms inputs before prediction. A fitted normalisation transform uses the training data's mean and spread to centre and scale inputs. Those statistics stay fixed during gradient updates, but remain part of the program. Ship them with the weights: recomputing them on different data changes predictions even when m and c stay unchanged.
 
-That is what "training diverged" means when you meet it in a log: the step was longer than the valley was wide, the parameters landed higher on the far side, and the larger gradient there made the next step longer still. The loss for a linear model under mean squared error is a bowl with one bottom, so this cannot be a case of the loop finding a wrong valley; it is the loop being unable to stay in the only valley there is. Too small an η has the opposite symptom: the loss falls monotonically but so slowly that the run ends far from the bottom. In between is a range of η that works, and finding it is trial, not derivation.
+Training loss measures fit only on the rows used for training. To assess predictions on unseen rows, reserve separate data before fitting either the parameters or preprocessing. A falling training loss alone does not establish how the model performs on rows it has not seen.
 
-Two things follow for the reviewer. First, a loss curve is evidence about the loop, not about the model's quality: a curve that falls and flattens says the loop converged on the training rows, and says nothing about rows it did not see. That is why a held-out set is split off before training, and why the pull request's claim was about the holdout and not about the loss. This essay answers the first review question, what produced the file; a later essay in this book is about how much the holdout number can be trusted. Second, when a training run is reported as "not working", the first two questions are the ones this example answers: did the loss go up, and did it flatten far above zero? The first is the learning rate. The second is usually the learning rate too, or the model has too few parameters to fit the data, or the data does not contain the pattern.
-
-## What the loss cannot tell you
-
-The loss formula is a choice, and the choice is part of the program. Under mean squared error a row that is off by 10 contributes 100 to the sum while a row off by 3 contributes 9, so a single bad row can bend the fit toward itself. Mean absolute error weights every row's pull equally; the Huber loss switches from one to the other at a threshold you set. Three loops that differ only in step 2 will produce three different tables of numbers from the same data. None of that is visible in the weights file.
-
-Nor is the preprocessing. A typical model puts a normalisation layer in front of the line, and that layer's mean and spread are computed once from the training data and never updated by the loop; a framework lists them as non-trainable parameters. They are parameters all the same. Ship the trained weights without them, or recompute them on different data, and the same m and c give different answers. The artefact you are reviewing is the trainable numbers plus every fitted transform in front of them, and a review that looks only at the file that changed has looked at half the program.
-
-Finally, the example is a line because a line lets you check every number by hand, and it uses all three rows on every step. A network with a non-linearity between its layers is the same loop with a longer derivative chain, computed by the framework rather than by you, and usually on a random batch of rows per step rather than the whole set; the loss is no longer a single bowl, and the loop can settle in a valley that is not the lowest. The four steps do not change. What changes is that you can no longer say in advance where they will stop.
+A network with non-linear operations, whose outputs cannot be expressed as a straight-line function of their inputs, uses the same training loop. Its loss need not form a single bowl, so the loop need not reach the best possible fit.
 
 <!--mission-->
 ## Exercise: run the loop and break it
 
-You need any language with floating-point numbers. No library. The script below is plain Python and fits on one screen.
+Run this plain Python script; no libraries are required.
 
 ```python
 # Three points on y = 2x; model y = m*x + c; mean squared error; plain gradient descent.
@@ -90,8 +113,30 @@ for lr in (0.05, 0.5):
             break
 ```
 
-**Expected result.** At learning rate 0.05 the first line after the start reads m = 0.9333, c = 0.4000, loss 3.763, which is the worked example. By step 10 the loss is 0.061; by step 50, 0.023; by step 200, 0.00062 with m = 1.9711 and c = 0.0656. At learning rate 0.5 the first step reads m = 9.3333, c = 4.0000, loss 384.3, the second 7,942, the third 164,200, and the script reports divergence at step 4. The full output is in the essay's corpus.
+`points` holds the training rows. `loss` scores the current line; `gradients` averages the row contributions derived above. Each learning rate gets a fresh zero start. The inner loop computes both derivatives, updates the parameters and prints selected steps. The final condition stops a run once loss exceeds a million.
 
-Then two changes. Set the learning rate to 0.005 and watch the loss fall on every step and still sit at 0.048 at step 200, nearly eighty times what the faster run reached: the slow failure. Then put the learning rate back to 0.05 and change the third point to (3, 12), an outlier that no line passes through; the loss flattens near 2 instead of near zero, with m heading to 5 and c to −4, a line through none of the three points. Both runs end with a curve that has flattened. The loss values differ, 0.048 against 2, but a flat curve at 2 only tells you the fit has stopped improving; whether 2 is a failure or the best any line can do depends on the data, and the curve does not know the data.
+Expected output:
+
+```text
+learning rate 0.05: start loss 18.6667
+  step   1: m = 0.9333  c = 0.4000  loss = 3.763
+  step   2: m = 1.3511  c = 0.5733  loss = 0.8055
+  step   3: m = 1.5393  c = 0.6458  loss = 0.2175
+  step  10: m = 1.7121  c = 0.6530  loss = 0.06121
+  step  50: m = 1.8229  c = 0.4027  loss = 0.02326
+  step 200: m = 1.9711  c = 0.0656  loss = 0.0006182
+learning rate 0.5: start loss 18.6667
+  step   1: m = 9.3333  c = 4.0000  loss = 384.3
+  step   2: m = -32.8889  c = -14.6667  loss = 7942
+  step   3: m = 159.2593  c = 69.7778  loss = 1.642e+05
+  diverged: loss above a million at step 4
+```
+
+Try two variations separately:
+
+- Set the learning rate to 0.005. Loss still falls, but reaches only 0.048 at step 200, compared with 0.00062 at 0.05. The smaller updates need more steps.
+- Restore 0.05 and change the third point to (3, 12). No line passes through all the points. Loss flattens near 2, with m approaching 5 and c approaching −4. More training cannot remove the error left by the best-fitting line.
+
+A flat loss curve can reflect slow progress or the limit of what the chosen model can fit. These variations let you distinguish the causes because you control the learning rate and the data.
 
 *Sources: the Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), section 3, paraphrased as study material; Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, chapter 4, the gradient-descent section.*
