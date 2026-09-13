@@ -96,3 +96,5 @@ shared boilerplate phrases all essays use ("in the essay's corpus", figure marku
 - A Part IV or later essay on deep Q-learning, if any, should not re-explain the target network
   and replay memory from scratch; this essay gives each one paragraph.
 - 05-03's maze demonstration is cited only in a receipt note.
+
+**Review (2026-09-13, applied by the main session, Opus 5):** codex consolidation confirmed one finding (both lanes agreed): the moving-target sentence followed lecture 09-04's two claims in order and wording — rewritten around shared weights and overlapping activations. Reader persona reports kept in checks/readers/learn-the-action-or-learn-its-worth/; their points were read and none changed facts beyond the above.

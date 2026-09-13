@@ -27,7 +27,7 @@ Two more pieces matter. Augmentation is applied to training batches only, with a
 The numbers below are the book's own. Take a 3 × 3 image of a hook: a bar across the top and a bar down the left side, 1 for ink and 0 for background. A horizontal flip reverses the order of the columns, so column 0 becomes column 2 and column 2 becomes column 0; the middle column stays.
 
 <figure class="diagram">
-<svg viewBox="0 0 520 220" width="100%" role="img" aria-label="A 3 by 3 hook glyph with ink in the top row and left column, and its horizontal mirror with ink in the top row and right column; under each, the label it gets in the shape task and in the facing task" style="max-width:520px;font-family:inherit;font-size:14px">
+<svg viewBox="0 0 520 220" width="100%" role="img" aria-label="A 3 by 3 hook glyph with ink in the top row and left column, and its horizontal mirror with ink in the top row and right column; under each, its label in the shape task and, for the facing task, the direction it truly faces next to the label the flip leaves unchanged" style="max-width:520px;font-family:inherit;font-size:14px">
   <g fill="currentColor">
     <rect x="40" y="20" width="40" height="40"/><rect x="80" y="20" width="40" height="40"/><rect x="120" y="20" width="40" height="40"/>
     <rect x="40" y="60" width="40" height="40"/><rect x="40" y="100" width="40" height="40"/>
@@ -43,17 +43,17 @@ The numbers below are the book's own. Take a 3 × 3 image of a hook: a bar acros
   <g fill="currentColor" text-anchor="middle">
     <text x="258" y="68" font-size="13">flip: reverse columns</text>
     <text x="100" y="170">shape task: hook</text><text x="100" y="195">facing task: right</text>
-    <text x="420" y="170">shape task: hook</text><text x="420" y="195">facing task: left</text>
+    <text x="420" y="170">shape task: hook</text><text x="420" y="195">facing: left, label kept: right</text>
   </g>
 </svg>
-<figcaption>The hook [[1, 1, 1], [1, 0, 0], [1, 0, 0]] and its mirror [[1, 1, 1], [0, 0, 1], [0, 0, 1]]. The pixels are the same in both tasks; what the flip does to the label depends only on what the label means.</figcaption>
+<figcaption>The hook [[1, 1, 1], [1, 0, 0], [1, 0, 0]] and its mirror [[1, 1, 1], [0, 0, 1], [0, 0, 1]]. The flip changes the pixels and never the label. In the shape task the kept label, hook, is still true; in the facing task the mirror truly faces left but still carries the label right.</figcaption>
 </figure>
 
 Row by row, [1, 1, 1] stays [1, 1, 1]; [1, 0, 0] becomes [0, 0, 1], twice. Now attach two different labellings to the same images.
 
 In the **shape task** the label says which glyph is drawn, a hook or some other shape. The mirrored hook is still a hook, so the pair (flipped hook, "hook") is true. If your training photos happened to show every hook facing right while real inputs face both ways, the flip supplies the half of the world your collection missed.
 
-In the **facing task** the label says which way the glyph points. The mirrored right-facing hook is, pixel for pixel, a left-facing hook, and the flip hands it to the loss labelled "right". With p = 0.5 both directions arrive under both labels equally often, and nothing is left to separate them.
+In the **facing task** the label says which way the glyph points. The mirrored right-facing hook is, pixel for pixel, a left-facing hook, and the flip hands it to the loss labelled "right". Suppose the facing task's training set starts balanced, half the hooks facing each way, and each image is flipped with p = 0.5 independently. Then each of the four combinations of pixel direction and label turns up in 0.5 × 0.5 = 25% of presentations: right-facing pixels labelled right, right-facing labelled left, left-facing labelled left, left-facing labelled right. Both directions arrive under both labels equally often, and nothing is left to separate them.
 
 Now the scale of a claim. Suppose 1,000 training images, 20 epochs, and three independent transforms, each at p = 0.5.
 

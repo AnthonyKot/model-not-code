@@ -64,3 +64,5 @@ It also owes the calibration point only touched here ("outputs stop being freque
   the scores' meaning as probabilities; choosing a cut-off is a separate essay."
 - sources[]: C("4735368", "15-02", "06-02", "06-03"), B("huyen-dmls", "pp. 120–133"), plus the two
   PyTorch docs URLs if the catalog carries documentation sources.
+
+**Review (2026-09-13, applied by the main session, Opus 5):** codex consolidation confirmed one finding (both lanes agreed): "The loss did not fail; it found the minimum" assigned the search to the loss — now "The optimiser did not fail". Nothing rejected. Reader persona reports kept in checks/readers/class-imbalance-changes-the-loss/; their points were read and none changed facts beyond the above.

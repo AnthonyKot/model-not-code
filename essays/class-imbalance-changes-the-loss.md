@@ -28,7 +28,7 @@ Here 95 and 5 are the class counts, −ln(1 − p) is what each negative row pay
 
 <p class="formula">95 / (1 − p) − 5 / p = 0 &nbsp;⇒&nbsp; 5 · (1 − p) = 95 · p &nbsp;⇒&nbsp; p = 5 / 100 = 0.05</p>
 
-The best constant is the base rate, 0.05. Check it with the gradient: the 95 negatives pull down with 95 × 0.05 = 4.75, the 5 positives pull up with 5 × 0.95 = 4.75, and the pulls cancel. At 0.05 every row is below the 0.5 cut-off, so every row is predicted negative. The loss did not fail; it found the minimum of the sum it was given.
+The best constant is the base rate, 0.05. Check it with the gradient: the 95 negatives pull down with 95 × 0.05 = 4.75, the 5 positives pull up with 5 × 0.95 = 4.75, and the pulls cancel. At 0.05 every row is below the 0.5 cut-off, so every row is predicted negative. The optimiser did not fail; it found the minimum of the loss it was given.
 
 Now the class weight: a number that multiplies every loss term of one class. It exists because the plain sum rewards being right about the common class, which is rarely the class you care about, and a weight changes that without touching the data. The usual convention is inverse frequency: total rows divided by that class's rows. Here that is 100/95 ≈ 1.053 for the negatives and 100/5 = 20 for the positives. Each class's weighted total is then the same: 95 × 100/95 = 100 and 5 × 20 = 100. The weighted loss is:
 

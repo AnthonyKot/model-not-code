@@ -39,3 +39,5 @@
 ## Owed
 - Pitch C (mixup/cutmix) is referenced as "a separate essay"; if C is never drafted, that sentence needs cutting.
 - `input-pipeline-is-the-bottleneck` may want to point back here for "augmentation runs inside the training input map".
+
+**Review (2026-09-13, applied by the main session, Opus 5):** codex consolidation, five findings, all applied: the figure labelled the mirrored hook "facing task: left", contradicting the mechanism (the flip keeps the label) — figure, aria-label and caption now show true facing left with label kept right; the 25% combinations sentence lacked its balanced-start premise — premise and the four combinations added; catalog mechanism line named mixup/cutmix (both lanes) — mechanism line rewritten; the six Normalize constants were unreceipted — receipt aug-16 extended; torchvision docs missing from catalog sources — added. Reader persona reports kept in checks/readers/augmentation-declares-invariance/; their points were read and none changed facts beyond the above.

@@ -73,7 +73,7 @@ With a realistic learning rate the walk is slower. At α = 0.5 each update goes 
 
 ## When the table becomes a network
 
-Table entries are independent. Network outputs are not: a gradient step that raises the estimate for one state also raises it for states with similar inputs, and the next state usually looks like the current one. So the step that pulls Q(s, a) toward r + γ · max Q(s′, a′) also moves the number inside the target. That is the wandering loss from the opening.
+Table entries are independent. Network outputs are not, because every output is computed from the same shared weights. The prediction Q(s, a) and the target's Q(s′, ·) both depend on those weights, so when their inputs produce overlapping activations, one optimiser step that changes the prediction also changes the target it was aimed at. That is the wandering loss from the opening.
 
 Deep Q-learning damps it with two additions. A target network is a frozen copy used only to compute the targets, re-copied from the trained network periodically, so the labels hold still between copies. A replay memory is a bounded store of past transitions, oldest evicted first, from which each update samples a random batch, so consecutive near-identical states do not arrive together.
 
