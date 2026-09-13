@@ -81,3 +81,28 @@ verified numbers and where they live, so the rewrite could change the prose with
 facts; it pointed at a finished essay as the model of tone instead of describing tone in adjectives;
 it bounded the length; and it restricted codex to one file and asked for a report it could be
 checked against.
+
+---
+
+## 2. Apply a consolidated review report to one essay (2026-09-13)
+
+```bash
+timeout 1500 codex exec --skip-git-repo-check -s workspace-write -C /home/diablo/book20 "<prompt below with SLUG filled in>" < /dev/null > checks/codex-apply-<slug>.log 2>&1
+```
+
+Prompt:
+
+```text
+Apply every item under "Confirmed findings" in checks/reviews/SLUG/report.md to essays/SLUG.md, using each finding's fix
+(adapt wording only where the fix would break CONTEXT.md §4: no "the course"/"lecture"/"reported" in prose, no source
+narration, formulas glossed, no anthropomorphism). Ignore "Rejected findings". Do NOT edit site/catalog.mjs — list any
+catalog change a finding asks for (sources[], caution, mechanism) in your report instead. If a fix changes any number
+or code in the exercise, rerun the script with
+/tmp/claude-1000/-home-diablo/61edc119-0ca2-4ae9-9e8b-fc1c94596078/scratchpad/venv/bin/python workspace/SLUG/exercise.py,
+overwrite corpus/SLUG/run.log with the new output, update the essay's quoted expected output and every affected row of
+corpus/SLUG/receipts.tsv, and make the code block in the essay identical to the script. Append a dated "Review applied
+by codex" paragraph to notes/essays/SLUG.md listing each finding and what changed. Edit only essays/SLUG.md,
+corpus/SLUG/, notes/essays/SLUG.md and workspace/SLUG/. Do not commit. Finish by running
+node checks/receipts.mjs | grep SLUG and node checks/paraphrase.mjs --all | grep SLUG (0 failures required), then report
+what changed per finding and the catalog changes requested.
+```
