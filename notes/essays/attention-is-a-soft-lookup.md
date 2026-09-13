@@ -96,3 +96,14 @@ Flash lane (read 2026-09-13, late): applied — row-index/target notation (row i
 row 4's own scores and softmax written out, rounding note on (0.213, 0.893), expected-result
 strings matched to the script's printed lists. Rejected — attributing the eight-heads/512 figure
 to the course in prose (against §4). Pro lane idled out twice; not rerun.
+
+**Author's choices (2026-09-13):** (1) "both are more or less the same; take the shorter one and add more
+clear, human-suitable explanation". The codex tight version became current (previous kept as a variant), then
+the main session (Opus 5) restructured the prose as one story: the training/generation puzzle → attention as a
+blended lookup (score, softmax, blend, each explained in words before the formula) → where training would
+cheat → the causal requirement → the −∞ mask derived from it → the mask at work (tables) → cases. (2) "The fix
+comes from nowhere" — the mask is now derived from the requirement (zero weight on later columns, rows still
+summing to one). (3) "This kind of math is not readable" — the paragraph arithmetic became two comparison
+tables plus one worked row. (4) The limits section read out of context — replaced by a table of when the mask
+applies (decoder, encoder, translation, padding, masked language modelling), each tied to the same test;
+padding receipted to 4735368/28-03 (attention-23).
