@@ -51,7 +51,14 @@ for (const essay of essays) {
   const file = path.join(root, "essays", `${essay.slug}.md`);
   if (!fs.existsSync(file)) continue;
   const raw = fs.readFileSync(file, "utf8");
-  const words = normalizeWords(raw);
+  // Compare prose only: code blocks, figures, tables and the source credit are shared scaffolding.
+  const prose = raw
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/<figure[\s\S]*?<\/figure>/g, " ")
+    .replace(/^\|.*$/gm, " ")
+    .replace(/^\*Sources:.*$/gm, " ")
+    .replace(/^\*\*Expected result\.\*\*.*$/gm, " ");
+  const words = normalizeWords(prose);
   essayData.push({ slug: essay.slug, raw, words });
 }
 
