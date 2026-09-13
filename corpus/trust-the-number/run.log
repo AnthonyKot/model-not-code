@@ -1,0 +1,16 @@
+# PyTorch 2.14.0+cpu, CPU only; workspace/trust-the-number/exercise.py (the chapter exercise, verbatim)
+held-out photos whose product has a photo in training: 0.994
+split by photo:   held-out accuracy 0.924
+split by product: held-out accuracy 0.878
+never flag a blade, on validation: 0.938 of photos answered right
+class weights: [2.0, 3.24, 7.17, 19.23]
+unweighted, argmax                 category accuracy 0.878  blade recall 0.266  false flags  25  missed blades 91  cost  1870.0
+weighted, argmax                   category accuracy 0.865  blade recall 0.395  false flags  49  missed blades 75  cost  1598.0
+validation cost by blade threshold: {0.5: 2062.0, 0.2: 1574.0, 0.1: 1426.0, 0.05: 1294.0, 0.02: 1266.0, 0.01: 1304.0, 0.005: 1432.0, 0.002: 1692.0, 0.001: 1936.0} -> chosen 0.02
+TEST: split by photo, argmax       category accuracy 0.873  blade recall 0.211  false flags  26  missed blades 60  cost  1252.0
+TEST: split by product, argmax     category accuracy 0.886  blade recall 0.224  false flags  28  missed blades 59  cost  1236.0
+TEST: shipped, blade threshold 0.02 category accuracy 0.886  blade recall 0.711  false flags 337  missed blades 22  cost  1114.0
+num_workers=0: forecast  84.0 ms/step, measured  89.3
+num_workers=1: forecast  64.0 ms/step, measured  68.8
+num_workers=2: forecast  32.0 ms/step, measured  34.2
+num_workers=4: forecast  20.0 ms/step, measured  21.8

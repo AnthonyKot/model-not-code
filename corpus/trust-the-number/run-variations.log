@@ -1,0 +1,10 @@
+# variations.py: random horizontal flip in training; calibration bins of the unweighted model on validation
+no flip                  category accuracy 0.878  recall cable/kettle/lamp/blade [0.949, 0.924, 0.768, 0.266]  blades shown as lamps 26
+random horizontal flip   category accuracy 0.878  recall cable/kettle/lamp/blade [0.981, 0.947, 0.668, 0.056]  blades shown as lamps 88
+blade score in [0.0, 0.02): 1617 photos, share that are blades 0.021
+blade score in [0.02, 0.0909):  209 photos, share that are blades 0.120
+blade score in [0.0909, 0.5):  130 photos, share that are blades 0.323
+blade score in [0.5, 1.0):   44 photos, share that are blades 0.523
+# MISS_COST = 5.0 (try_miss5.py)
+validation cost by blade threshold: {0.5: 547.0, 0.2: 479.0, 0.1: 511.0, 0.05: 574.0, 0.02: 756.0, 0.01: 959.0, 0.005: 1177.0, 0.002: 1527.0, 0.001: 1831.0} -> chosen 0.2
+TEST: shipped, blade threshold 0.2 category accuracy 0.886  blade recall 0.316  false flags  73  missed blades 52  cost   406.0

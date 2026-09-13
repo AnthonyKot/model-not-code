@@ -1,0 +1,35 @@
+claim_id	paraphrase	label	source	locator	note
+ttn-01	Evaluating on rows the model trained on overstates performance; split into training, validation and test; fit the normaliser on the training split only	inferred	course-4735368	03-09	
+ttn-02	Save-best checkpointing keeps the weights with the lowest validation loss seen so far	inferred	course-4735368	07-04	
+ttn-03	Choosing the checkpoint by validation loss is itself a kind of training, so a separate test split is kept for the final number	inferred	course-6100015	07-20	
+ttn-04	Any use of the test split beyond reporting the final number, including tuning, leaks it into training	inferred	huyen-dmls	pp. 166, 223	
+ttn-05	Standard error of an accuracy sqrt(p(1-p)/n): 0.0073 at n 2,000 and 0.0146 at n 500 for p 0.878	observed	huyen-dmls	p. 116	the book's own arithmetic; run-worked.log section 1; source row anchors the scarcity-of-validation point
+ttn-06	Four photos per product, 20% of photos held out at random: a held-out photo has a sibling in training with probability 1 - 0.2^3 = 0.992; exercise measures 0.994	observed	huyen-dmls	pp. 165–166	group leakage (two scans of one patient split across train and test); the book's own arithmetic; run-worked.log section 2; run.log
+ttn-07	Leakage is data or metadata unavailable at prediction time that correlates with the outcome; the outcome, or a function of it, used as a feature; detected when production performance falls short of test	inferred	ds-hard-parts	pp. 139–143	physical pages
+ttn-08	Time-correlated data split randomly and duplicates split across train and test leak; split by time	inferred	huyen-dmls	pp. 163–165	physical pages
+ttn-09	Winner's curse: 12 settings all truly 0.88 on 500 validation items: mean best 0.9032, same winner on fresh items 0.8799; P(best >= 0.90) 0.696 vs 0.093 for one setting	observed	course-6100015	07-20	the book's own simulation; run-worked.log section 3
+ttn-10	Picking the best of many candidates on one benchmark over and over overfits that benchmark; benchmark questions leaking into training data (contamination) inflates scores	inferred	course-6100015	04-04	
+ttn-11	Class imbalance lets training settle on predicting the majority; accuracy is dominated by the majority; per-class recall is the better lens	inferred	huyen-dmls	pp. 120–126	early release, physical pages
+ttn-12	Class-balanced loss weights each class by N / (samples of that class); resampling alternatives; never evaluate on resampled data	inferred	huyen-dmls	pp. 130–133	
+ttn-13	Class weights penalise mistakes on the under-represented class more; gathering more data is the first remedy	inferred	course-4735368	15-02	
+ttn-14	Best constant for 950 others and 50 blades is 0.05 (pulls 47.5 each); pos_weight 950/50 = 19 moves it to 0.5 (pulls 475 each)	observed	huyen-dmls	pp. 130–133	the book's own derivation; run-worked.log section 4
+ttn-15	CrossEntropyLoss(weight=w) multiplies each row's loss by its true class's weight; mean reduction divides by the sum of those weights	reported	https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html	docstring	installed torch 2.14.0+cpu docstring, 2026-09-13
+ttn-16	Precision TP/(TP+FP), recall TP/(TP+FN); accuracy counts both errors alike; lowering the threshold from 0.5 trades missed positives for false alarms	inferred	course-4735368	06-02	
+ttn-17	Confusion-matrix counts move between false negatives and false positives as the threshold changes	inferred	course-4735368	06-03	
+ttn-18	Each ROC point is one threshold; the useful region depends on which error is unaffordable	inferred	course-4735368	06-04	
+ttn-19	Precision/recall trade-off; prefer the PR curve when the positive class is rare	inferred	geron-pytorch	pp. 146–151	physical pages
+ttn-20	Ten-listing threshold sweep with costs 2 and 20: t 0.5 cost 62, 0.2 cost 42, 0.1 cost 24, 0.03 cost 8, 0.01 cost 12; calibrated break-even 2/22 = 0.0909	observed	geron-pytorch	pp. 146–151	the book's own numbers; run-worked.log section 5a
+ttn-21	Precision at TPR 0.8, FPR 0.1: 0.296 when 5% are blades, 0.889 when half are	observed	geron-pytorch	pp. 146–151	the book's own arithmetic; run-worked.log section 5b
+ttn-22	Augmentation is applied to the training set only; a too-wide rotation range produced images unlike validation and lowered accuracy; add transforms one at a time	inferred	course-4735368	11-04	
+ttn-23	Each transform has its own probability; choose transforms by what the dataset allows; always look at augmented outputs	inferred	course-4735368	08-05	
+ttn-24	Horizontal flip is generally fine except for text and other asymmetrical objects; augmentation normally training-only	inferred	geron-pytorch	pp. 468–469	physical pages
+ttn-25	Flip variation: random horizontal flip leaves category accuracy at 0.878 but cuts blade recall 0.266 -> 0.056 and raises blades shown as lamps 26 -> 88	observed	course-4735368	08-05	the book's own run; run-variations.log
+ttn-26	Validation photos with blade score in [0.02, 0.0909): 209, of which 12.0% are blades; [0, 0.02): 2.1%; [0.0909, 0.5): 32.3%; [0.5, 1]: 52.3%	observed	geron-pytorch	pp. 146–151	the book's own run; run-variations.log
+ttn-27	Prefetch lets the next batch load while the current one trains; parallel map calls	inferred	course-4735368	03-11	
+ttn-28	DataLoader num_workers pre-fetches on CPU while the accelerator works; prefetch_factor per worker; pin_memory; worker start-up cost; persistent_workers	inferred	geron-pytorch	p. 367	physical page
+ttn-29	Pipeline table: L 320 ms (5 ms x 64), C 100 ms; steps 420/320/160/106.7/100/100 ms; busy 23.8/31.2/62.5/93.8/100/100%; epoch of 100,000 photos = 1,563 steps: 656/500/250/167/156/156 s	observed	geron-pytorch	p. 367	the book's own numbers; run-worked.log section 7
+ttn-30	Work-queue pattern: independent items processed by several workers; caching preprocessed batches	inferred	dist-ml-patterns	pp. 29, 59–60	physical pages
+ttn-31	Many small files: store as larger record files; preprocessed data can be stored once	inferred	course-4735368	11-05	
+ttn-32	Exercise: held-out photos with a sibling in training 0.994; split by photo 0.924, by product 0.878; never-flag 0.938; class weights [2.0, 3.24, 7.17, 19.23]; unweighted blade recall 0.266, weighted 0.395; validation cost by threshold, chosen 0.02; test photo-split 0.873, product-split 0.886, shipped recall 0.711 cost 1114.0 vs 1236.0; loader forecast vs measured	observed	course-4735368	03-09	the book's own run; corpus/trust-the-number/run.log; timings vary by a few ms between runs
+ttn-33	DataLoader with num_workers=0 loads in the main process; prefetch_factor x num_workers batches outstanding	reported	https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py	docstring and _MultiProcessingDataLoaderIter	as of PyTorch 2.14
+ttn-34	MISS_COST 5 variation: validation sweep chooses 0.2; shipped row on test flags 73 false, misses 52, cost 406.0	observed	geron-pytorch	pp. 146–151	the book's own run; run-variations.log

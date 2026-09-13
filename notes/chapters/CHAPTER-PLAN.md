@@ -152,3 +152,4 @@ Original process, as amended:
 3. Chapters 5–8 drafted fresh, pitch per chapter (project + section list), then prose.
 4. Receipts: each chapter writes its own `corpus/<chapter-slug>/receipts.tsv`; the essays' receipts stay with the archive.
 5. **Chapter 1 (`search-the-catalogue`) written and published 2026-09-13** as the pilot; awaits the author's read.
+6. **Chapter 2 (`trust-the-number`) written and published 2026-09-13** at the author's request; the author reviews chapters 1 and 2 together.

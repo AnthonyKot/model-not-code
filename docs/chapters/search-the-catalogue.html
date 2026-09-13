@@ -23,24 +23,24 @@
     </a>
     <div class="header-actions">
       <a href="../about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 1 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 2 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 1 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 2 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
       <nav aria-label="Book contents">
     <a class="book-nav__item is-active" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
       <span class="book-nav__number">01</span>
       <span>Search the Catalogue, Then Answer From It</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <span class="book-nav__item book-nav__item--planned">
+    <a class="book-nav__item" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
       <span class="book-nav__number">02</span>
-      <span>Trust the Number Before You Ship the Classifier<small class="book-nav__planned">in writing</small></span>
-      <span></span>
-    </span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
     <span class="book-nav__item book-nav__item--planned">
       <span class="book-nav__number">03</span>
       <span>Reuse a Pretrained Model<small class="book-nav__planned">in writing</small></span>
@@ -682,7 +682,7 @@ causal=False: largest change in the first four positions after appending: 5.01e+
     </div>
     <nav class="essay-pager" aria-label="Adjacent chapters">
     <span></span>
-    <a class="essay-pager__next" href="../index.html"><span>Chapter 2 is in writing</span>The chapters</a>
+    <a class="essay-pager__next" href="trust-the-number.html"><span>Next</span>Trust the Number Before You Ship the Classifier</a>
   </nav>
     <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 3.7, 28.2, 34.2, 34.4</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 1.29, 1.32, 3.11, 3.13, 3.20, 7.22</li><li><em>Building LLMs like ChatGPT from Scratch and Cloud Deployment</em> (Udemy, Neuralearn.ai), lecture 2.3</li><li>Large Language Models: A Deep Dive — Bridging Theory and Practice, pp. 63–68, 88–89</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 173–177, 702–703</li><li>arXiv:1508.07909, 3.2</li></ul><p>Every example is synthetic: toy catalogue, hand-chosen vectors, a one-block model trained in seconds. Library defaults are as of sentence-transformers 6.0.1 and PyTorch 2.14.</p></details>
     <p class="archive-note">Earlier standalone essays on this ground, kept for reference: <a href="../old/essays/model-is-a-learned-function.html">The Program Is Now a Table of Numbers, and Training Is the Compile Step</a> · <a href="../old/essays/tokens-not-characters.html">Why the Model Cannot Count the Letters in “Strawberry”</a> · <a href="../old/essays/attention-is-a-soft-lookup.html">Attention Is a Dictionary Lookup That Returns a Weighted Mix</a> · <a href="../old/essays/embeddings-are-coordinates.html">Similar Means Whatever the Training Pairs Said</a>.</p>

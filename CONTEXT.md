@@ -348,6 +348,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   35 receipts; worked numbers verified in `corpus/search-the-catalogue/run-worked.log`; the exercise
   and its two variations run on CPU with logs) and published for the author's read. Not yet through
   the review lanes.
+- **2026-09-13 (later still)** — At the author's request ("let's do chapter 2 and I review couple"),
+  chapter 2, *Trust the Number Before You Ship the Classifier*, written from scratch and published
+  (≈24.6k characters of prose; the age-check flag on the rare blade category carries imbalance and the
+  threshold; 34 receipts; exercise, worked numbers and three variations run). The author reviews
+  chapters 1 and 2 together before chapter 3.
 
 ## 10. Open questions
 

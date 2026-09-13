@@ -1,0 +1,29 @@
+== 1. standard error
+ p 0.878 n 2000: SE 0.0073
+ p 0.878 n 500: SE 0.0146
+== 2. sibling in training, 4 photos, 20% held out: 0.992
+== 3. winner's curse: 12 settings all truly 0.88, 500 validation items, 20,000 trials
+ mean best validation 0.9032  winner on fresh 500 0.8799  P(best >= 0.90) 0.696  SE 0.0145
+ P(one setting >= 0.90) 0.093
+== 4. best constant for the blade flag, 1,000 listings, 50 blades
+ pulls at p = 0.05: 47.5 47.5  pos_weight 950/50 = 19.0  weighted pulls at 0.5: 475.0 475.0
+ ln 19 = 2.9444
+== 5a. ten listings, costs 2 per false flag and 20 per missed blade
+ t 0.5: flagged 2 false flags 1 missed 3 cost 62
+ t 0.2: flagged 3 false flags 1 missed 2 cost 42
+ t 0.1: flagged 5 false flags 2 missed 1 cost 24
+ t 0.03: flagged 8 false flags 4 missed 0 cost 8
+ t 0.01: flagged 10 false flags 6 missed 0 cost 12
+ calibrated break-even 2/(2+20) = 0.0909
+ weighted-model equivalent (odds x19): 0.6552
+== 5b. precision depends on how common blades are; TPR 0.8, FPR 0.1
+ prevalence 0.05: precision 0.296
+ prevalence 0.5: precision 0.889
+== 7. input pipeline: 5 ms per photo, batch 64 -> L 320 ms; C 100 ms; 100,000 photos
+ sequential step 420.0 ms  busy 23.8%  epoch 656.0 s
+ 1 worker   step 320.0 ms  busy 31.2%  epoch 500.0 s
+ 2 workers  step 160.0 ms  busy 62.5%  epoch 250.0 s
+ 3 workers  step 106.7 ms  busy 93.8%  epoch 167.0 s
+ 4 workers  step 100.0 ms  busy 100.0%  epoch 156.0 s
+ 8 workers  step 100.0 ms  busy 100.0%  epoch 156.0 s
+ steps per epoch 1563  halve C, 1 worker: busy 15.6

@@ -98,7 +98,7 @@
       <h1 class="essay-title">Augmentation Is Telling the Model What Does Not Matter</h1>
       <p class="essay-payoff">Why adding a standard flip or rotation can lower validation accuracy, and how to check which transforms your labels actually allow before you train.</p>
     </header>
-    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground will be rewritten in Chapter 2: Trust the Number Before You Ship the Classifier (in writing).</nav>
+    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground is rewritten in <a href="../../chapters/trust-the-number.html">Chapter 2: Trust the Number Before You Ship the Classifier</a>.</nav>
     
     <article class="prose"><p>You are training a classifier that sorts photographs of faces into three expressions: angry, happy and sad. It overfits, so you add the augmentation stack every tutorial shows: random rotation, random horizontal flip, random contrast, applied to the training images only. You retrain and validation accuracy drops from 75% to 54%. Nothing in the code is broken; each transform ran exactly as configured.</p>
 <p>What went wrong is a claim. Every transform in a training pipeline asserts something about your labels, and one of the three asserted something your data does not support. This essay reads augmentation as a list of such claims and ends with a PyTorch run in which the same flip rescues one task and ruins another.</p>
