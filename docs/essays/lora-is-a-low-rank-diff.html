@@ -339,7 +339,7 @@ with torch.no_grad():
 </ul>
 <p><strong>Expected result.</strong> Run with PyTorch 2.14 on a CPU, seed 0; the full output is in the essay&#39;s corpus. Trainable 512, frozen 4,160; <code>W.grad is None: True</code> on every printed step; the loss reaches 0.0000 by step 500; the adapter holds A (4, 64) and B (64, 4), 2,048 bytes; the merged and unmerged outputs differ by less than 10<sup>−5</sup>.</p>
 <p>In a training library the same three moves, freeze, attach, train the attachment, are one configuration object. With the Hugging Face PEFT library, the configuration for the rank-32 attention-only setup from the tables above is:</p>
-<pre><code class="language-python"># illustrative, not executed; API as of the course&#39;s library versions
+<pre><code class="language-python"># illustrative, not executed; PEFT API as of the time of writing
 from peft import LoraConfig, get_peft_model
 
 config = LoraConfig(r=32, lora_alpha=64, lora_dropout=0.1,
