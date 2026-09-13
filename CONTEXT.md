@@ -6,6 +6,11 @@ touching an essay. Precedence when documents disagree: this file → `AGENT.md` 
 
 ## 1. Purpose and reader
 
+> **Superseded in form (2026-09-13):** the essays are being merged into project chapters of
+> 20,000–35,000 characters, each explaining one thing end to end on a real project. The plan is
+> `notes/chapters/CHAPTER-PLAN.md`; where this section says "standalone essay" or "1,000–1,800 words",
+> the plan wins. Every other rule (sourcing, register, formulas, exercises) still holds.
+
 Twenty to thirty standalone essays on the practical things a **senior software developer moving
 into ML / AI engineering** needs. The reader has ten to twenty years of software behind them,
 is fluent in systems, testing, deployment and measurement, and is new to ML practice. Nothing
@@ -319,6 +324,13 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   rewrite plus trace. Essay 3: the shorter version rewritten as one story. Essay 4: the original (the
   codex variant was rejected; two passages await a practitioner-register redo). Essay 5: the codex
   tight rewrite.
+
+- **2026-09-13 (night)** — The author read the twelve published essays as "separate islands of ML".
+  Decision: merge them into bigger chapters (20,000–35,000 characters) that explain one thing end to
+  end on a real project; essay 9 (transfer) joins LoRA; plan everything before writing. Plan in
+  `notes/chapters/CHAPTER-PLAN.md` (8 chapters on three running projects: shop product search,
+  malaria cell classifier, reward-trained agent), awaiting the author's approval. Parts III–VI are
+  planned as chapters 5–8 in the same form.
 
 ## 10. Open questions
 

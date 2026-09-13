@@ -1,6 +1,6 @@
 # The Program Is Now a Model
 
-Standalone essays for a senior software developer moving into ML and AI engineering. One
+Standalone essays (being merged into project chapters — `notes/chapters/CHAPTER-PLAN.md`) for a senior software developer moving into ML and AI engineering. One
 mechanism per essay, explained so you can recompute the worked example, with an exercise you can
 do without a GPU or a paid API.
 

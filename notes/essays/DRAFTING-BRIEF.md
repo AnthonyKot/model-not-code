@@ -62,6 +62,8 @@ every step is on the page. They will not tolerate a formula they cannot read ter
   `<p class="formula">…</p>` for display formulas; exactly one `<!--mission-->` line before the
   exercise heading.
 - **Length.** 1,000–1,800 words of prose (code, tables, figures and the credit line excluded).
+  *Superseded 2026-09-13:* the book is moving to project chapters of 20,000–35,000 characters —
+  see `notes/chapters/CHAPTER-PLAN.md` before drafting anything new.
 
 ## Author's recommendations (2026-09-13)
 

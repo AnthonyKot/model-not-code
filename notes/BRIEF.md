@@ -1,5 +1,7 @@
 # Essay contract — adopted 2026-09-12 from book11's standalone brief
 
+> Superseded in form on 2026-09-13 by project chapters: `notes/chapters/CHAPTER-PLAN.md`.
+
 One change from the original: the sources are course lectures and book pages (see
 `CONTEXT.md §5`), not one book, and the reader is a senior developer moving into ML.
 Everything else stands as written.

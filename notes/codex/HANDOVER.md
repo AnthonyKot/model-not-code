@@ -1,5 +1,10 @@
 # Handover for codex — state as of 2026-09-13 (night)
 
+> **2026-09-13 night — read first:** the book is being restructured from standalone essays into
+> project chapters; plan in `notes/chapters/CHAPTER-PLAN.md`, awaiting the author's approval. Do not
+> rewrite or draft essays until it is approved. Chapters 1–5 have one page each (variants removed).
+
+
 Read `CONTEXT.md` (constitution; §4 has tonight's prose rules), `AGENT.md` (who does what), `PLAN.md`,
 then this file. Codex does mechanical work only (AGENT.md "Who does what"); the main Claude session
 drafts, reviews and commits. Run with `-s workspace-write`; do not commit.
