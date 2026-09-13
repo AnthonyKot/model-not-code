@@ -10,8 +10,8 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 | Ch | Slug | State |
 |---|---|---|
 | 1 | `search-the-catalogue` | published; Gemini review in, findings verified, **not applied** |
-| 2 | `trust-the-number` | published; review lanes running/finished — see `checks/reviews/`, `checks/readers/` |
-| 3 | `reuse-a-pretrained-model` | published; same |
+| 2 | `trust-the-number` | published; Gemini review + 3 readers finished (2026-09-13 22:54), findings not yet verified |
+| 3 | `reuse-a-pretrained-model` | published; Gemini review + 3 readers finished, findings not yet verified |
 | 4 | `train-from-reward` | **prepared, no prose**: `workspace/train-from-reward/NOTES.md`, `PROTOTYPE.md`, `exercise_proto.py`; draft receipts `corpus/train-from-reward/receipts.tsv` |
 | 5–8 | see plan | not started; each needs a one-page outline approved by the author before prose |
 
