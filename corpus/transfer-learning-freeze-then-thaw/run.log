@@ -1,0 +1,15 @@
+after  1 batches: running_mean 0.2000, running_var 0.9250, input 2.5 -> 2.3914
+after 10 batches: running_mean 1.3026, running_var 0.5115, input 2.5 -> 1.6741
+after 50 batches: running_mean 1.9897, running_var 0.2539, input 2.5 -> 1.0127
+BatchNorm1d parameters: ['weight', 'bias']  buffers: ['running_mean', 'running_var', 'num_batches_tracked']
+LayerNorm parameters: ['weight', 'bias']  buffers: []
+pretrained: running_mean[:3] [-0.289, -0.19, -0.407], old-task accuracy 0.994
+A  requires_grad=False, train(): weights moved 0.0e+00, running_mean[:3] [0.902, -0.47, -1.218], probe output changed by 11.325
+   old-task accuracy 0.534, new-task accuracy 0.985
+B  requires_grad=False, BN eval(): weights moved 0.0e+00, running_mean[:3] [-0.289, -0.19, -0.407], probe output changed by 0.000
+   old-task accuracy 0.994, new-task accuracy 0.806
+C  requires_grad=False, momentum=0: weights moved 0.0e+00, running_mean[:3] [-0.289, -0.19, -0.407], probe output changed by 0.000
+   old-task accuracy 0.994, new-task accuracy 0.519
+C  same target inputs, train() vs eval() features differ by up to 4.443
+thaw: group learning rates [0.01, 0.001] | max change head 1.3397, backbone 0.2451 | new-task accuracy 0.894, old-task accuracy 0.967
+      running_mean[:3] [-0.289, -0.19, -0.407]

@@ -91,8 +91,11 @@ export const essays = [
     "Serialise once, read sequentially, map in parallel, prefetch: the producer–consumer pattern applied to training.",
     [C("4735368", "11-05", "03-11"), B("dist-ml-patterns")]),  // 10-04 is hyperparameter tuning; dropped (pitch note)
   E("transfer-learning-freeze-then-thaw", "II", "Borrow the Eyes, Retrain the Judgement",
-    "Freeze a pretrained backbone, train a new head, then unfreeze with a small learning rate.",
-    [C("4735368", "13-01", "13-02", "12-03", "12-05"), B("geron-pytorch"), B("raschka-qai")]),
+    "requires_grad=False stops gradients but not BatchNorm's running statistics; eval() on those layers freezes them, and parameter groups give the thawed backbone a smaller learning rate.",
+    [C("4735368", "13-01", "13-02", "12-03"), B("geron-pytorch", "pp. 406–409, 413–416, 436, 492–493"), B("raschka-qai", "pp. 132–133")],
+    { status: "drafted",
+      payoff: "Why a backbone you froze with requires_grad=False can still change during training, and how to freeze, train a new head and thaw without that happening by accident.",
+      caution: "The exercise's domain shift is deliberately extreme; on real data, whether frozen or re-estimated BatchNorm statistics serve the new task better has to be measured." }),
   E("lora-is-a-low-rank-diff", "II", "Fine-Tuning Without Touching the Weights",
     "A low-rank delta B·A of rank r is trained beside frozen weights; QLoRA keeps the base in 4-bit and the adapters in higher precision.",
     [C("6100015", "07-02", "07-03", "07-04", "07-05", "07-06", "07-11", "07-12", "07-20"), B("raschka-qai", "pp. 141–142"), P("arXiv:2106.09685", "4.1")],
@@ -106,7 +109,10 @@ export const essays = [
       caution: "Tabular and deterministic; the corridor shows bias and propagation speed exactly, but variance only through an exploratory behaviour, not through random rewards." }),
   E("ppo-clips-the-step", "II", "PPO: Reuse the Samples, But Not Too Much",
     "The probability ratio new/old is clipped so a reused batch cannot move the policy too far; the trust region is the motivation, RLHF the application.",
-    [C("4635836", "11-01", "11-02", "11-03", "11-04", "11-05", "11-06", "12-01", "13-01"), B("lapan-drl"), P("arXiv:2203.02155", "3.5")]),
+    [C("4635836", "11-01", "11-02", "11-03", "11-06", "12-01", "12-05", "12-06", "13-01"), B("lapan-drl"), P("arXiv:1707.06347", "3, 5"), P("arXiv:2203.02155", "3.5")],
+    { status: "drafted",
+      payoff: "Why training a reinforcement-learning policy on the same batch for several epochs can wreck it, and how PPO's clipped ratio switches off each sample's gradient once the policy has moved far enough on its account.",
+      caution: "The clip removes the incentive to move further; it does not cap how far the policy actually moves, as the exercise shows." }),
 
   // ── III. Evaluation and monitoring ──────────────────────────────────────
   E("the-model-outputs-a-score", "III", "The Model Outputs a Score; You Choose the Threshold",
