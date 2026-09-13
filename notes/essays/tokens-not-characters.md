@@ -100,3 +100,9 @@ version is the one the reader can tally; bytes are named in Limits); showing a p
 tokenizer's split of "strawberry" (no tokenizer on disk to run; nothing claimed from memory).
 Pro lane rerun (read 2026-09-13, late): applied — the "snug" table row (n and u are adjacent, in
 the wrong order) and the printed form of the merge list; "1994" was already removed.
+
+**Author's choice (2026-09-13):** "both are more or less the same, I'd take the smaller one and improve on top".
+The codex tight rewrite became `essays/tokens-not-characters.md`; the previous text is kept as
+`essays/variants/tokens-not-characters.previous.md`. Added at the author's suggestion: a text trace from raw
+string → fragment → token ID → embedding row, with the vector produced by a real `nn.Embedding(8, 4)` run
+(receipt tokens-27).
