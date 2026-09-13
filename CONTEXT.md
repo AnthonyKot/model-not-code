@@ -282,6 +282,10 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   additions on the engineering spine, four manifest rows to add, eight open questions. Awaits
   the author's decisions before Parts III–VI are pitched.
 
+- **2026-09-13** — Part I essays 1–3 (`model-is-a-learned-function`, `tokens-not-characters`,
+  `attention-is-a-soft-lookup`) published on the author's instruction so they can be read on Pages;
+  the author's read notes are still owed.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

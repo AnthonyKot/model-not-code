@@ -23,7 +23,7 @@
     </a>
     <div class="header-actions">
       <a href="../about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 1 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
@@ -31,11 +31,26 @@
     <aside class="book-nav" id="book-navigation" data-book-nav>
       <div class="book-nav__intro">
         <a href="../index.html">The shelf</a>
-        <p>1 essay. Worked examples and exercises included.</p>
+        <p>4 essays. Worked examples and exercises included.</p>
       </div>
       <nav aria-label="Book contents">
-    <a class="book-nav__item is-active" href="../essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+    <a class="book-nav__item" href="../essays/model-is-a-learned-function.html" data-mission-link="model-is-a-learned-function">
       <span class="book-nav__number">01</span>
+      <span>The Program Is Now a Table of Numbers, and Training Is the Compile Step</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../essays/tokens-not-characters.html" data-mission-link="tokens-not-characters">
+      <span class="book-nav__number">02</span>
+      <span>Why the Model Cannot Count the Letters in “Strawberry”</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../essays/attention-is-a-soft-lookup.html" data-mission-link="attention-is-a-soft-lookup">
+      <span class="book-nav__number">03</span>
+      <span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+      <span class="book-nav__number">04</span>
       <span>Fine-Tuning Without Touching the Weights</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a></nav>
@@ -43,7 +58,7 @@
     </aside>
     <main id="main" class="essay-page">
     <header class="essay-hero">
-      <div class="essay-kicker"><span>01</span>Part II · Data and training</div>
+      <div class="essay-kicker"><span>04</span>Part II · Data and training</div>
       <h1 class="essay-title">Fine-Tuning Without Touching the Weights</h1>
       <p class="essay-payoff">What a LoRA adapter actually is, why it is so much smaller than the model it changes, and how to work out its size before you train.</p>
     </header>
@@ -355,7 +370,7 @@ model.print_trainable_parameters()
       <button type="button" data-complete-mission="lora-is-a-low-rank-diff">Mark exercise complete</button>
     </div>
     <nav class="essay-pager" aria-label="Adjacent essays">
-    <span></span>
+    <a href="attention-is-a-soft-lookup.html"><span>Previous</span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</a>
     <a class="essay-pager__next" href="../index.html"><span>Return</span>The complete shelf</a>
   </nav>
     <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 7.2–7.6, 7.11–7.12, 7.20</li><li>Machine Learning Q and AI, pp. 141–142</li><li>arXiv:2106.09685, 4.1</li></ul></details>

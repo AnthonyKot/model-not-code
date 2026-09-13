@@ -23,7 +23,7 @@
     </a>
     <div class="header-actions">
       <a href="about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 1 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
@@ -31,11 +31,26 @@
     <aside class="book-nav" id="book-navigation" data-book-nav>
       <div class="book-nav__intro">
         <a href="index.html">The shelf</a>
-        <p>1 essay. Worked examples and exercises included.</p>
+        <p>4 essays. Worked examples and exercises included.</p>
       </div>
       <nav aria-label="Book contents">
-    <a class="book-nav__item" href="essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+    <a class="book-nav__item" href="essays/model-is-a-learned-function.html" data-mission-link="model-is-a-learned-function">
       <span class="book-nav__number">01</span>
+      <span>The Program Is Now a Table of Numbers, and Training Is the Compile Step</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/tokens-not-characters.html" data-mission-link="tokens-not-characters">
+      <span class="book-nav__number">02</span>
+      <span>Why the Model Cannot Count the Letters in “Strawberry”</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/attention-is-a-soft-lookup.html" data-mission-link="attention-is-a-soft-lookup">
+      <span class="book-nav__number">03</span>
+      <span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+      <span class="book-nav__number">04</span>
       <span>Fine-Tuning Without Touching the Weights</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a></nav>
@@ -45,18 +60,33 @@
     <section class="home-hero">
       <div class="home-hero__eyebrow">Standalone essays for a senior developer moving into ML and AI engineering</div>
       <h1>The Program Is Now a Model</h1>
-      <p>1 standalone essay. Each explains one mechanism with a worked example you can recompute, and closes with an exercise you can do without a GPU, a paid API, or the source.</p>
+      <p>4 standalone essays. Each explains one mechanism with a worked example you can recompute, and closes with an exercise you can do without a GPU, a paid API, or the source.</p>
       <div class="home-hero__actions">
         <a class="button button--primary" href="essays/lora-is-a-low-rank-diff.html">Read the recommended start</a>
         <a class="button button--quiet" href="#the-shelf">Browse the shelf</a>
       </div>
-      <div class="home-proof"><span><strong>1</strong> essays published</span></div>
+      <div class="home-proof"><span><strong>4</strong> essays published</span></div>
     </section>
     <section class="shelf-section" id="the-shelf">
       <div class="section-heading"><div><span class="section-label">The shelf</span><h2>Reading order</h2></div><p>Each essay is standalone; read in any order.</p></div>
     </section>
-    <section class="shelf-section" id="part-i"><div class="section-heading"><div><span class="section-label">Part I</span><h2>The program is now a set of weights</h2></div></div><p class="part-empty">No essays published yet.</p></section><section class="shelf-section" id="part-ii"><div class="section-heading"><div><span class="section-label">Part II</span><h2>Data and training</h2></div></div><div class="shelf-grid"><article class="shelf-card shelf-card--recommended" data-mission-card="lora-is-a-low-rank-diff">
+    <section class="shelf-section" id="part-i"><div class="section-heading"><div><span class="section-label">Part I</span><h2>The program is now a set of weights</h2></div></div><div class="shelf-grid"><article class="shelf-card" data-mission-card="model-is-a-learned-function">
     <div class="shelf-card__top"><span>01</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/model-is-a-learned-function.html">The Program Is Now a Table of Numbers, and Training Is the Compile Step</a></h3>
+    <p>The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong.</p>
+    <a class="shelf-card__action" href="essays/model-is-a-learned-function.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="tokens-not-characters">
+    <div class="shelf-card__top"><span>02</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/tokens-not-characters.html">Why the Model Cannot Count the Letters in “Strawberry”</a></h3>
+    <p>How a tokenizer's table is built by counting, why a common word reaches the network as one integer, and what that does to any question about its letters.</p>
+    <a class="shelf-card__action" href="essays/tokens-not-characters.html">Read the essay <span>→</span></a>
+  </article><article class="shelf-card" data-mission-card="attention-is-a-soft-lookup">
+    <div class="shelf-card__top"><span>03</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="essays/attention-is-a-soft-lookup.html">Attention Is a Dictionary Lookup That Returns a Weighted Mix</a></h3>
+    <p>The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.</p>
+    <a class="shelf-card__action" href="essays/attention-is-a-soft-lookup.html">Read the essay <span>→</span></a>
+  </article></div></section><section class="shelf-section" id="part-ii"><div class="section-heading"><div><span class="section-label">Part II</span><h2>Data and training</h2></div></div><div class="shelf-grid"><article class="shelf-card shelf-card--recommended" data-mission-card="lora-is-a-low-rank-diff">
+    <div class="shelf-card__top"><span>04</span><span class="shelf-card__status">Unread</span></div>
     <h3><a href="essays/lora-is-a-low-rank-diff.html">Fine-Tuning Without Touching the Weights</a></h3>
     <p>What a LoRA adapter actually is, why it is so much smaller than the model it changes, and how to work out its size before you train.</p>
     <a class="shelf-card__action" href="essays/lora-is-a-low-rank-diff.html">Start here <span>→</span></a>
