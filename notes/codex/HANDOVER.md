@@ -1,5 +1,11 @@
 # Handover for codex — state as of 2026-09-13 (night)
 
+> **2026-09-13 late night — read this first:** plan rev 2 is approved. Chapters are written from
+> scratch in `chapters/<slug>.md` (register: `chapters[]` in `site/catalog.mjs`); the twelve essays are
+> an archive built to `docs/old/`, with redirects from `docs/essays/`. Chapter 1 `search-the-catalogue`
+> is published and awaits the author's read. Do not edit essays; do not start chapter 2 until the
+> author has read chapter 1.
+
 > **2026-09-13 night — read first:** the book is being restructured from standalone essays into
 > project chapters; plan in `notes/chapters/CHAPTER-PLAN.md`, awaiting the author's approval. Do not
 > rewrite or draft essays until it is approved. Chapters 1–5 have one page each (variants removed).

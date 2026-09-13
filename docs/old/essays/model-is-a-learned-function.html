@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="The Program Is Now a Table of Numbers, and Training Is the Compile Step">
+  <meta property="og:description" content="The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong.">
+  <meta property="og:type" content="website">
+  <title>The Program Is Now a Table of Numbers, and Training Is the Compile Step · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../../assets/styles.css">
+  <script defer src="../../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="model-is-a-learned-function">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 12 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../../old/index.html">Archived essays</a><p>The twelve essays the chapters replaced, kept for reference. <a href="../../index.html">Back to the chapters →</a></p></div>
+      <nav aria-label="Archived essays">
+    <a class="book-nav__item is-active" href="../../old/essays/model-is-a-learned-function.html" data-mission-link="model-is-a-learned-function">
+      <span class="book-nav__number">01</span>
+      <span>The Program Is Now a Table of Numbers, and Training Is the Compile Step</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/tokens-not-characters.html" data-mission-link="tokens-not-characters">
+      <span class="book-nav__number">02</span>
+      <span>Why the Model Cannot Count the Letters in “Strawberry”</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/attention-is-a-soft-lookup.html" data-mission-link="attention-is-a-soft-lookup">
+      <span class="book-nav__number">03</span>
+      <span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/embeddings-are-coordinates.html" data-mission-link="embeddings-are-coordinates">
+      <span class="book-nav__number">04</span>
+      <span>Similar Means Whatever the Training Pairs Said</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/validation-set-is-a-budget.html" data-mission-link="validation-set-is-a-budget">
+      <span class="book-nav__number">05</span>
+      <span>You Only Get to Look at the Test Set Once</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/class-imbalance-changes-the-loss.html" data-mission-link="class-imbalance-changes-the-loss">
+      <span class="book-nav__number">06</span>
+      <span>95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/augmentation-declares-invariance.html" data-mission-link="augmentation-declares-invariance">
+      <span class="book-nav__number">07</span>
+      <span>Augmentation Is Telling the Model What Does Not Matter</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/input-pipeline-is-the-bottleneck.html" data-mission-link="input-pipeline-is-the-bottleneck">
+      <span class="book-nav__number">08</span>
+      <span>Your GPU Is Waiting on Your JPEG Decoder</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/transfer-learning-freeze-then-thaw.html" data-mission-link="transfer-learning-freeze-then-thaw">
+      <span class="book-nav__number">09</span>
+      <span>Borrow the Eyes, Retrain the Judgement</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+      <span class="book-nav__number">10</span>
+      <span>Fine-Tuning Without Touching the Weights</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/learn-the-action-or-learn-its-worth.html" data-mission-link="learn-the-action-or-learn-its-worth">
+      <span class="book-nav__number">11</span>
+      <span>Measure the Return, or Guess It From the Next State</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/ppo-clips-the-step.html" data-mission-link="ppo-clips-the-step">
+      <span class="book-nav__number">12</span>
+      <span>PPO: Reuse the Samples, But Not Too Much</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>01</span>Part I · The program is now a set of weights</div>
+      <h1 class="essay-title">The Program Is Now a Table of Numbers, and Training Is the Compile Step</h1>
+      <p class="essay-payoff">The loop that turns a loss and a gradient into a file of weights, walked once by hand, and the two ways a training run visibly goes wrong.</p>
+    </header>
+    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground is rewritten in <a href="../../chapters/search-the-catalogue.html">Chapter 1: Search the Catalogue, Then Answer From It</a>.</nav>
+    
+    <article class="prose"><p>A model is a function whose parameters, the numbers that control its output, are fitted to data. You choose the function&#39;s form and how to measure its errors. Training repeatedly changes the parameters to reduce those errors. The resulting values determine the predictions when you run the model. In that sense training plays the part a compiler plays in ordinary software: it turns what you specified, a function&#39;s form, a loss and a dataset, into the artifact you ship, which is a table of numbers rather than machine code.</p>
+<h2 id="three-points-and-a-starting-loss">Three points and a starting loss</h2>
+<p>Take the example points (1, 2), (2, 4) and (3, 6). Each pair contains an input x and its known answer y. A straight-line model predicts m·x + c: m is the <strong>weight</strong>, which multiplies the input, and c is the <strong>bias</strong>, which adds a fixed offset. Here m is the line&#39;s slope and c its intercept. The points lie on y = 2x, so m = 2 and c = 0 would fit them exactly.</p>
+<p>Start with m = c = 0. Every prediction is zero. A <strong>loss</strong> is a single number measuring prediction error; smaller means a better fit according to that measure. Use mean squared error: square each prediction minus its answer, then average.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input x</th>
+<th>Answer y</th>
+<th>Prediction</th>
+<th>Error</th>
+<th>Squared error</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td>−2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4</td>
+<td>0</td>
+<td>−4</td>
+<td>16</td>
+</tr>
+<tr>
+<td>3</td>
+<td>6</td>
+<td>0</td>
+<td>−6</td>
+<td>36</td>
+</tr>
+<tr>
+<td>Total</td>
+<td></td>
+<td></td>
+<td></td>
+<td>4 + 16 + 36 = 56</td>
+</tr>
+<tr>
+<td>Mean</td>
+<td></td>
+<td></td>
+<td></td>
+<td>56/3 ≈ 18.667</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>For any number of rows, the same calculation is:</p>
+<p class="formula">L = (1/n) ∑<sub>i=1</sub><sup>n</sup> (m·x<sub>i</sub> + c − y<sub>i</sub>)<sup>2</sup></p>
+
+<p>L is the loss and n the number of rows. The symbol ∑ adds the expression for each row i, from the first through the nth. x<sub>i</sub> is that row&#39;s input, y<sub>i</sub> its answer, and m·x<sub>i</sub> + c its prediction using weight m and bias c. Subtracting the answer gives the error; the superscript 2 squares it; dividing by n gives the mean.</p>
+<p>Squaring prevents positive and negative errors from cancelling. It also makes large errors count disproportionately: an error of 10 contributes 100, while an error of 3 contributes 9. Choosing this formula therefore affects which line training produces.</p>
+<h2 id="from-loss-to-gradient-to-step">From loss to gradient to step</h2>
+<p>A <strong>derivative</strong> measures how fast a quantity changes as another changes. A <strong>partial derivative</strong> measures that rate for one parameter while holding the others fixed. The <strong>gradient</strong> collects the loss&#39;s partial derivatives for all parameters. Its direction is uphill: towards increasing loss.</p>
+<p>For one row, changing m changes the prediction at rate x; changing c changes it at rate 1. Squaring the error contributes a factor of twice the error. Multiplying these rates gives each row&#39;s contribution to the loss derivative, then averaging gives the gradient:</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Contribution for m: 2 × error × x</th>
+<th>Contribution for c: 2 × error</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>(1, 2)</td>
+<td>2 × (−2) × 1 = −4</td>
+<td>2 × (−2) = −4</td>
+</tr>
+<tr>
+<td>(2, 4)</td>
+<td>2 × (−4) × 2 = −16</td>
+<td>2 × (−4) = −8</td>
+</tr>
+<tr>
+<td>(3, 6)</td>
+<td>2 × (−6) × 3 = −36</td>
+<td>2 × (−6) = −12</td>
+</tr>
+<tr>
+<td>Mean</td>
+<td>(−4 − 16 − 36)/3 = −56/3 ≈ −18.667</td>
+<td>(−4 − 8 − 12)/3 = −8</td>
+</tr>
+</tbody></table>
+<p>Both derivatives are negative, so increasing either parameter slightly reduces the loss at this starting point. <strong>Gradient descent</strong> repeatedly moves the parameters against the gradient. The <strong>learning rate</strong>, η, is the multiplier you choose to control the size of each move:</p>
+<p class="formula">m ← m − η · ∂L/∂m,&nbsp;&nbsp;&nbsp; c ← c − η · ∂L/∂c</p>
+
+<p>m and c are the weight and bias; each arrow replaces the old value with the expression on its right. L is the loss. ∂L/∂m and ∂L/∂c are its partial derivatives for the weight and bias, respectively. η multiplies each derivative, and subtraction moves downhill locally. Compute both derivatives from the same old parameters before updating either.</p>
+<p>With η = 0.05, m becomes 0 − 0.05 × (−56/3) ≈ 0.933 and c becomes 0 − 0.05 × (−8) = 0.4. Score the new line:</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Prediction, rounded</th>
+<th>Error, rounded</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0.933 + 0.4 ≈ 1.333</td>
+<td>−0.667</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.933 × 2 + 0.4 ≈ 2.267</td>
+<td>−1.733</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.933 × 3 + 0.4 ≈ 3.2</td>
+<td>−2.8</td>
+</tr>
+<tr>
+<td>Mean squared error</td>
+<td></td>
+<td>((−0.667)² + (−1.733)² + (−2.8)²)/3 ≈ 3.763</td>
+</tr>
+</tbody></table>
+<p>Keep unrounded values during calculation; the table displays approximations. One step reduces loss from 18.667 to 3.763. Repeat prediction, loss, gradient and step 200 times: m ≈ 1.971, c ≈ 0.066 and loss ≈ 0.00062.</p>
+<p>The fall is fast initially, then slower. Here the gradient approaches zero as the line approaches the best fit. Multiplying a shrinking gradient by a fixed learning rate produces smaller steps. More steps bring the parameters closer to (2, 0), with progressively smaller improvements.</p>
+<h2 id="too-far-or-too-slowly">Too far or too slowly</h2>
+<p>Restart at zero with η = 0.5, ten times larger. The first update gives m = 0 − 0.5 × (−56/3) ≈ 9.333 and c = 0 − 0.5 × (−8) = 4.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Prediction, rounded</th>
+<th>Squared error</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>9.333 + 4 ≈ 13.333</td>
+<td>(13.333 − 2)²</td>
+</tr>
+<tr>
+<td>2</td>
+<td>9.333 × 2 + 4 ≈ 22.667</td>
+<td>(22.667 − 4)²</td>
+</tr>
+<tr>
+<td>3</td>
+<td>9.333 × 3 + 4 ≈ 32.0</td>
+<td>(32.0 − 6)²</td>
+</tr>
+<tr>
+<td>Mean squared error</td>
+<td></td>
+<td>((13.333 − 2)² + (22.667 − 4)² + (32.0 − 6)²)/3 ≈ 384.3</td>
+</tr>
+</tbody></table>
+<p>The step overshoots the fit. The new gradient reverses direction and grows; the next update sends m to −32.9 and loss to 7,942. The third sends m to 159.3 and loss to 164,200. Loss exceeds a million at step 4. This is <strong>divergence</strong>: successive updates move farther from the solution.</p>
+<p>For these points, squared-error loss forms a bowl with a single bottom over the possible values of m and c. A sufficiently small step descends towards it; a large one can cross the bowl and land higher on the opposite side. Too small a learning rate makes progress slow enough that your run ends well short of the best fit.</p>
+<h2 id="what-else-determines-the-result">What else determines the result</h2>
+<p>The loss formula sets the error penalties and therefore the gradients. Mean absolute error averages error magnitudes without squaring them, reducing the influence of large errors. Changing the loss can change the fitted parameters even with identical data.</p>
+<p><strong>Preprocessing</strong> transforms inputs before prediction. A fitted normalisation transform uses the training data&#39;s mean and spread to centre and scale inputs. Those statistics stay fixed during gradient updates, but remain part of the program. Ship them with the weights: recomputing them on different data changes predictions even when m and c stay unchanged.</p>
+<p>Training loss measures fit only on the rows used for training. To assess predictions on unseen rows, reserve separate data before fitting either the parameters or preprocessing. A falling training loss alone does not establish how the model performs on rows it has not seen.</p>
+<p>A network with non-linear operations, whose outputs cannot be expressed as a straight-line function of their inputs, uses the same training loop. Its loss need not form a single bowl, so the loop need not reach the best possible fit.</p>
+<section class="mission" data-mission="model-is-a-learned-function"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-run-the-loop-and-break-it">Exercise: run the loop and break it</h2>
+<p>Run this plain Python script; no libraries are required.</p>
+<pre><code class="language-python"># Three points on y = 2x; model y = m*x + c; mean squared error; plain gradient descent.
+points = [(1, 2), (2, 4), (3, 6)]
+
+def loss(m, c):
+    return sum((m * x + c - y) ** 2 for x, y in points) / len(points)
+
+def gradients(m, c):
+    n = len(points)
+    dm = sum(2 * (m * x + c - y) * x for x, y in points) / n   # d loss / d m
+    dc = sum(2 * (m * x + c - y) for x, y in points) / n       # d loss / d c
+    return dm, dc
+
+for lr in (0.05, 0.5):
+    m = c = 0.0
+    print(f&quot;learning rate {lr}: start loss {loss(m, c):.4f}&quot;)
+    for step in range(1, 201):
+        dm, dc = gradients(m, c)
+        m -= lr * dm
+        c -= lr * dc
+        if step &lt;= 3 or step in (10, 50, 200):
+            print(f&quot;  step {step:3d}: m = {m:.4f}  c = {c:.4f}  loss = {loss(m, c):.4g}&quot;)
+        if loss(m, c) &gt; 1e6:
+            print(f&quot;  diverged: loss above a million at step {step}&quot;)
+            break
+</code></pre>
+<p><code>points</code> holds the training rows. <code>loss</code> scores the current line; <code>gradients</code> averages the row contributions derived above. Each learning rate gets a fresh zero start. The inner loop computes both derivatives, updates the parameters and prints selected steps. The final condition stops a run once loss exceeds a million.</p>
+<p>Expected output:</p>
+<pre><code class="language-text">learning rate 0.05: start loss 18.6667
+  step   1: m = 0.9333  c = 0.4000  loss = 3.763
+  step   2: m = 1.3511  c = 0.5733  loss = 0.8055
+  step   3: m = 1.5393  c = 0.6458  loss = 0.2175
+  step  10: m = 1.7121  c = 0.6530  loss = 0.06121
+  step  50: m = 1.8229  c = 0.4027  loss = 0.02326
+  step 200: m = 1.9711  c = 0.0656  loss = 0.0006182
+learning rate 0.5: start loss 18.6667
+  step   1: m = 9.3333  c = 4.0000  loss = 384.3
+  step   2: m = -32.8889  c = -14.6667  loss = 7942
+  step   3: m = 159.2593  c = 69.7778  loss = 1.642e+05
+  diverged: loss above a million at step 4
+</code></pre>
+<p>Try two variations separately:</p>
+<ul>
+<li>Set the learning rate to 0.005. Loss still falls, but reaches only 0.048 at step 200, compared with 0.00062 at 0.05. The smaller updates need more steps.</li>
+<li>Restore 0.05 and change the third point to (3, 12). No line passes through all the points. Loss flattens near 2, with m approaching 5 and c approaching −4. More training cannot remove the error left by the best-fitting line.</li>
+</ul>
+<p>A flat loss curve can reflect slow progress or the limit of what the chosen model can fit. These variations let you distinguish the causes because you control the learning rate and the data.</p>
+<p><em>Sources: the Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), section 3, paraphrased as study material; Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, chapter 4, the gradient-descent section.</em></p>
+</section></article>
+    <div class="mission-action" data-mission-action="model-is-a-learned-function">
+      <div><strong>Check your understanding.</strong><span>Try the exercise and compare your reasoning with the explanation.</span></div>
+      <button type="button" data-complete-mission="model-is-a-learned-function">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Adjacent essays">
+    <span></span>
+    <a class="essay-pager__next" href="tokens-not-characters.html"><span>Next</span>Why the Model Cannot Count the Letters in “Strawberry”</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 3.5–3.7, 3.9</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 173–177</li></ul></details>
+  </main>
+  </div>
+</body>
+</html>

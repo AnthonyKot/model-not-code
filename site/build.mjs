@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
-import { meta, parts, courses, essays, skips } from "./catalog.mjs";
+import { meta, parts, courses, essays, skips, chapters } from "./catalog.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -18,9 +18,16 @@ const builtEssays = essays.filter((essay) =>
   fs.existsSync(path.join(root, "essays", `${essay.slug}.md`))
 );
 const partsById = Object.fromEntries(parts.map((part) => [part.id, part]));
+// Chapters (the book since 2026-09-13): built when published (or --all) and chapters/<slug>.md exists.
+const builtChapters = chapters.filter((chapter) =>
+  (buildAll || chapter.status === "published") &&
+  fs.existsSync(path.join(root, "chapters", `${chapter.slug}.md`))
+);
+const chapterFor = (essaySlug) => chapters.find((chapter) => chapter.builtFrom.includes(essaySlug));
+const pad2 = (n) => String(n).padStart(2, "0");
 
 fs.rmSync(out, { recursive: true, force: true });
-for (const directory of [out, path.join(out, "essays"), path.join(out, "assets")]) {
+for (const directory of [out, path.join(out, "essays"), path.join(out, "assets"), path.join(out, "chapters"), path.join(out, "old", "essays")]) {
   fs.mkdirSync(directory, { recursive: true });
 }
 if (skips.length) fs.mkdirSync(path.join(out, "reviews"), { recursive: true });
@@ -100,6 +107,7 @@ function sourceLine(source) {
 }
 
 function sourceNotes(essay) {
+  if (!essay.sources.length) return "";
   const items = essay.sources.map((source) => `<li>${sourceLine(source)}</li>`).join("");
   const caution = essay.caution ? `<p>${escapeHtml(essay.caution)}</p>` : "";
   return `<details class="source-notes"><summary>Sources and limits</summary><ul>${items}</ul>${caution}</details>`;
@@ -118,7 +126,7 @@ renderer.heading = function ({ tokens, depth }) {
   return `<h${depth} id="${id}">${rendered}</h${depth}>\n`;
 };
 renderer.link = function ({ href, title, tokens }) {
-  const destination = /^essays\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
+  const destination = /^(?:\.\.\/)?(?:essays|chapters)\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
   const external = /^https?:\/\//.test(destination);
   const attributes = `${title ? ` title="${escapeHtml(title)}"` : ""}${external ? ' target="_blank" rel="noreferrer"' : ""}`;
   return `<a href="${escapeHtml(destination)}"${attributes}>${this.parser.parseInline(tokens)}</a>`;
@@ -130,16 +138,36 @@ function renderMarkdown(markdown) {
   return marked.parse(markdown);
 }
 
-function navItems(prefix, activeSlug = "") {
+// Two navigations share one shell: the chapters (the book) and the archived essays (docs/old/).
+function essayNavItems(prefix, activeSlug = "") {
   return builtEssays.map((essay, index) => `
-    <a class="book-nav__item${essay.slug === activeSlug ? " is-active" : ""}" href="${prefix}essays/${essay.slug}.html" data-mission-link="${essay.slug}">
-      <span class="book-nav__number">${String(index + 1).padStart(2, "0")}</span>
+    <a class="book-nav__item${essay.slug === activeSlug ? " is-active" : ""}" href="${prefix}old/essays/${essay.slug}.html" data-mission-link="${essay.slug}">
+      <span class="book-nav__number">${pad2(index + 1)}</span>
       <span>${essay.domain ? `<small>${escapeHtml(essay.domain)}</small>` : ""}${escapeHtml(essay.title)}</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>`).join("");
 }
 
-function shell({ title, description, prefix = "", activeSlug = "", body, pageClass = "" }) {
+function chapterNavItems(prefix, activeSlug = "") {
+  return chapters.map((chapter) => builtChapters.includes(chapter) ? `
+    <a class="book-nav__item${chapter.slug === activeSlug ? " is-active" : ""}" href="${prefix}chapters/${chapter.slug}.html" data-mission-link="${chapter.slug}">
+      <span class="book-nav__number">${pad2(chapter.number)}</span>
+      <span>${escapeHtml(chapter.title)}</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>` : `
+    <span class="book-nav__item book-nav__item--planned">
+      <span class="book-nav__number">${pad2(chapter.number)}</span>
+      <span>${escapeHtml(chapter.title)}<small class="book-nav__planned">in writing</small></span>
+      <span></span>
+    </span>`).join("");
+}
+
+function shell({ title, description, prefix = "", activeSlug = "", body, pageClass = "", archive = false }) {
+  const count = archive ? builtEssays.length : builtChapters.length;
+  const intro = archive
+    ? `<a href="${prefix}old/index.html">Archived essays</a><p>The twelve essays the chapters replaced, kept for reference. <a href="${prefix}index.html">Back to the chapters →</a></p>`
+    : `<a href="${prefix}index.html">The chapters</a><p>One shop, eight chapters. ${builtChapters.length} of ${chapters.length} written. <a href="${prefix}old/index.html">Archived essays →</a></p>`;
+  const nav = archive ? essayNavItems(prefix, activeSlug) : chapterNavItems(prefix, activeSlug);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -165,18 +193,14 @@ function shell({ title, description, prefix = "", activeSlug = "", body, pageCla
     </a>
     <div class="header-actions">
       <a href="${prefix}about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of ${builtEssays.length} exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of ${count} exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro">
-        <a href="${prefix}index.html">The shelf</a>
-        <p>${builtEssays.length} essay${builtEssays.length === 1 ? "" : "s"}. Worked examples and exercises included.</p>
-      </div>
-      <nav aria-label="Book contents">${navItems(prefix, activeSlug)}</nav>
-      ${skips.length ? `<a class="book-nav__skips" href="${prefix}index.html#transparent-skips">Editorial skips →</a>` : ""}
+      <div class="book-nav__intro">${intro}</div>
+      <nav aria-label="${archive ? "Archived essays" : "Book contents"}">${nav}</nav>
     </aside>
     ${body}
   </div>
@@ -214,8 +238,14 @@ function essayPage(essay, index, variant = null) {
   const next = builtEssays[index + 1];
   const pager = `<nav class="essay-pager" aria-label="Adjacent essays">
     ${previous ? `<a href="${previous.slug}.html"><span>Previous</span>${escapeHtml(previous.title)}</a>` : "<span></span>"}
-    ${next ? `<a class="essay-pager__next" href="${next.slug}.html"><span>Next</span>${escapeHtml(next.title)}</a>` : `<a class="essay-pager__next" href="../index.html"><span>Return</span>The complete shelf</a>`}
+    ${next ? `<a class="essay-pager__next" href="${next.slug}.html"><span>Next</span>${escapeHtml(next.title)}</a>` : `<a class="essay-pager__next" href="../index.html"><span>Return</span>The archive</a>`}
   </nav>`;
+  const chapter = chapterFor(essay.slug);
+  const archiveBanner = `<nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> ${chapter
+    ? (builtChapters.includes(chapter)
+      ? `Its ground is rewritten in <a href="../../chapters/${chapter.slug}.html">Chapter ${chapter.number}: ${escapeHtml(chapter.title)}</a>.`
+      : `Its ground will be rewritten in Chapter ${chapter.number}: ${escapeHtml(chapter.title)} (in writing).`)
+    : `<a href="../../index.html">Read the chapters</a>.`}</nav>`;
   const part = partsById[essay.part];
   const partLabel = part ? `Part ${part.id} · ${part.title}` : essay.part;
   const body = `<main id="main" class="essay-page">
@@ -224,6 +254,7 @@ function essayPage(essay, index, variant = null) {
       <h1 class="essay-title">${escapeHtml(essay.title)}</h1>
       <p class="essay-payoff">${escapeHtml(essay.payoff || essay.mechanism)}</p>
     </header>
+    ${archiveBanner}
     ${compareBanner(essay, variant ? variant.label : "")}
     <article class="prose">${article}</article>
     <div class="mission-action" data-mission-action="${essay.slug}">
@@ -233,7 +264,44 @@ function essayPage(essay, index, variant = null) {
     ${pager}
     ${sourceNotes(essay)}
   </main>`;
-  return shell({ title: essay.title, description: essay.payoff || essay.mechanism, prefix: "../", activeSlug: essay.slug, body, pageClass: "article-view" });
+  return shell({ title: essay.title, description: essay.payoff || essay.mechanism, prefix: "../../", activeSlug: essay.slug, body, pageClass: "article-view", archive: true });
+}
+
+function chapterPage(chapter) {
+  const source = fs.readFileSync(path.join(root, "chapters", `${chapter.slug}.md`), "utf8");
+  let article = renderMarkdown(source).replace(/^<h1[^>]*>.*?<\/h1>\s*/s, "");
+  const missionOpen = `<section class="mission" data-mission="${chapter.slug}"><div class="mission__label">${escapeHtml(chapter.missionLabel || "Try the exercise")}</div>`;
+  if (article.includes("<!--mission-->")) article = article.replace("<!--mission-->", missionOpen) + "</section>";
+  const index = builtChapters.indexOf(chapter);
+  const previous = builtChapters[index - 1];
+  const next = chapters.find((c) => c.number === chapter.number + 1);
+  const nextLink = next && builtChapters.includes(next)
+    ? `<a class="essay-pager__next" href="${next.slug}.html"><span>Next</span>${escapeHtml(next.title)}</a>`
+    : `<a class="essay-pager__next" href="../index.html"><span>${next ? `Chapter ${next.number} is in writing` : "Return"}</span>The chapters</a>`;
+  const pager = `<nav class="essay-pager" aria-label="Adjacent chapters">
+    ${previous ? `<a href="${previous.slug}.html"><span>Previous</span>${escapeHtml(previous.title)}</a>` : "<span></span>"}
+    ${nextLink}
+  </nav>`;
+  const archived = chapter.builtFrom.map((slug) => essays.find((e) => e.slug === slug)).filter((e) => e && builtEssays.includes(e));
+  const archiveNote = archived.length
+    ? `<p class="archive-note">Earlier standalone essays on this ground, kept for reference: ${archived.map((e) => `<a href="../old/essays/${e.slug}.html">${escapeHtml(e.title)}</a>`).join(" · ")}.</p>`
+    : "";
+  const body = `<main id="main" class="essay-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>${pad2(chapter.number)}</span>Chapter ${chapter.number} of ${chapters.length}</div>
+      <h1 class="essay-title">${escapeHtml(chapter.title)}</h1>
+      <p class="essay-payoff">${escapeHtml(chapter.payoff)}</p>
+    </header>
+    <article class="prose">${article}</article>
+    <div class="mission-action" data-mission-action="${chapter.slug}">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="${chapter.slug}">Mark exercise complete</button>
+    </div>
+    ${pager}
+    ${sourceNotes(chapter)}
+    ${archiveNote}
+  </main>`;
+  return shell({ title: chapter.title, description: chapter.payoff, prefix: "../", activeSlug: chapter.slug, body, pageClass: "article-view" });
 }
 
 function skipReviewPage(item) {
@@ -259,41 +327,65 @@ function partSection(part) {
     <div class="shelf-card__top"><span>${String(globalIndex + 1).padStart(2, "0")}${essay.domain ? ` · ${escapeHtml(essay.domain)}` : ""}</span><span class="shelf-card__status">Unread</span></div>
     <h3><a href="essays/${essay.slug}.html">${escapeHtml(essay.title)}</a></h3>
     <p>${escapeHtml(essay.payoff || essay.mechanism)}</p>
-    <a class="shelf-card__action" href="essays/${essay.slug}.html">${essay.recommended ? "Start here" : "Read the essay"} <span>→</span></a>
+    <a class="shelf-card__action" href="essays/${essay.slug}.html">Read the archived essay <span>→</span></a>
   </article>`;
   }).join("");
   return `<section class="shelf-section" id="part-${slugify(part.id)}">${heading}<div class="shelf-grid">${cards}</div></section>`;
 }
 
+function archiveHomePage() {
+  const body = `<main id="main" class="home-page">
+    <section class="home-hero">
+      <div class="home-hero__eyebrow">Archive</div>
+      <h1>The standalone essays</h1>
+      <p>Before the book became eight project chapters on one shop, it was written as standalone essays, one mechanism each. They are kept here unchanged for reference. The chapters are written from scratch and supersede them.</p>
+      <div class="home-hero__actions">
+        <a class="button button--primary" href="../index.html">Read the chapters</a>
+      </div>
+      <div class="home-proof"><span><strong>${builtEssays.length}</strong> archived essays</span></div>
+    </section>
+    ${parts.filter((part) => builtEssays.some((essay) => essay.part === part.id)).map(partSection).join("")}
+    <footer class="home-footer"><div><strong>${escapeHtml(meta.title)}</strong><p>Archived essays</p></div><p><a href="${escapeHtml(meta.repo)}">Source on GitHub</a></p></footer>
+  </main>`;
+  return shell({ title: "Archived essays", description: "The standalone essays the chapters replaced, kept for reference.", prefix: "../", body, pageClass: "home-view", archive: true });
+}
+
 function homePage() {
-  const recommended = builtEssays.find((essay) => essay.recommended);
-  const skipCards = skips.map((item) => `<article class="skip-card">
-    <div><span>Skip verdict</span><h3>${escapeHtml(item.title || item.slug)}</h3></div>
-    <p>${escapeHtml(item.reason || "")}</p>
-    <a href="reviews/${item.slug}.html">Read the evidence →</a>
-  </article>`).join("");
+  const first = builtChapters[0];
+  const cards = chapters.map((chapter) => {
+    const built = builtChapters.includes(chapter);
+    return `<article class="shelf-card${built ? " shelf-card--recommended" : " shelf-card--planned"}"${built ? ` data-mission-card="${chapter.slug}"` : ""}>
+    <div class="shelf-card__top"><span>Chapter ${chapter.number}</span><span class="shelf-card__status">${built ? "Unread" : "In writing"}</span></div>
+    <h3>${built ? `<a href="chapters/${chapter.slug}.html">${escapeHtml(chapter.title)}</a>` : escapeHtml(chapter.title)}</h3>
+    <p>${escapeHtml(chapter.payoff)}</p>
+    ${built ? `<a class="shelf-card__action" href="chapters/${chapter.slug}.html">Read the chapter <span>→</span></a>` : ""}
+  </article>`;
+  }).join("");
   const body = `<main id="main" class="home-page">
     <section class="home-hero">
       <div class="home-hero__eyebrow">${escapeHtml(meta.subtitle)}</div>
       <h1>${escapeHtml(meta.title)}</h1>
-      <p>${builtEssays.length} standalone essay${builtEssays.length === 1 ? "" : "s"}. Each explains one mechanism with a worked example you can recompute, and closes with an exercise you can do without a GPU, a paid API, or the source.</p>
+      <p>One online shop, followed from its first search box to the question of whether it needed a model at all. Each chapter builds one working part of the shop end to end, with worked numbers you can recompute and an exercise that runs on a laptop CPU.</p>
       <div class="home-hero__actions">
-        ${recommended ? `<a class="button button--primary" href="essays/${recommended.slug}.html">Read the recommended start</a>` : ""}
-        <a class="button button--quiet" href="#the-shelf">Browse the shelf</a>
+        ${first ? `<a class="button button--primary" href="chapters/${first.slug}.html">Start with chapter ${first.number}</a>` : ""}
+        <a class="button button--quiet" href="old/index.html">Archived essays</a>
       </div>
-      <div class="home-proof"><span><strong>${builtEssays.length}</strong> essays published</span>${skips.length ? `<span><strong>${skips.length}</strong> transparent skips</span>` : ""}</div>
+      <div class="home-proof"><span><strong>${builtChapters.length}</strong> of ${chapters.length} chapters written</span></div>
     </section>
-    <section class="shelf-section" id="the-shelf">
-      <div class="section-heading"><div><span class="section-label">The shelf</span><h2>Reading order</h2></div><p>Each essay is standalone; read in any order.</p></div>
+    <section class="shelf-section" id="the-chapters">
+      <div class="section-heading"><div><span class="section-label">The chapters</span><h2>Reading order</h2></div><p>Read in order: each chapter builds on the shop the previous one left.</p></div>
+      <div class="shelf-grid">${cards}</div>
     </section>
-    ${parts.map(partSection).join("")}
-    ${skips.length ? `<section class="skip-section" id="transparent-skips">
-      <div class="section-heading"><div><span class="section-label">Transparent skips</span><h2>Not every candidate earns an essay.</h2></div><p>These pitches were not selected. The records explain why.</p></div>
-      <div class="skip-grid">${skipCards}</div>
-    </section>` : ""}
     <footer class="home-footer"><div><strong>${escapeHtml(meta.title)}</strong><p>${escapeHtml(meta.subtitle)}</p></div><p><a href="${escapeHtml(meta.repo)}">Source on GitHub</a></p></footer>
   </main>`;
   return shell({ title: meta.title, description: meta.subtitle, body, pageClass: "home-view" });
+}
+
+function redirectPage(target, title) {
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>${escapeHtml(title)} · ${escapeHtml(meta.title)}</title>
+<meta http-equiv="refresh" content="0; url=${target}"><link rel="canonical" href="${target}"></head>
+<body><main id="main"><p>This essay moved to the archive: <a href="${target}">${escapeHtml(title)}</a>.</p></main></body></html>`;
 }
 
 function aboutPage() {
@@ -311,14 +403,13 @@ function aboutPage() {
 
 fs.writeFileSync(path.join(out, "index.html"), homePage());
 fs.writeFileSync(path.join(out, "about.html"), aboutPage());
+fs.writeFileSync(path.join(out, "old", "index.html"), archiveHomePage());
+builtChapters.forEach((chapter) => fs.writeFileSync(path.join(out, "chapters", `${chapter.slug}.html`), chapterPage(chapter)));
 builtEssays.forEach((essay, index) => {
-  fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), essayPage(essay, index));
-  for (const variant of variantsOf(essay.slug)) {
-    fs.writeFileSync(path.join(out, "essays", `${essay.slug}--${variant.label}.html`), essayPage(essay, index, variant));
-  }
+  fs.writeFileSync(path.join(out, "old", "essays", `${essay.slug}.html`), essayPage(essay, index));
+  fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), redirectPage(`../old/essays/${essay.slug}.html`, essay.title));
 });
-skips.forEach((item) => fs.writeFileSync(path.join(out, "reviews", `${item.slug}.html`), skipReviewPage(item)));
 for (const asset of ["styles.css", "app.js"]) fs.copyFileSync(path.join(here, asset), path.join(out, "assets", asset));
 fs.writeFileSync(path.join(out, ".nojekyll"), "");
 fs.writeFileSync(path.join(out, "404.html"), homePage());
-console.log(`Built ${builtEssays.length} of ${essays.length} essays in docs/ (${skips.length} skip records).`);
+console.log(`Built ${builtChapters.length} of ${chapters.length} chapters and ${builtEssays.length} archived essays in docs/.`);

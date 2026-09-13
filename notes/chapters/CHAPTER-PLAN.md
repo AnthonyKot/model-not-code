@@ -139,8 +139,16 @@ Every item has a home. Prompt injection, decided standalone, is a section of cha
 form makes "standalone" moot). "Benchmark is a claim about a test set" merges into chapter 2.
 "The score is not the lift" stays deferred.
 
-## Process once approved
+## Process (approved 2026-09-13; amended by the author the same night)
+
+**Amendment:** every chapter is written **from scratch**, not converted from the essays. The twelve
+essays stay online unchanged as an archive at `docs/old/` (source still `essays/`), old URLs redirect
+there, and each archived page links to the chapter that replaces it. Chapter sources are
+`chapters/<slug>.md`, registered in `site/catalog.mjs` `chapters[]`; receipts in `corpus/<slug>/`.
+
+Original process, as amended:
 1. Main session writes chapter 1 as the pilot of the form (sequential pass rule); publish; author reads.
-2. Then chapters 2–4 from existing essays; old essays stay in git history, pages replaced.
+2. Then chapters 2–4, written from scratch on the essays' ground; the essays stay in the archive.
 3. Chapters 5–8 drafted fresh, pitch per chapter (project + section list), then prose.
-4. Receipts: merge the essays' `corpus/<slug>/receipts.tsv` into `corpus/<chapter>/`.
+4. Receipts: each chapter writes its own `corpus/<chapter-slug>/receipts.tsv`; the essays' receipts stay with the archive.
+5. **Chapter 1 (`search-the-catalogue`) written and published 2026-09-13** as the pilot; awaits the author's read.

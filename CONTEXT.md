@@ -9,7 +9,8 @@ touching an essay. Precedence when documents disagree: this file → `AGENT.md` 
 > **Superseded in form (2026-09-13):** the essays are being merged into project chapters of
 > 20,000–35,000 characters, each explaining one thing end to end on a real project. The plan is
 > `notes/chapters/CHAPTER-PLAN.md`; where this section says "standalone essay" or "1,000–1,800 words",
-> the plan wins. Every other rule (sourcing, register, formulas, exercises) still holds.
+> the plan wins. Every other rule (sourcing, register, formulas, exercises) still holds. Since the
+> late-night entry in §9 the chapters are written from scratch in `chapters/`; the essays are an archive.
 
 Twenty to thirty standalone essays on the practical things a **senior software developer moving
 into ML / AI engineering** needs. The reader has ten to twenty years of software behind them,
@@ -338,6 +339,15 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   chapter 8 closes as a project decision). The author chose to run the image classifier on the
   shop's product photos, so the book follows **one shop**; the assistant chapter now precedes serving.
   Plan revision 2 in `notes/chapters/CHAPTER-PLAN.md`, awaiting approval; chapter 1 is the pilot.
+
+- **2026-09-13 (late night)** — The author approved plan revision 2 and amended it: the chapters are
+  written **from scratch**, and the existing essays are kept online for reference only, under
+  `docs/old/` (old essay URLs redirect there; each archived page names its replacement chapter). Site
+  rebuilt around `chapters[]` in the catalog; checks extended to chapters. Chapter 1, *Search the
+  Catalogue, Then Answer From It*, written as the pilot (~27,700 characters of prose; one figure;
+  35 receipts; worked numbers verified in `corpus/search-the-catalogue/run-worked.log`; the exercise
+  and its two variations run on CPU with logs) and published for the author's read. Not yet through
+  the review lanes.
 
 ## 10. Open questions
 

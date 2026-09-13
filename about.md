@@ -1,14 +1,14 @@
 # How this book was made and checked
 
 **Who it is for.** A senior software developer moving into ML and AI engineering: fluent in
-systems, new to models. Each essay explains one mechanism until you can recompute its worked
-example, then gives you an exercise with an expected result. Read them in any order.
+systems, new to models. The book follows one online shop through eight chapters, each building one
+working part end to end, with worked examples you can recompute and an exercise with an expected
+result. Read the chapters in order. The standalone essays that preceded them are kept as an archive.
 
 **Where it comes from.** The author is enrolled in seven Udemy courses and owns the books named
 on each essay's source line. The essays are study notes made rigorous: the mechanisms are
 re-derived in the book's own words and arithmetic, the courses and books are credited by name,
-and nothing from them is reproduced beyond a phrase. Where a number is a lecturer's, the essay
-says "as reported in the lecture". The book is not a substitute for the courses and does not
+and nothing from them is reproduced beyond a phrase. Where a number comes from a course or book rather than the page's own arithmetic, its receipt says so. The book is not a substitute for the courses and does not
 pretend to be.
 
 **What is checked by machine.** Every lecture an essay cites exists as a transcript file on the

@@ -10,7 +10,7 @@
   function renderProgress() {
     const completed = readCompleted();
     document.querySelectorAll("[data-progress-summary]").forEach((node) => {
-      node.textContent = `${completed.size} of ${allSlugs.length} exercises`;
+      node.textContent = `${allSlugs.filter((slug) => completed.has(slug)).length} of ${allSlugs.length} exercises`;
     });
     document.querySelectorAll("[data-mission-link]").forEach((node) => node.classList.toggle("is-complete", completed.has(node.dataset.missionLink)));
     document.querySelectorAll("[data-mission-card]").forEach((node) => {

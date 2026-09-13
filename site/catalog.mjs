@@ -9,7 +9,7 @@
 export const meta = {
   title: "The Program Is Now a Model",
   slug: "model-not-code",
-  subtitle: "Standalone essays for a senior developer moving into ML and AI engineering",
+  subtitle: "Eight project chapters for a senior developer moving into ML and AI engineering",
   repo: "https://github.com/AnthonyKot/model-not-code",
   site: "https://anthonykot.github.io/model-not-code/",
 };
@@ -199,3 +199,46 @@ export const essays = [
 ];
 
 export const skips = [];
+
+// ── Chapters (plan revision 2, notes/chapters/CHAPTER-PLAN.md) ─────────────────────────
+// The book is now eight project chapters on one shop, written from scratch. The essays above are
+// kept as an archive, built under docs/old/. A chapter is built when status is "published" (or
+// --all) and chapters/<slug>.md exists; the rest are listed on the home page as planned.
+// builtFrom[] names the archived essays whose ground the chapter covers (for the archive banner).
+const CH = (number, slug, title, payoff, builtFrom, sources, extra = {}) => ({
+  number, slug, title, payoff, builtFrom, sources,
+  status: "planned", caution: "", missionLabel: "",
+  ...extra,
+});
+
+export const chapters = [
+  CH(1, "search-the-catalogue", "Search the Catalogue, Then Answer From It",
+    "The shop's search box and its answer writer, built from the same parts: tokens, attention, a vector per text trained on query–title pairs, and the causal mask that turns the blocks into a generator.",
+    ["model-is-a-learned-function", "tokens-not-characters", "attention-is-a-soft-lookup", "embeddings-are-coordinates"],
+    [C("4735368", "03-07", "28-02", "34-02", "34-04"), C("6100015", "01-29", "01-32", "03-11", "03-13", "03-20", "07-22"), C("6538601", "02-03"),
+     B("llm-deep-dive", "pp. 63–68, 88–89"), B("geron-pytorch", "pp. 173–177, 702–703"), P("arXiv:1508.07909", "3.2")],
+    { status: "published",
+      caution: "Every example is synthetic: toy catalogue, hand-chosen vectors, a one-block model trained in seconds. Library defaults are as of sentence-transformers 6.0.1 and PyTorch 2.14." }),
+  CH(2, "trust-the-number", "Trust the Number Before You Ship the Classifier",
+    "The shop's product-photo classifier evaluated before release: the split, leakage, rare categories, the threshold as a cost, augmentation and the input pipeline.",
+    ["validation-set-is-a-budget", "class-imbalance-changes-the-loss", "augmentation-declares-invariance", "input-pipeline-is-the-bottleneck"], []),
+  CH(3, "reuse-a-pretrained-model", "Reuse a Pretrained Model",
+    "Freeze and thaw a pretrained backbone for the photo classifier; then adapt the shop's language model with a low-rank diff.",
+    ["transfer-learning-freeze-then-thaw", "lora-is-a-low-rank-diff"], []),
+  CH(4, "train-from-reward", "Train From Reward",
+    "A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.",
+    ["learn-the-action-or-learn-its-worth", "ppo-clips-the-step"], []),
+  CH(5, "keep-it-right-after-launch", "Keep It Right After Launch",
+    "The photo classifier in production: what ships, what can be measured before the labels arrive, when an anomaly means investigate, and the feedback loop.",
+    [], []),
+  CH(6, "build-the-assistant", "Build the Assistant",
+    "The shop's assistant from search and the generator: measure retrieval, choose the chunk, run the tool loop, and treat retrieved text as untrusted input.",
+    [], []),
+  CH(7, "serve-the-assistant-cheaply", "Serve the Assistant Cheaply",
+    "What the generator costs per token and where it goes down: the KV cache, four bits per weight, batching.",
+    [], []),
+  CH(8, "did-the-shop-need-a-model", "Did the Shop Need a Model?",
+    "A keyword rule, the search encoder and the assistant compared on the quality and cost measured in this book.",
+    [], []),
+];
+

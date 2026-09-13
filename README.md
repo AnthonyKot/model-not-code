@@ -1,15 +1,15 @@
 # The Program Is Now a Model
 
-Standalone essays (being merged into project chapters — `notes/chapters/CHAPTER-PLAN.md`) for a senior software developer moving into ML and AI engineering. One
-mechanism per essay, explained so you can recompute the worked example, with an exercise you can
-do without a GPU or a paid API.
+Eight project chapters on one online shop (`notes/chapters/CHAPTER-PLAN.md`) for a senior software
+developer moving into ML and AI engineering, written from scratch; the earlier standalone essays are
+kept as an archive at `/old/`. Worked examples you can recompute, exercises that run on a CPU.
 
 Published at https://anthonykot.github.io/model-not-code/ (GitHub Pages from `docs/`).
 
 ## How it is built
 
-- `essays/<slug>.md` — one markdown file per essay; `site/catalog.mjs` is the register (order,
-  part, mechanism, sources, status).
+- `chapters/<slug>.md` — one markdown file per chapter; `essays/<slug>.md` — the archived essays.
+  `site/catalog.mjs` is the register for both (`chapters[]`, `essays[]`).
 - `npm run build` renders `docs/`; `npm run check` runs the structural check, the receipt check
   and the paraphrase guard; `npm run consistency` reports shelf-wide repetition and hedging.
 - `scripts/review.sh <slug>` and `scripts/readers.sh <slug>` run the review lanes; nothing is

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Attention Is a Dictionary Lookup That Returns a Weighted Mix">
+  <meta property="og:description" content="The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.">
+  <meta property="og:type" content="website">
+  <title>Attention Is a Dictionary Lookup That Returns a Weighted Mix · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../../assets/styles.css">
+  <script defer src="../../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="attention-is-a-soft-lookup">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 12 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../../old/index.html">Archived essays</a><p>The twelve essays the chapters replaced, kept for reference. <a href="../../index.html">Back to the chapters →</a></p></div>
+      <nav aria-label="Archived essays">
+    <a class="book-nav__item" href="../../old/essays/model-is-a-learned-function.html" data-mission-link="model-is-a-learned-function">
+      <span class="book-nav__number">01</span>
+      <span>The Program Is Now a Table of Numbers, and Training Is the Compile Step</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/tokens-not-characters.html" data-mission-link="tokens-not-characters">
+      <span class="book-nav__number">02</span>
+      <span>Why the Model Cannot Count the Letters in “Strawberry”</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../../old/essays/attention-is-a-soft-lookup.html" data-mission-link="attention-is-a-soft-lookup">
+      <span class="book-nav__number">03</span>
+      <span>Attention Is a Dictionary Lookup That Returns a Weighted Mix</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/embeddings-are-coordinates.html" data-mission-link="embeddings-are-coordinates">
+      <span class="book-nav__number">04</span>
+      <span>Similar Means Whatever the Training Pairs Said</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/validation-set-is-a-budget.html" data-mission-link="validation-set-is-a-budget">
+      <span class="book-nav__number">05</span>
+      <span>You Only Get to Look at the Test Set Once</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/class-imbalance-changes-the-loss.html" data-mission-link="class-imbalance-changes-the-loss">
+      <span class="book-nav__number">06</span>
+      <span>95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/augmentation-declares-invariance.html" data-mission-link="augmentation-declares-invariance">
+      <span class="book-nav__number">07</span>
+      <span>Augmentation Is Telling the Model What Does Not Matter</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/input-pipeline-is-the-bottleneck.html" data-mission-link="input-pipeline-is-the-bottleneck">
+      <span class="book-nav__number">08</span>
+      <span>Your GPU Is Waiting on Your JPEG Decoder</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/transfer-learning-freeze-then-thaw.html" data-mission-link="transfer-learning-freeze-then-thaw">
+      <span class="book-nav__number">09</span>
+      <span>Borrow the Eyes, Retrain the Judgement</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/lora-is-a-low-rank-diff.html" data-mission-link="lora-is-a-low-rank-diff">
+      <span class="book-nav__number">10</span>
+      <span>Fine-Tuning Without Touching the Weights</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/learn-the-action-or-learn-its-worth.html" data-mission-link="learn-the-action-or-learn-its-worth">
+      <span class="book-nav__number">11</span>
+      <span>Measure the Return, or Guess It From the Next State</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../../old/essays/ppo-clips-the-step.html" data-mission-link="ppo-clips-the-step">
+      <span class="book-nav__number">12</span>
+      <span>PPO: Reuse the Samples, But Not Too Much</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>03</span>Part I · The program is now a set of weights</div>
+      <h1 class="essay-title">Attention Is a Dictionary Lookup That Returns a Weighted Mix</h1>
+      <p class="essay-payoff">The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation.</p>
+    </header>
+    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground is rewritten in <a href="../../chapters/search-the-catalogue.html">Chapter 1: Search the Catalogue, Then Answer From It</a>.</nav>
+    
+    <article class="prose"><p>A language model is trained on whole documents: every token of a sentence is in memory at once, including the tokens it is being taught to predict. Yet when you use it, it produces one token at a time, each appended before the next is chosen. Those two facts look incompatible. Either training lets the model peek at the answer, which would make the training score meaningless, or generation runs a different computation from the one that was trained. Neither is true, and the reason is one small addition inside attention called the <strong>causal mask</strong>. This essay builds attention on numbers small enough to follow, shows exactly where the peeking would happen, and derives the mask from what is needed to stop it.</p>
+<h2 id="attention-is-a-lookup-that-returns-a-blend">Attention is a lookup that returns a blend</h2>
+<p>A dictionary lookup takes a key, finds the entry with exactly that key and returns its value. Attention keeps the shape of a lookup but changes two things. Instead of asking &quot;is this key equal?&quot;, it gives every stored key a <strong>score</strong> for how well it matches. And instead of returning one value, it returns a <strong>blend</strong> of all the values, with better-matching entries contributing more.</p>
+<p>The text is first split into <strong>tokens</strong>, pieces of words, and each token is turned into a list of numbers, a <strong>vector</strong>. From each token&#39;s vector the model computes three smaller vectors with its learned weights:</p>
+<ul>
+<li>a <strong>query</strong>: what this position is looking for;</li>
+<li>a <strong>key</strong>: what this position offers to be matched against;</li>
+<li>a <strong>value</strong>: what this position contributes to the blend if it matches.</li>
+</ul>
+<p>Here are three tokens with invented vectors, kept small so every number can be checked by hand:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>token</th>
+<th>key</th>
+<th>value</th>
+<th>query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>(2, 0, 0, 0)</td>
+<td>(1, 0)</td>
+<td>(1, 1, 0, 0)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>(0, 2, 0, 0)</td>
+<td>(0, 1)</td>
+<td>(0, 2, 0, 0)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>(1, 0, 1, 0)</td>
+<td>(1, 1)</td>
+<td>(2, 0, 0, 0)</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p><strong>Step 1: score.</strong> A query is scored against a key with the <strong>dot product</strong>: multiply the matching entries and add them up. Vectors that point the same way score high; unrelated ones score zero. Each score is then scaled down by the square root of the key&#39;s length, here √4 = 2, which keeps scores from growing just because vectors are long. For token 2&#39;s query:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Dot product with query (0, 2, 0, 0)</th>
+<th>Scaled score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0 × 2 + 2 × 0 + 0 × 0 + 0 × 0 = 0</td>
+<td>0 / 2 = 0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0 × 0 + 2 × 2 + 0 × 0 + 0 × 0 = 4</td>
+<td>4 / 2 = 2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0 × 1 + 2 × 0 + 0 × 1 + 0 × 0 = 0</td>
+<td>0 / 2 = 0</td>
+</tr>
+</tbody></table>
+<p>Every token is a query, so doing this for all three gives a square table of scores. Row i holds token i&#39;s query scored against every key:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>row \ column</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p><strong>Step 2: turn scores into shares.</strong> The <strong>softmax</strong> turns a row of scores into weights that are positive and add up to one. It raises the number e (about 2.718) to each score and divides each result by the row&#39;s total. The exponent makes a higher score take a disproportionately larger share. Row 2&#39;s scores 0, 2, 0 become e<sup>0</sup> = 1, e<sup>2</sup> ≈ 7.39 and e<sup>0</sup> = 1; the total is 9.39, so the weights are about 0.11, 0.79 and 0.11.</p>
+<p><strong>Step 3: blend.</strong> The output for row 2 is the values mixed by those weights: 0.11 × (1, 0) + 0.79 × (0, 1) + 0.11 × (1, 1) ≈ (0.21, 0.89). Token 2&#39;s own value dominates because its key matched best, but tokens 1 and 3 still leak in a little. That is the difference from a dictionary: nothing is ever fully excluded.</p>
+<p>In symbols, for one query q against all keys K:</p>
+<p class="formula">out = Σ<sub>j</sub> w<sub>j</sub> v<sub>j</sub>, where w = softmax(q·K<sup>T</sup> / √d<sub>k</sub>)</p>
+
+<p>Read it right to left. q·K<sup>T</sup> is the list of dot products of the query with every key (the T, &quot;transpose&quot;, just lines the keys up so one multiplication does them all). Dividing by √d<sub>k</sub> is step 1&#39;s scaling, with d<sub>k</sub> the key length. Softmax is step 2, producing the weights w<sub>j</sub>. The sum Σ<sub>j</sub> w<sub>j</sub> v<sub>j</sub> is step 3: each value v<sub>j</sub> times its weight, added up.</p>
+<h2 id="where-training-would-cheat">Where training would cheat</h2>
+<p>Now connect this to how the model learns. During training, the output of row i is used to predict the next token, i + 1. Row 1 predicts token 2, row 2 predicts token 3, and so on, and all rows are computed in one pass over the document. That is what makes training on whole documents efficient.</p>
+<p>Look at row 2 again. It is supposed to predict token 3, yet its blend just gave token 3&#39;s value a weight of 0.11. Row 1 is worse: it predicts token 2, and without any restriction its weights are 0.38, 0.38 and 0.23, so more than a third of its output is token 2&#39;s own value. The answer is being fed into the prediction of that answer. A model trained this way would learn to copy from the future, score well, and fail the moment it has to generate text where the future does not exist yet.</p>
+<h2 id="from-the-requirement-to-the-mask">From the requirement to the mask</h2>
+<p>The requirement can be stated exactly: row i may use tokens 1 to i and nothing after. This property is called <strong>causal</strong>, because information only flows from earlier positions to later ones, the way text is written. In the weight table it means every weight to the right of the diagonal must be exactly zero. A small weight is not enough; even a sliver of the answer is still the answer leaking in.</p>
+<p>There is a second condition. Each row&#39;s remaining weights must still add up to one, or the output stops being a proper blend. The obvious fix, computing the weights and then zeroing the forbidden ones, breaks this: row 2 would be left with only about 0.89 of its weight.</p>
+<p>The softmax offers a cleaner place to intervene. A weight is e<sup>score</sup> divided by the row&#39;s total, and e raised to minus infinity is zero. So if a forbidden score is replaced by −∞ before the softmax, that entry adds zero to the top of its fraction and zero to the total below it. Its weight is zero, and the remaining weights automatically share the whole. That is the causal mask, written as one added matrix:</p>
+<p class="formula">weights = softmax(Q·K<sup>T</sup> / √d<sub>k</sub> + M)</p>
+
+<p>Q·K<sup>T</sup> / √d<sub>k</sub> is the whole scaled score table from above, every query against every key at once. M is the <strong>mask</strong>, a table of the same shape holding 0 where the column is at or before the row and −∞ where the column comes after it. Adding M leaves the allowed scores untouched and turns the forbidden ones into −∞. The softmax then runs along each row. In code the −∞ is a very large negative number such as −10<sup>9</sup>, whose exponential is exactly 0.0 on a computer. The same mask is applied in every attention layer, because a later layer that could see the future would undo the earlier ones.</p>
+<h2 id="the-mask-at-work">The mask at work</h2>
+<p>Row 2 with the mask: column 3&#39;s score becomes −∞ and drops out, so the total is 1 + 7.39 = 8.39 and the weights are about 0.12 and 0.88. The output is 0.12 × (1, 0) + 0.88 × (0, 1) = (0.12, 0.88). Here is the whole table both ways, rounded to two places:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Row (predicts)</th>
+<th>Masked weights: col 1, 2, 3</th>
+<th>Masked output</th>
+<th>Unmasked weights: col 1, 2, 3</th>
+<th>Unmasked output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 (token 2)</td>
+<td><strong>1.00</strong>, 0, 0</td>
+<td>(1.00, 0.00)</td>
+<td>0.38, 0.38, 0.23</td>
+<td>(0.62, 0.62)</td>
+</tr>
+<tr>
+<td>2 (token 3)</td>
+<td>0.12, <strong>0.88</strong>, 0</td>
+<td>(0.12, 0.88)</td>
+<td>0.11, 0.79, 0.11</td>
+<td>(0.21, 0.89)</td>
+</tr>
+<tr>
+<td>3 (token 4)</td>
+<td>0.67, 0.09, 0.24</td>
+<td>(0.91, 0.33)</td>
+<td>0.67, 0.09, 0.24</td>
+<td>(0.91, 0.33)</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The masked side has zeros above the diagonal: that is the causal rule, visible in the numbers. Row 3 is identical both ways, because in a three-token sequence nothing comes after it.</p>
+<p>The payoff is a property you can test. Delete token 3 from the input and recompute row 2 with the mask: scores 0 and 2, weights 0.12 and 0.88, output (0.12, 0.88), exactly as before. Row 2 cannot tell whether token 3 exists or has not been generated yet. Now append a fourth token, with key (0, 1, 0, 2), value (0, 2) and query (1, 0, 1, 1), and compare the earlier rows:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Masked, 3 tokens</th>
+<th>Masked, 4 tokens</th>
+<th>Unmasked, 3 tokens</th>
+<th>Unmasked, 4 tokens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>(1.00, 0.00)</td>
+<td>(1.00, 0.00)</td>
+<td>(0.62, 0.62)</td>
+<td>(0.50, 0.88)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>(0.12, 0.88)</td>
+<td>(0.12, 0.88)</td>
+<td>(0.21, 0.89)</td>
+<td>(0.17, 1.14)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>(0.91, 0.33)</td>
+<td>(0.91, 0.33)</td>
+<td>(0.91, 0.33)</td>
+<td>(0.83, 0.47)</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>With the mask, no earlier row moves; the new token only adds row 4, which blends all four values with weights 0.30, 0.11, 0.30, 0.30 into (0.59, 1.00). Without the mask, every earlier row changes.</p>
+<p>This resolves the opening puzzle. Training is not cheating: row i was computed exactly as if later tokens were absent, so comparing it with token i + 1 is a fair test. And generation is the same computation, run one row at a time: the rows already computed never change, so a serving system can keep their keys and values instead of recomputing them. That stored table is the <strong>KV cache</strong>, the subject of an essay in Part IV.</p>
+<h2 id="when-the-mask-applies-and-when-it-does-not">When the mask applies, and when it does not</h2>
+<p>The mask answers one question: does any row predict a token that appears later in the same table? If yes, those later columns must be hidden. The same test, applied case by case, explains where the mask is used and where it is not.</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Is the causal mask used?</th>
+<th>Why, in terms of that question</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A model generating text left to right (a <strong>decoder</strong>, as in chat models)</td>
+<td>Yes, in every layer</td>
+<td>Each row predicts the next token, and that token is in the table during training.</td>
+</tr>
+<tr>
+<td>A model reading a whole passage to understand it (an <strong>encoder</strong>, as in the BERT family)</td>
+<td>No</td>
+<td>No row predicts a later token; the whole passage is given, so letting every token see every other is allowed and helps understanding. Such a model cannot write the next token this way.</td>
+</tr>
+<tr>
+<td>Translation-style models, where a decoder writes an output while reading a separate input</td>
+<td>Yes for the decoder attending to its own output; no for its attention to the input</td>
+<td>The output is being predicted, so it is masked. The input sentence is given in full, so it is not an answer and may be seen entirely.</td>
+</tr>
+<tr>
+<td>Sentences of different lengths in one batch, filled out with <strong>padding</strong> tokens</td>
+<td>A different mask with the same trick: −∞ on the padding columns</td>
+<td>Padding is not text, so no row should blend it in; the same −∞-before-softmax step hides it.</td>
+</tr>
+<tr>
+<td><strong>Masked language modelling</strong>, how encoder models are trained</td>
+<td>Not this mask, despite the name</td>
+<td>Random input tokens are replaced by a placeholder, so the answer is removed from the input itself rather than hidden inside attention.</td>
+</tr>
+</tbody></table>
+<p>Three practical notes. The simple version computes the full square and then discards half; optimised attention code skips the hidden half, so the result is the same and the saving is real. Real layers run several lookups side by side, called <strong>heads</strong>, for example eight heads of 64 numbers each in a model whose vectors have 512; every head uses the same mask. And the &quot;earlier rows never change&quot; guarantee holds only while earlier tokens and their position information stay fixed: edit the middle of a prompt and everything after the edit is recomputed. It is exact in arithmetic but not always on hardware, where two implementations may add numbers in a different order and differ in the last digits, so compare real models with a small tolerance; the script below can use exact equality because its masked terms add a literal zero.</p>
+<section class="mission" data-mission="attention-is-a-soft-lookup"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-append-a-token-and-watch-the-rows-hold">Exercise: append a token and watch the rows hold</h2>
+<p>Run this plain Python script:</p>
+<pre><code class="language-python">import math
+
+NEG = -1e9  # minus infinity for practical purposes: exp(-1e9) is 0.0 in floating point
+
+def dot(a, b):
+    return sum(x * y for x, y in zip(a, b))
+
+def softmax(row):
+    e = [math.exp(s) for s in row]
+    z = sum(e)
+    return [x / z for x in e]
+
+def attention(Q, K, V, causal):
+    &quot;&quot;&quot;Return (weights, outputs): one weight row and one output vector per query.&quot;&quot;&quot;
+    dk = len(K[0])
+    weights, outputs = [], []
+    for i, q in enumerate(Q):
+        scores = [dot(q, k) / math.sqrt(dk) for k in K]          # scaled q·k against every key
+        if causal:
+            scores = [s if j &lt;= i else NEG for j, s in enumerate(scores)]  # hide columns after i
+        w = softmax(scores)                                       # row-wise: this row sums to one
+        out = [sum(w[j] * V[j][c] for j in range(len(V))) for c in range(len(V[0]))]
+        weights.append(w)
+        outputs.append(out)
+    return weights, outputs
+
+def show(label, weights, outputs):
+    print(label)
+    for i, (w, o) in enumerate(zip(weights, outputs), 1):
+        print(f&quot;  row {i}: weights {[round(x, 3) for x in w]} -&gt; output {[round(x, 3) for x in o]}&quot;)
+
+# Three tokens. Keys are four numbers each (so sqrt(d_k) = 2), values two numbers each.
+K = [(2, 0, 0, 0), (0, 2, 0, 0), (1, 0, 1, 0)]
+V = [(1, 0), (0, 1), (1, 1)]
+Q = [(1, 1, 0, 0), (0, 2, 0, 0), (2, 0, 0, 0)]
+
+w3, o3 = attention(Q, K, V, causal=True)
+show(&quot;masked, 3 tokens&quot;, w3, o3)
+w3u, o3u = attention(Q, K, V, causal=False)
+show(&quot;unmasked, 3 tokens&quot;, w3u, o3u)
+
+# Append a fourth token. With the mask, rows 1-3 do not move.
+K4 = K + [(0, 1, 0, 2)]
+V4 = V + [(0, 2)]
+Q4 = Q + [(1, 0, 1, 1)]
+w4, o4 = attention(Q4, K4, V4, causal=True)
+show(&quot;masked, 4 tokens&quot;, w4, o4)
+for i in range(3):
+    assert o4[i] == o3[i], f&quot;row {i + 1} changed&quot;
+print(&quot;assertion with the mask: rows 1-3 unchanged after appending token 4&quot;)
+
+# Without the mask the same append changes every earlier row.
+w4u, o4u = attention(Q4, K4, V4, causal=False)
+show(&quot;unmasked, 4 tokens&quot;, w4u, o4u)
+try:
+    for i in range(3):
+        assert o4u[i] == o3u[i], f&quot;row {i + 1} changed&quot;
+    print(&quot;assertion without the mask: passed (unexpected)&quot;)
+except AssertionError as e:
+    print(f&quot;assertion without the mask: failed as expected ({e})&quot;)
+</code></pre>
+<p><code>attention</code> scores, optionally masks, normalises and mixes each row. The first assertion checks unchanged earlier outputs after appending token 4. The unmasked comparison fails on row 1.</p>
+<p>Recorded verification output follows exactly. Its scaled-score printout and two-token check are additional diagnostics from the verification run; the script above prints the remaining lines.</p>
+<pre><code class="language-text">scaled score table (row = query, column = key):
+   [1.0, 1.0, 0.5]
+   [0.0, 2.0, 0.0]
+   [2.0, 0.0, 1.0]
+masked, 3 tokens
+  row 1: weights [1.0, 0.0, 0.0] -&gt; output [1.0, 0.0]
+  row 2: weights [0.119, 0.881, 0.0] -&gt; output [0.119, 0.881]
+  row 3: weights [0.665, 0.09, 0.245] -&gt; output [0.91, 0.335]
+unmasked, 3 tokens
+  row 1: weights [0.384, 0.384, 0.233] -&gt; output [0.616, 0.616]
+  row 2: weights [0.107, 0.787, 0.107] -&gt; output [0.213, 0.893]
+  row 3: weights [0.665, 0.09, 0.245] -&gt; output [0.91, 0.335]
+masked, 2 tokens
+  row 1: weights [1.0, 0.0] -&gt; output [1.0, 0.0]
+  row 2: weights [0.119, 0.881] -&gt; output [0.119, 0.881]
+masked, 4 tokens
+  row 1: weights [1.0, 0.0, 0.0, 0.0] -&gt; output [1.0, 0.0]
+  row 2: weights [0.119, 0.881, 0.0, 0.0] -&gt; output [0.119, 0.881]
+  row 3: weights [0.665, 0.09, 0.245, 0.0] -&gt; output [0.91, 0.335]
+  row 4: weights [0.297, 0.109, 0.297, 0.297] -&gt; output [0.594, 1.0]
+assertion with the mask: rows 1-3 unchanged after appending token 4
+unmasked, 4 tokens
+  row 1: weights [0.311, 0.311, 0.189, 0.189] -&gt; output [0.5, 0.878]
+  row 2: weights [0.083, 0.61, 0.083, 0.225] -&gt; output [0.165, 1.142]
+  row 3: weights [0.61, 0.083, 0.225, 0.083] -&gt; output [0.835, 0.472]
+  row 4: weights [0.297, 0.109, 0.297, 0.297] -&gt; output [0.594, 1.0]
+assertion without the mask: failed as expected (row 1 changed)
+</code></pre>
+<p>Explain why row k cannot depend on later tokens. Then change <code>NEG</code> to <code>-30</code>: <code>math.exp(-30)</code> remains nonzero, later columns receive nonzero weight, and the first assertion fails. A negative score alone does not guarantee exclusion.</p>
+<p><em>Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lecture 28.2, and Building LLMs like ChatGPT from Scratch (Neuralearn.ai, Udemy), lecture 2.2, paraphrased as study material; AI Engineer Core Track: LLM Engineering (Ed Donner, Udemy), lecture 3.18, for the four attention projections; Sebastian Raschka, Machine Learning Q and AI, Leanpub edition of 2023-05-21, pp. 117–126 (physical); Uday Kamath, Kevin Keenan, Garrett Somers and Sarah Sorenson, Large Language Models: A Deep Dive, pp. 63–68 and 81 (physical), §§2.2.1, 2.3.2, 2.3.5, 2.3.8 and 2.5.2.</em></p>
+</section></article>
+    <div class="mission-action" data-mission-action="attention-is-a-soft-lookup">
+      <div><strong>Check your understanding.</strong><span>Try the exercise and compare your reasoning with the explanation.</span></div>
+      <button type="button" data-complete-mission="attention-is-a-soft-lookup">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Adjacent essays">
+    <a href="tokens-not-characters.html"><span>Previous</span>Why the Model Cannot Count the Letters in “Strawberry”</a>
+    <a class="essay-pager__next" href="embeddings-are-coordinates.html"><span>Next</span>Similar Means Whatever the Training Pairs Said</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Building LLMs like ChatGPT from Scratch and Cloud Deployment</em> (Udemy, Neuralearn.ai), lecture 2.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lecture 3.18</li><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lecture 28.2</li><li>Machine Learning Q and AI, pp. 117–126</li><li>Large Language Models: A Deep Dive — Bridging Theory and Practice, pp. 63–68, 81</li></ul></details>
+  </main>
+  </div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays } from "../site/catalog.mjs";
+import { essays, chapters } from "../site/catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const buildAll = process.argv.includes("--all") || process.env.BUILD_ALL === "1";
@@ -99,6 +99,11 @@ for (const essay of essays) {
       targets.push({ essay: { ...essay, slug: essay.slug }, label: f.replace(/\.md$/, ""), file: path.join(variantDir, f) });
     }
   }
+}
+
+for (const chapter of chapters) {
+  const file = path.join(root, "chapters", `${chapter.slug}.md`);
+  if (fs.existsSync(file)) targets.push({ essay: chapter, label: chapter.slug, file });
 }
 
 for (const { essay: baseEssay, label, file: essayPath } of targets) {

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays, skips } from "./catalog.mjs";
+import { essays, chapters } from "./catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.join(root, "docs");
@@ -16,12 +16,25 @@ const builtEssays = essays.filter((essay) =>
   fs.existsSync(path.join(root, "essays", `${essay.slug}.md`))
 );
 
+const builtChapters = chapters.filter((chapter) =>
+  (buildAll || chapter.status === "published") &&
+  fs.existsSync(path.join(root, "chapters", `${chapter.slug}.md`))
+);
+
 const pages = [
   path.join(out, "index.html"),
   path.join(out, "about.html"),
-  ...builtEssays.map((e) => path.join(out, "essays", `${e.slug}.html`)),
-  ...skips.map((e) => path.join(out, "reviews", `${e.slug}.html`)),
+  path.join(out, "old", "index.html"),
+  ...builtChapters.map((c) => path.join(out, "chapters", `${c.slug}.html`)),
+  ...builtEssays.map((e) => path.join(out, "old", "essays", `${e.slug}.html`)),
 ];
+// Old essay URLs stay alive as redirects into the archive.
+for (const essay of builtEssays) {
+  const stub = path.join(out, "essays", `${essay.slug}.html`);
+  if (!fs.existsSync(stub) || !fs.readFileSync(stub, "utf8").includes(`../old/essays/${essay.slug}.html`)) {
+    errors.push(`essays/${essay.slug}.html does not redirect to the archive`);
+  }
+}
 
 for (const page of pages) {
   if (!fs.existsSync(page)) { errors.push(`Missing ${path.relative(root, page)}`); continue; }
@@ -38,9 +51,13 @@ for (const page of pages) {
   }
 }
 
-for (const essay of builtEssays) {
-  const html = fs.readFileSync(path.join(out, "essays", `${essay.slug}.html`), "utf8");
-  const source = fs.readFileSync(path.join(root, "essays", `${essay.slug}.md`), "utf8");
+const documents = [
+  ...builtEssays.map((e) => ({ ...e, html: path.join(out, "old", "essays", `${e.slug}.html`), md: path.join(root, "essays", `${e.slug}.md`) })),
+  ...builtChapters.map((c) => ({ ...c, html: path.join(out, "chapters", `${c.slug}.html`), md: path.join(root, "chapters", `${c.slug}.md`) })),
+];
+for (const essay of documents) {
+  const html = fs.readFileSync(essay.html, "utf8");
+  const source = fs.readFileSync(essay.md, "utf8");
   if (source.match(/^# (.+)$/m)?.[1] !== essay.title) errors.push(`${essay.slug}: catalog title disagrees with the chapter`);
   if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1) errors.push(`${essay.slug}: expected one main heading`);
   const missions = (html.match(/class="mission"/g) || []).length;
@@ -65,4 +82,4 @@ if (errors.length) {
   errors.forEach((error) => console.error(`- ${error}`));
   process.exit(1);
 }
-console.log(`Site validation passed: ${pages.length} HTML pages, ${builtEssays.length} exercise sections, local links resolved, no private source paths.`);
+console.log(`Site validation passed: ${pages.length} HTML pages (${builtChapters.length} chapters, ${builtEssays.length} archived essays), ${documents.length} exercise sections, local links resolved, no private source paths.`);

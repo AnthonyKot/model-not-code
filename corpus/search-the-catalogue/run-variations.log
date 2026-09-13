@@ -1,0 +1,14 @@
+# exercise Part 1 with sim * 1.0 (scale 1, tau 1)
+step   0  loss 1.8758  english top-1 1/6
+step 100  loss 0.9366  english top-1 6/6
+step 300  loss 0.9187  english top-1 6/6
+spanish top-1: 0/6
+rows of spanish-only words changed: False
+spanish query vectors changed: True
+# exercise Part 1 with a second loss term on Spanish-title pairs
+step   0  loss 11.8683  english top-1 1/6
+step 100  loss 0.0021  english top-1 6/6
+step 300  loss 0.0005  english top-1 6/6
+spanish top-1: 6/6
+rows of spanish-only words changed: True
+spanish query vectors changed: True

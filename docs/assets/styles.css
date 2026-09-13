@@ -249,3 +249,12 @@ button { font: inherit; }
 .compare-banner span { color: var(--muted); margin-right: .35rem; }
 .compare-banner a { color: var(--forest); font-weight: 700; }
 .compare-banner a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 800; }
+
+/* Chapters (2026-09-13): planned chapters in the navigation and on the home page; archive notes. */
+.book-nav__item--planned { color: #8d918c; cursor: default; }
+.book-nav__item--planned:hover { background: transparent; color: #8d918c; }
+.book-nav__planned { display: block; margin-top: .2rem; font-family: var(--sans); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+.shelf-card--planned { opacity: .72; }
+.archive-note { margin-top: 1rem; color: var(--muted); font-size: .85rem; line-height: 1.6; }
+.archive-note a { color: var(--forest); }
+.book-nav__intro p a { display: inline; font-family: var(--sans); font-size: .8rem; font-weight: 700; color: var(--forest); }

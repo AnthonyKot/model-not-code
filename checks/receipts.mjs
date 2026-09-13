@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays, courses } from "../site/catalog.mjs";
+import { essays, courses, chapters } from "../site/catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -111,8 +111,12 @@ let totalRows = 0;
 let totalFailingConditions = 0;
 const summaryLines = [];
 
-for (const essay of essays) {
-  if (!fs.existsSync(path.join(root, "essays", `${essay.slug}.md`))) continue;
+// Archived essays live in essays/, chapters in chapters/; both keep receipts in corpus/<slug>/.
+const drafted = [
+  ...essays.filter((e) => fs.existsSync(path.join(root, "essays", `${e.slug}.md`))),
+  ...chapters.filter((c) => fs.existsSync(path.join(root, "chapters", `${c.slug}.md`))),
+];
+for (const essay of drafted) {
   const { rows, structuralFailures } = checkReceiptsFile(essay.slug);
   totalRows += rows.length;
   for (const row of rows) console.log(`  ${essay.slug} ${row.claim_id}: ${row.status} — ${row.note}`);

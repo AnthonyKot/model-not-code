@@ -1,0 +1,47 @@
+== 1. one training step on two learnable scores
+p [0.5, 0.5] loss 0.6931 grad [-0.5, 0.5]
+lr 1.0 scores [0.5, -0.5] p [0.731, 0.269] loss 0.3133
+nudge a by 0.01 loss 0.68816 slope -0.499
+ step 1 scores [0.5, -0.5] p_keyboard 0.731 loss 0.3133
+ step 2 scores [0.769, -0.769] p_keyboard 0.823 loss 0.1946
+ step 3 scores [0.946, -0.946] p_keyboard 0.869 loss 0.1405
+ step 4 scores [1.077, -1.077] p_keyboard 0.896 loss 0.1098
+ step 5 scores [1.181, -1.181] p_keyboard 0.914 loss 0.0901
+== 2. BPE on the query log
+ round 1 [(('a', 's'), 11), (('s', 'e'), 10), (('c', 'a'), 9), (('e', 's'), 3), (('b', 'a'), 2), (('s', 'h'), 1)]
+ round 2 [(('as', 'e'), 10), (('c', 'as'), 9), (('e', 's'), 3), (('b', 'as'), 2), (('as', 'h'), 1)]
+ round 3 [(('c', 'ase'), 8), (('ase', 's'), 3), (('b', 'ase'), 2), (('as', 'h'), 1), (('c', 'as'), 1)]
+ merges [('a', 's'), ('as', 'e'), ('c', 'ase')]
+ table {'a': 0, 'as': 1, 'ase': 2, 'b': 3, 'c': 4, 'case': 5, 'e': 6, 'h': 7, 's': 8}
+  case ('case',) [5]
+  cases ('case', 's') [5, 8]
+  base ('b', 'ase') [3, 2]
+  cash ('c', 'as', 'h') [4, 1, 7]
+  caes ('c', 'a', 'e', 's') [4, 0, 6, 8]
+  aces ('a', 'c', 'e', 's') [0, 4, 6, 8]
+== 3. attention table: keyboard, for, laptop
+ scaled scores [[0.0, 0.0, 2.0], [1.0, 1.0, 1.0], [2.0, 0.0, 0.0]]
+ both ways weights [[0.107, 0.107, 0.787], [0.333, 0.333, 0.333], [0.787, 0.107, 0.107]] out [[0.107, 0.787], [0.333, 0.333], [0.787, 0.107]]
+ causal weights [[1.0, 0.0, 0.0], [0.5, 0.5, 0.0], [0.787, 0.107, 0.107]] out [[1.0, 0.0], [0.5, 0.0], [0.787, 0.107]]
+ 4 tokens causal [[1.0, 0.0], [0.5, 0.0], [0.787, 0.107], [0.594, 0.594]]
+ 4 tokens both ways [[0.193, 0.807], [0.406, 0.406], [0.807, 0.193], [0.594, 0.594]]
+ e^2 7.389 row1 weights 0.107 0.787 row3 masked 0.787
+== 4. pooling with padding
+ masked mean [0.409, 0.409] naive mean [1.557, -0.943]
+== 4b. cost of scoring
+ pair scorer passes per minute 2000000000  encoder passes per minute 1000
+== 4c. contrastive row: q=(1,0), match (0.6,0.8), negative (0.8,-0.6)
+ tau 1.0: scores [0.6, 0.8] p [0.4502, 0.5498] loss 0.7981 dL/dcos [-0.5498, 0.5498] grad [[-0.3519, 0.2639], [0.1979, 0.2639]]
+   lr 0.01: new docs [[0.6035, 0.7974], [0.798, -0.6026]] lengths [1.0, 1.0] cos [0.6035, 0.798]
+   lr 0.02: new docs [[0.607, 0.7947], [0.796, -0.6053]] lengths [1.0, 1.0] cos [0.607, 0.796]
+ tau 0.05: scores [12.0, 16.0] p [0.018, 0.982] loss 4.0181 dL/dcos [-19.6403, 19.6403] grad [[-12.5698, 9.4273], [7.0705, 9.4273]]
+   lr 0.01: new docs [[0.7257, 0.7057], [0.7293, -0.6943]] lengths [1.0123, 1.0069] cos [0.7169, 0.7243]
+   lr 0.02: new docs [[0.8514, 0.6115], [0.6586, -0.7885]] lengths [1.0482, 1.0274] cos [0.8122, 0.641]
+ floor with 63 negatives at cos -1, tau 1.0: loss 2.254; at cos 0: 3.1854; two docs +1/-1: p 0.8808 loss 0.1269
+ floor with 63 negatives at cos -1, tau 0.05: loss 0.0; at cos 0: 0.0; two docs +1/-1: p 1.0 loss 0.0
+== 5. sampling temperature over four candidate next tokens
+ T 0.5: scaled [6.0, 4.0, 2.0, 0.0] probs [0.865, 0.117, 0.016, 0.002]
+ T 1.0: scaled [3.0, 2.0, 1.0, 0.0] probs [0.644, 0.237, 0.087, 0.032]
+ T 2.0: scaled [1.5, 1.0, 0.5, 0.0] probs [0.455, 0.276, 0.167, 0.102]
+ T 0 (greedy): index 0
+ next-token loss if the true token is ' $' at T 1: 0.4402  if ' less': 3.4402
