@@ -1,0 +1,16 @@
+# PyTorch 2.14.0+cpu, CPU only; workspace/reuse-a-pretrained-model/exercise.py (the chapter exercise, verbatim)
+pretrained: old-task accuracy 0.981
+A requires_grad=False only   weights moved 0.0e+00  running_mean[0] -0.044  old task 0.952  new task 0.765
+B + BatchNorm in eval()      weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.824
+C + momentum=0, train mode   weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.639
+thaw at 1/10 the head's rate: weights moved 0.215  old task 0.932  new task 0.980
+
+pretrained writer: loss on its own text 0.2502, on the shop format 10.3556
+  writes: kettle : the watch ships today </s>
+LoRA r=1 on q,k,v,o: trainable 256, frozen 6428, adapter 1024 bytes  | shop-format loss 0.8303, own-text loss 6.6182
+  writes: kettle : boils water in stock </s> | backpack : carries school books : the stock </s>
+LoRA r=4 on q,k,v,o: trainable 1024, frozen 6428, adapter 4096 bytes  | shop-format loss 0.3883, own-text loss 12.4983
+  writes: kettle : boils water fast : in stock </s> | backpack : carries school books : in stock </s>
+adapter unplugged: own-text loss 0.2502, base weights unchanged: True
+merged into W: largest output difference 1.2e-05
+full fine-tune: trainable 6428  | shop-format loss 0.1934, own-text loss 5.4382

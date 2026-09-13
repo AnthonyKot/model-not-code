@@ -23,13 +23,13 @@
     </a>
     <div class="header-actions">
       <a href="../about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 2 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 3 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 2 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 3 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
       <nav aria-label="Book contents">
     <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
       <span class="book-nav__number">01</span>
@@ -41,11 +41,11 @@
       <span>Trust the Number Before You Ship the Classifier</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <span class="book-nav__item book-nav__item--planned">
+    <a class="book-nav__item" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
       <span class="book-nav__number">03</span>
-      <span>Reuse a Pretrained Model<small class="book-nav__planned">in writing</small></span>
-      <span></span>
-    </span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
     <span class="book-nav__item book-nav__item--planned">
       <span class="book-nav__number">04</span>
       <span>Train From Reward<small class="book-nav__planned">in writing</small></span>
@@ -558,7 +558,7 @@ num_workers=4: forecast  20.0 ms/step, measured  21.8
     </div>
     <nav class="essay-pager" aria-label="Adjacent chapters">
     <a href="search-the-catalogue.html"><span>Previous</span>Search the Catalogue, Then Answer From It</a>
-    <a class="essay-pager__next" href="../index.html"><span>Chapter 3 is in writing</span>The chapters</a>
+    <a class="essay-pager__next" href="reuse-a-pretrained-model.html"><span>Next</span>Reuse a Pretrained Model</a>
   </nav>
     <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 3.9, 3.11, 6.2–6.4, 7.4, 8.5, 11.4–11.5, 15.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 4.4, 7.20</li><li>Designing Machine Learning Systems, pp. 116, 120–133, 163–166, 223</li><li>Data Science: The Hard Parts, pp. 139–143</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367, 468–469</li><li>Distributed Machine Learning Patterns, pp. 29, 59–60</li><li>https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html</li><li>https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py</li></ul><p>Every example is synthetic: 12 x 12 photos, invented prices for the two mistakes, sleeps standing in for decoding and training. PyTorch behaviour as of 2.14.</p></details>
     <p class="archive-note">Earlier standalone essays on this ground, kept for reference: <a href="../old/essays/validation-set-is-a-budget.html">You Only Get to Look at the Test Set Once</a> · <a href="../old/essays/class-imbalance-changes-the-loss.html">95% Accuracy on a 95/5 Dataset Is the Baseline, Not a Result</a> · <a href="../old/essays/augmentation-declares-invariance.html">Augmentation Is Telling the Model What Does Not Matter</a> · <a href="../old/essays/input-pipeline-is-the-bottleneck.html">Your GPU Is Waiting on Your JPEG Decoder</a>.</p>

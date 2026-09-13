@@ -98,7 +98,7 @@
       <h1 class="essay-title">Borrow the Eyes, Retrain the Judgement</h1>
       <p class="essay-payoff">Why a backbone you froze with requires_grad=False can still change during training, and how to freeze, train a new head and thaw without that happening by accident.</p>
     </header>
-    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground will be rewritten in Chapter 3: Reuse a Pretrained Model (in writing).</nav>
+    <nav class="compare-banner archive-banner" aria-label="Archive notice"><span>Archived essay, kept for reference.</span> Its ground is rewritten in <a href="../../chapters/reuse-a-pretrained-model.html">Chapter 3: Reuse a Pretrained Model</a>.</nav>
     
     <article class="prose"><p>You have a network pretrained on a large dataset and a few hundred labelled examples of your own. You set <code>requires_grad = False</code> on every parameter of the pretrained part, attach a new output layer, and train only that layer. Afterwards the pretrained weights are bit-identical to the copy you saved, yet the same fixed input produces a different output. In the exercise at the end of this essay, the original head, which reads the same &quot;frozen&quot; part, drops from 99.4% to 53.4% accuracy on its own task, and no weight changed.</p>
 <p>The weights were frozen; the network was not. A batch-normalisation layer carries state that is not a parameter, and a flag that stops gradients does nothing to it. This essay is about that second kind of state, and about the three-step recipe it complicates: freeze, train the head, thaw.</p>

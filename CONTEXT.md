@@ -353,6 +353,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   (≈24.6k characters of prose; the age-check flag on the rare blade category carries imbalance and the
   threshold; 34 receipts; exercise, worked numbers and three variations run). The author reviews
   chapters 1 and 2 together before chapter 3.
+- **2026-09-13 (night, continued)** — At the author's request, chapter 3, *Reuse a Pretrained Model*,
+  written from scratch and published before the review of chapters 1–2 (freeze/thaw with the BatchNorm
+  buffer trap on the photo classifier; LoRA on chapter 1's attention projections for the answer writer;
+  ≈22k characters of prose; 26 receipts; exercise and two variations run). Chapters 4–8 wait for the
+  author's feedback on 1–3.
 
 ## 10. Open questions
 

@@ -1,0 +1,10 @@
+# thaw with the backbone at the head's rate (1e-2)
+thaw at 1/10 the head's rate: weights moved 0.459  old task 0.882  new task 0.942
+# LoRA on q and v only (print labels still say q,k,v,o; the adapters wrap q and v)
+  writes: kettle : the watch ships today </s>
+LoRA r=1 on q,k,v,o: trainable 128, frozen 6428, adapter 512 bytes  | shop-format loss 1.5484, own-text loss 3.4908
+  writes: kettle : watch tells in stock </s> | backpack : backpack school books : the </s>
+LoRA r=4 on q,k,v,o: trainable 512, frozen 6428, adapter 2048 bytes  | shop-format loss 0.4027, own-text loss 7.5518
+  writes: kettle : boils water fast : in stock </s> | backpack : carries school books : in stock </s>
+adapter unplugged: own-text loss 0.2502, base weights unchanged: True
+merged into W: largest output difference 1.1e-05
