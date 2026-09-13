@@ -29,14 +29,17 @@ cd "$(dirname "$0")/.."
 
 INPUT="${1:-}"
 if [ -z "$INPUT" ]; then
-  echo "usage: scripts/review.sh <slug | essays/<slug>.md>"; exit 2
+  echo "usage: scripts/review.sh <slug | chapters/<slug>.md | essays/<slug>.md>"; exit 2
 fi
 # Accept a bare slug.
 if [ -f "$INPUT" ]; then
   ESSAY="$INPUT"
+elif [ -f "chapters/${INPUT}.md" ]; then
+  ESSAY="chapters/${INPUT}.md"          # chapters (the book since 2026-09-13) win over archived essays
 else
   ESSAY="essays/${INPUT}.md"
 fi
+case "$ESSAY" in chapters/*) KIND=chapter ;; *) KIND=essay ;; esac
 if [ ! -f "$ESSAY" ]; then
   echo "no such essay: $1"; exit 2
 fi
@@ -45,14 +48,18 @@ SLUG=$(basename "$ESSAY" .md)
 OUT="checks/reviews/$SLUG"
 mkdir -p "$OUT"
 
-CHECKLIST=$(cat scripts/prompts/review-checklist.md)
+if [ "$KIND" = chapter ]; then
+  CHECKLIST=$(cat scripts/prompts/review-checklist-chapter.md)
+else
+  CHECKLIST=$(cat scripts/prompts/review-checklist.md)
+fi
 BODY=$(cat "$ESSAY")
 
 PROMPT="$CHECKLIST
 
 ---
 
-# The essay under review — \`$ESSAY\`
+# The $KIND under review — \`$ESSAY\`
 
 $BODY"
 
@@ -93,7 +100,8 @@ fi
 # -- consolidation ----------------------------------------------------------
 echo "  codex  … consolidating (${CODEX_MODEL:-gpt-5.6-sol})"
 
-CONSOLIDATE="You are the meta-reviewer for one essay of *The Program Is Now a Model*. Two models
+CONSOLIDATE="You are the meta-reviewer for one $KIND ($ESSAY) of *The Program Is Now a Model*. If it is a chapter,
+the contract is scripts/prompts/review-checklist-chapter.md and notes/chapters/CHAPTER-PLAN.md, not notes/BRIEF.md. Two models
 reviewed it independently against a fixed checklist (scripts/prompts/review-checklist.md). Your
 job is to be adversarial toward THEIR findings, not toward the essay.
 

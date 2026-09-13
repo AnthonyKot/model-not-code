@@ -154,3 +154,5 @@ Original process, as amended:
 5. **Chapter 1 (`search-the-catalogue`) written and published 2026-09-13** as the pilot; awaits the author's read.
 6. **Chapter 2 (`trust-the-number`) written and published 2026-09-13** at the author's request; the author reviews chapters 1 and 2 together.
 7. **Chapter 3 (`reuse-a-pretrained-model`) written and published 2026-09-13** at the author's request, before the review of 1–2.
+8. Chapter 4 prepared, not written (2026-09-13): research notes, verified exercise prototype and draft receipts;
+   prose waits for the author's feedback on chapters 1–3.

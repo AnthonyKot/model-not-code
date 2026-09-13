@@ -1,0 +1,25 @@
+claim_id	paraphrase	label	source	locator	note
+tfr-01	Reward is the immediate result of an action; the return is the (discounted) sum of rewards to the end; the goal is the largest expected return	inferred	course-3725442	02-05	DRAFT receipts for chapter 4 research (2026-09-13); rows re-checked when the chapter is written
+tfr-02	The discount factor multiplies each later reward by a higher power of gamma	inferred	course-3725442	02-06	
+tfr-03	Q(s, a) is the expected return from taking a in s and following the policy afterwards	inferred	course-3725442	02-08	
+tfr-04	Monte Carlo methods play an episode to its end and average the returns observed from each state or state-action	inferred	course-3725442	04-01	
+tfr-05	TD methods update after every action towards reward plus a discounted estimate of the next state; Monte Carlo tables stay unchanged until an episode ends	inferred	course-3725442	05-03	
+tfr-06	Q-learning is off-policy: its target uses the greedy (max) estimate while a separate behaviour collects experience	inferred	course-3725442	05-08	
+tfr-07	Bootstrapped targets are biased early; full returns are sums of many random rewards and have high variance	inferred	course-3725442	06-03	
+tfr-08	A replay memory stores transitions and samples random batches	inferred	course-3725442	09-03	
+tfr-09	With a function approximator, bootstrapping is unstable because a step for one state moves nearby estimates; a target network copy fixes the target between syncs	inferred	course-3725442	09-04	
+tfr-10	Policy-gradient methods output action probabilities directly; REINFORCE uses the full measured return	inferred	course-3725442	11-05	
+tfr-11	A too-large policy step gathers worse data and can be hard to recover from; trust-region methods bound each step	inferred	course-4635836	11-02	
+tfr-12	Reusing a batch many times overfits the policy to it; PPO stores the old action probability and uses the ratio new/old	inferred	course-4635836	12-01	
+tfr-13	PPO code: ratio = exp(new logp - old logp); surrogate = ratio x advantage; clamp to [1-eps, 1+eps]; loss = -min	inferred	course-4635836	12-06	
+tfr-14	PPO clipped objective; clipping removes the incentive to move the ratio outside [1-eps, 1+eps]; eps = 0.2 as example; K epochs of minibatch updates on data collected with theta_old	inferred	arXiv:1707.06347	3, 5	
+tfr-15	Reward model trained on comparisons: loss = -E[log sigma(r(x, y_w) - r(x, y_l))]; the reward difference is the log-odds of preference; labelers rank 4 to 9 responses	inferred	instructgpt	p. 8	physical page
+tfr-16	Training labelers agree with each other 72.6 +/- 1.5% of the time; held-out labelers 77.3 +/- 1.3%	reported	instructgpt	p. 8	
+tfr-17	RL fine-tuning with PPO in a bandit environment (prompt, response, reward from the reward model, episode ends) with a per-token KL penalty from the SFT model against over-optimisation of the reward model; value function initialised from the RM	inferred	instructgpt	p. 9	
+tfr-18	Objective: reward model score minus beta log(pi_RL / pi_SFT), plus an optional pretraining term	inferred	instructgpt	p. 9	eq. 2
+tfr-19	RLHF replaces the environment reward with a reward predictor trained on human choices between two short segments; cross-entropy between the label and a two-way softmax over the segments' summed predicted rewards; far fewer labels than labelling every action; negative as well as positive feedback	inferred	lapan-drl	unknown	EPUB ch023.xhtml, Chapter 19, section "Method overview"
+tfr-20	LLM pipeline: pretraining, supervised fine-tuning on curated dialogues, then RLHF on pairs of generated dialogues; comparing is easier than writing	inferred	lapan-drl	unknown	ch023.xhtml, section "RLHF and LLMs"; 10K-100K and ~1M figures as stated, not used unless needed
+tfr-21	When fine-tuning with a learned reward, freezing the convolution layers and lowering the learning rate 10x was needed; without it the agent quickly unlearned prior knowledge	reported	lapan-drl	unknown	ch023.xhtml, section "Combining A2C with the reward model"
+tfr-22	PPO section: clipped objective; old log-probs computed once and detached; eps 0.2, 10 epochs, batch 64; advantages normalised	inferred	lapan-drl	unknown	ch020.xhtml, Chapter 16 "Trust Region Methods", section "PPO"
+tfr-23	Hosted fine-tuning types: SFT with correct outputs; DPO from good and bad examples (users' thumbs up/down on variations); RFT with a grader program or an LLM judge	inferred	course-6100015	06-22	as of the recording
+tfr-24	RLHF is the step that turned a base GPT model into its chat variant	inferred	course-6100015	01-20	

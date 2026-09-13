@@ -18,7 +18,7 @@ finding depends on overlap.
   can recompute the worked example; then limits or a counterexample; then one exercise doable
   without a GPU, a paid API, the source, or a notebook, with an expected result.
 - **Paraphrased study sources.** Courses and books are named; nothing is quoted beyond a phrase;
-  lecture numbers are "as reported in the lecture"; worked-example numbers are the book's own.
+  the prose never names a course, lecturer or book as the source of a fact ("reported", "the course"): provenance lives in receipts and the credit line (CONTEXT §4, author's rule 2026-09-13); worked-example numbers are the book's own.
 - **Second person for the reader, third for the mechanism.** No scenes, no hero, no war metaphors,
   nothing sold, no anthropomorphism that hides the mechanism.
 

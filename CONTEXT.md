@@ -358,6 +358,19 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   buffer trap on the photo classifier; LoRA on chapter 1's attention projections for the answer writer;
   ≈22k characters of prose; 26 receipts; exercise and two variations run). Chapters 4–8 wait for the
   author's feedback on 1–3.
+- **2026-09-13 (night, prep while the author reads 1–3)** — Author's decision: no chapter 4 prose before
+  the feedback on chapters 1–3; do the low-regret work instead. Done: (1) `scripts/review.sh` and
+  `scripts/readers.sh` accept chapters (`chapters/<slug>.md` wins over `essays/`), with a chapter checklist
+  (`scripts/prompts/review-checklist-chapter.md`) and reader frame; the essay checklist's outdated "as
+  reported in the lecture" line replaced by the no-source-narration rule; review lanes launched on chapters
+  1–3 (reports in `checks/reviews/<slug>/`, `checks/readers/<slug>/`; nothing applied). (2) Chapter 4
+  research notes (`workspace/train-from-reward/NOTES.md`; Lapan ch. 19 on RLHF and InstructGPT §3.5 are the
+  bridge sources; no course lecture implements a reward model). (3) Exercise prototype verified
+  (`workspace/train-from-reward/PROTOTYPE.md`, `corpus/train-from-reward/prototype-run.log`): one shared
+  `ppo_loss` for a corridor policy and the answer writer; noisy preference pairs → reward model (0.770
+  held-out pair accuracy) → PPO; without the KL penalty the learned reward rises while the labeler's score
+  falls (reward hacking); without the clip, 10 reused epochs escape even with KL on. Draft receipts in
+  `corpus/train-from-reward/receipts.tsv`.
 
 ## 10. Open questions
 

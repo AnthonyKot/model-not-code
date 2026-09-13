@@ -24,13 +24,16 @@ cd "$(dirname "$0")/.."
 
 INPUT="${1:-}"
 if [ -z "$INPUT" ]; then
-  echo "usage: scripts/readers.sh <slug | essays/<slug>.md>"; exit 2
+  echo "usage: scripts/readers.sh <slug | chapters/<slug>.md | essays/<slug>.md>"; exit 2
 fi
 if [ -f "$INPUT" ]; then
   ESSAY="$INPUT"
+elif [ -f "chapters/${INPUT}.md" ]; then
+  ESSAY="chapters/${INPUT}.md"          # chapters (the book since 2026-09-13) win over archived essays
 else
   ESSAY="essays/${INPUT}.md"
 fi
+case "$ESSAY" in chapters/*) KIND=chapter ;; *) KIND=essay ;; esac
 if [ ! -f "$ESSAY" ]; then
   echo "no such essay: $1"; exit 2
 fi
@@ -50,7 +53,11 @@ FLASH="${FLASH_MODEL:-gemini-3.8-flash-high}"
 PRO="${PRO_MODEL:-gemini-3.1-pro-high}"
 
 PROSE=$(sed 's/<!--mission-->//' "$ESSAY")
-FRAME=$(cat scripts/prompts/readers/_frame.txt)
+if [ "$KIND" = chapter ]; then
+  FRAME=$(cat scripts/prompts/readers/_frame-chapter.txt)
+else
+  FRAME=$(cat scripts/prompts/readers/_frame.txt)
+fi
 
 build_prompt() {  # persona-file
   local persona; persona=$(cat "$1")

@@ -1,0 +1,15 @@
+# PROTOTYPE, not the final exercise: workspace/train-from-reward/exercise_proto.py, PyTorch 2.14.0+cpu, CPU, 2026-09-13
+Monte Carlo after 1 episode:   Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+Q-learning after 1 episode(s): Q(cell, right) = [0.0, 0.0, 0.0, 1.0]
+Q-learning after 2 episode(s): Q(cell, right) = [0.0, 0.0, 0.9, 1.0]
+Q-learning after 3 episode(s): Q(cell, right) = [0.0, 0.81, 0.9, 1.0]
+Q-learning after 4 episode(s): Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+policy round  1: mean steps to the end 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
+policy round 10: mean steps to the end  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
+policy round 30: mean steps to the end  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
+reward model: held-out pair accuracy 0.770; weights {'in': 0.24, 'stock': 0.84, 'ships': 0.68, 'today': 0.58, 'great': 0.63, 'value': -0.57, 'buy': -2.2, 'now': 0.57, '</s>': 0.3}
+before RL        : rm 0.34  labeler 0.33  words 3.5  KL 0.00 | buy now ships today
+no KL, clip 0.2, 4 epochs  : rm 6.12  labeler -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+KL 0.2, clip 0.2, 4 epochs : rm 2.39  labeler 0.97  words 4.1  KL 2.34 | in stock ships today
+KL 0.2, clip 0.2, 10 epochs: rm 2.31  labeler 1.00  words 4.0  KL 2.07 | in stock ships today
+KL 0.2, no clip, 10 epochs : rm 5.91  labeler -0.20  words 8.0  KL 44.19 | in stock stock great stock stock stock stock
