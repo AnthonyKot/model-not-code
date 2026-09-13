@@ -286,6 +286,14 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   `attention-is-a-soft-lookup`) published on the author's instruction so they can be read on Pages;
   the author's read notes are still owed.
 
+- **2026-09-13 (morning)** — Author's decisions on the Parts III–VI audit: prompt injection stays a
+  standalone essay (`untrusted-text-is-an-untrusted-code-path` is not merged); Part VI keeps two
+  essays; Part III at eight is too heavy, so `the-score-is-not-the-lift` is deferred (Part III = 7).
+  The rest of the audit's proposed outline is taken as accepted (additions A–D and F, merges of
+  `design-the-data-loop-first` into `labels-arrive-later`, drop `show-the-eval-not-the-demo`, defer
+  `which-feature-moved-the-prediction`, `position-is-a-rotation`, `predict-the-time-left`). Total
+  stays 30. Catalog reshaping for III–VI is queued; the author asked to finish Parts I and II first.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this
