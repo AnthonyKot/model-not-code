@@ -63,6 +63,16 @@ every step is on the page. They will not tolerate a formula they cannot read ter
   exercise heading.
 - **Length.** 1,000–1,800 words of prose (code, tables, figures and the credit line excluded).
 
+## Author's recommendations (2026-09-13)
+
+- **Connect it forward and back (recommended).** When a quantity or knob appears in more than one
+  essay, say so where it appears: temperature in embeddings is the same knob as temperature in
+  generation; softmax scaling returns in LoRA's alpha. Chapters should build on each other.
+- **Start from how the sources explain it practically (recommended).** Before writing a mechanism,
+  check how the courses and books in the repo explain it to a practitioner (an API parameter, a config
+  field, a line of code) and build on that framing. Do not re-derive what a practitioner never derives.
+
+
 ## Procedure — save files as you go (standing rule)
 
 1. Research into `workspace/<slug>/lectures.md` (your notes with `NN-NN` locators; paraphrase only)

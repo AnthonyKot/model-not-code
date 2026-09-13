@@ -74,6 +74,16 @@ Imported from *The Going Concern* §4 and kept whole:
 - A provocation may open an essay. It may not close one; if a sentence stands unqualified at the
   end, qualify it or cut it.
 
+Recommendations the author added on 2026-09-13 after reading essay 4:
+
+- **Connect it forward and back (recommended).** When a quantity or knob appears in more than one
+  essay, say so where it appears: temperature in embeddings is the same knob as temperature in
+  generation; softmax scaling returns in LoRA's alpha. Chapters should build on each other.
+- **Start from how the sources explain it practically (recommended).** Before writing a mechanism,
+  check how the courses and books in the repo explain it to a practitioner (an API parameter, a config
+  field, a line of code) and build on that framing. Do not re-derive what a practitioner never derives.
+
+
 Added for this book:
 
 - **No anthropomorphism that hides the mechanism.** A model does not "understand", "know",

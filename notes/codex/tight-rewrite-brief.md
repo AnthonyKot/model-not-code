@@ -37,6 +37,15 @@ ML). Model of the register: `essays/model-is-a-learned-function.md` (the accepte
 - Second person, no "we", no anthropomorphism, no slogans, no condescension.
 - Target about 60–70% of the current prose length, never below 1,000 words of prose.
 
+## Author's recommendations (2026-09-13)
+
+- **Connect it forward and back (recommended).** When a quantity or knob appears in more than one
+  essay, say so where it appears: temperature in embeddings is the same knob as temperature in
+  generation; softmax scaling returns in LoRA's alpha. Chapters should build on each other.
+- **Start from how the sources explain it practically (recommended).** Before writing a mechanism,
+  check how the courses and books in the repo explain it to a practitioner (an API parameter, a config
+  field, a line of code) and build on that framing. Do not re-derive what a practitioner never derives.
+
 ## Finish
 - Run `node checks/paraphrase.mjs --all 2>&1 | grep 'SLUG.tight'` (0 twelve-word failures required).
 - Report: prose word count before and after, what you cut, what you restructured, any number touched.
