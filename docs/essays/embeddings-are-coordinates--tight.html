@@ -102,27 +102,25 @@
       <h1 class="essay-title">Similar Means Whatever the Training Pairs Said</h1>
       <p class="essay-payoff">How an embedding model comes to put matching texts close together, worked through one training step by hand, and why queries of a kind it never trained on can come back as noise.</p>
     </header>
-    <nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> <a href="embeddings-are-coordinates.html" aria-current="page">Current version</a> · <a href="embeddings-are-coordinates--tight.html">Tighter rewrite</a></nav>
-    <article class="prose"><p>You have put an off-the-shelf embedding model in front of a product catalogue. English queries find the right items, including queries that share no word with the title they match. Then the Spanish queries arrive, or the queries written in your industry&#39;s part numbers and abbreviations, and the top results are noise. You want to know what would fix it, and you cannot say, because you do not know what the model was trained to do.</p>
-<p>The search itself is not the problem. Ranking is a few lines of arithmetic that treat every query alike. Which texts count as near each other was fixed earlier, by the pairs the model was trained on. This essay computes one training step by hand to show how a pair moves two vectors together, then shows what happens to a pair type the training never contained.</p>
-<h2 id="the-search-step-encode-once-compare-by-angle">The search step: encode once, compare by angle</h2>
-<p>An encoder is a model that turns a whole text into one fixed-length list of numbers, a vector. A transformer encoder produces one vector per token; a common way to get one vector for the whole text is to average them, leaving padding out of the average. A small MiniLM sentence-encoder checkpoint had about 22 million parameters and emitted 384 numbers per text.</p>
-<p>The reason to want vectors is cost. A model that scores a query and a title together has to run once per catalogue item for every query. An encoder runs once per item when it is stored and once per query when it arrives; ranking then compares vectors without consulting the model. The comparison is cosine similarity:</p>
+    <nav class="compare-banner" aria-label="Versions of this essay"><span>Compare versions:</span> <a href="embeddings-are-coordinates.html">Current version</a> · <a href="embeddings-are-coordinates--tight.html" aria-current="page">Tighter rewrite</a></nav>
+    <article class="prose"><p>An embedding is a vector, a fixed-length list of numbers representing an input. An encoder produces that vector from text. For search, training adjusts the encoder so matching queries and titles have similar vector directions. You can rank titles by comparing directions, but an accurate comparison cannot repair positions that training never arranged.</p>
+<h2 id="compare-directions">Compare directions</h2>
+<p>Take an invented example: query q = (1, 0), matching document d<sub>1</sub> = (0.6, 0.8), and non-matching document d<sub>2</sub> = (0.8, −0.6). All have unit length, meaning length 1. Cosine similarity measures their alignment:</p>
 <p class="formula">cos(q, d) = (q · d) / (|q| × |d|)</p>
 
-<p>q is the query&#39;s vector and d a document&#39;s. q · d is the dot product: multiply the two vectors position by position and add the results. |q| and |d| are the lengths, the square root of the sum of squared entries. The ratio is the cosine of the angle between the two vectors, 1 when they point the same way, 0 at right angles, −1 when opposite. Only direction counts.</p>
-<p>If every vector is normalised to length 1 when it is stored, the lengths drop out and the cosine is just the dot product. Scoring a catalogue of 1.8 million titles is then one matrix multiplication, a 1.8 million × 384 table times the query&#39;s 384 numbers, followed by a sort. That runs on a CPU.</p>
-<p>Take a two-number example, the book&#39;s own. The query is q = (1, 0). Two documents are already unit length: d<sub>1</sub> = (0.6, 0.8) and d<sub>2</sub> = (0.8, −0.6). The cosines are 1 × 0.6 + 0 × 0.8 = 0.6 and 1 × 0.8 + 0 × (−0.6) = 0.8, so d<sub>2</sub> ranks first. Suppose d<sub>1</sub> is the right answer. Nothing in the search step can fix that. The vectors are where training left them.</p>
-<h2 id="where-the-positions-come-from-pairs-and-a-loss">Where the positions come from: pairs and a loss</h2>
-<p>An embedding model for search is trained on pairs: a query and a title that matches it. The same encoder, with the same weights, encodes both sides. The idea is older than transformers: word2vec paired a word with a word near it in running text, labelled 1, and with a random word, labelled 0, so its labels cost nothing.</p>
-<p>A common way to train is to take a batch of B pairs, encode all B queries and B titles, and compute the B × B table of cosines. Entry (i, j) compares query i with title j. The diagonal holds the true pairs; every other entry compares a query with some other pair&#39;s title, which serves as a negative for free. Each row is then treated as a classification over B titles whose correct answer is the diagonal one.</p>
-<p>One more quantity is needed first. Cosines lie between −1 and 1, too close together for a softmax to become confident. With two documents, even a perfect +1 against −1 gives the right one a probability of only 1/(1 + e<sup>−2</sup>) = 0.881, so even at the largest possible cosine margin the loss stays at −ln 0.881 = 0.127. The <em>temperature</em> τ fixes the scale: every cosine is divided by τ before the softmax, and a τ below 1 stretches the range. Some systems learn τ during training; the example here fixes it at 0.1. The loss for row i is:</p>
+<p>q and d are the query and document vectors. The dot product q · d multiplies corresponding entries and sums them. Each length, |q| or |d|, is the square root of the sum of squared entries. Their ratio gives the cosine of the angle: 1 for the same direction, 0 for right angles, −1 for opposite directions. Only direction counts.</p>
+<p>Here the lengths cancel. The cosines are 1 × 0.6 + 0 × 0.8 = 0.6 and 1 × 0.8 + 0 × (−0.6) = 0.8. The wrong document ranks first.</p>
+<p>For a catalogue, you encode each title once when storing it and each query when it arrives. Normalisation divides a vector by its length; normalised queries and titles need only dot products for ranking. A matrix, a rectangular table of numbers, holds the title vectors as rows. Matrix multiplication computes their dot products with the query together, then sorting orders the results. A model scoring each query–title pair directly instead runs once per item per query.</p>
+<h2 id="train-on-matching-pairs">Train on matching pairs</h2>
+<p>Contrastive training raises similarity for matching pairs and lowers it for alternatives. A batch is a group of pairs processed together. With B pairs, the same encoder produces B query vectors and B title vectors. Their B × B cosine table compares query i with title j. The diagonal entries, where i = j, hold the matches; other titles serve as negatives, examples treated as non-matches. Duplicate or otherwise relevant titles can therefore create incorrect negatives.</p>
+<p>A loss measures error, with smaller values indicating a better fit. Softmax converts scores into probabilities by raising e, the base of the natural logarithm, to each score and dividing by the sum of those values. With two documents, cosines of +1 and −1 give the match at most 1/(1 + e<sup>−2</sup>) = 0.881 probability. The natural logarithm, ln, reverses raising e to a power. Cross-entropy, minus the natural logarithm of the correct answer&#39;s probability, then has a floor of −ln 0.881 = 0.127.</p>
+<p>The temperature τ controls this scale: dividing cosines by τ below 1 widens score differences. Some systems learn it; here you fix it at 0.1. The row loss is:</p>
 <p class="formula">L<sub>i</sub> = −ln [ e<sup>s<sub>ii</sub>/τ</sup> / Σ<sub>j</sub> e<sup>s<sub>ij</sub>/τ</sup> ]</p>
 
-<p>s<sub>ij</sub> is the cosine between query i and title j. Dividing by τ turns each cosine into a score. The fraction is the softmax: e raised to the true pair&#39;s score, over the sum of e raised to every score in the row, which gives the probability the row assigns to its own title. Minus its log is the cross-entropy: 0 when the probability is 1, growing without limit as it falls. The batch loss is the average over rows. This loss is known as InfoNCE.</p>
-<p>The gradient of cross-entropy after a softmax has a simple form. Write p<sub>ij</sub> for the probability the row gives title j. The loss changes by (p<sub>ii</sub> − 1)/τ per unit of the true pair&#39;s cosine and by p<sub>ij</sub>/τ per unit of each other cosine. A step against the gradient therefore raises the matching cosine in proportion to the probability it is missing and lowers each wrong cosine in proportion to the probability that title took.</p>
-<h2 id="worked-example-one-step-by-hand">Worked example: one step by hand</h2>
-<p>Keep q, d<sub>1</sub> and d<sub>2</sub>, with d<sub>1</sub> as q&#39;s true title and d<sub>2</sub> another pair&#39;s title. Follow this one row, and move only the two document vectors.</p>
+<p>L<sub>i</sub> is query i&#39;s loss; s<sub>ij</sub> is its cosine with title j, and s<sub>ii</sub> its matching cosine. τ is the temperature. e is the natural logarithm&#39;s base; Σ<sub>j</sub> sums over every title. The fraction is the matching title&#39;s softmax probability; −ln turns it into cross-entropy, zero at probability 1 and growing without limit as probability approaches zero. Averaging rows gives the batch loss, known as InfoNCE.</p>
+<p>A gradient collects rates of change with respect to individual inputs or parameters, the adjustable numbers controlling a model’s output. Write p<sub>ij</sub> for title j&#39;s probability in row i. The loss gradient per unit of cosine is (p<sub>ii</sub> − 1)/τ for the match and p<sub>ij</sub>/τ for each negative. Gradient descent subtracts a multiple of the gradient, locally increasing the matching cosine and decreasing the others.</p>
+<h2 id="one-step-by-hand">One step by hand</h2>
+<p>Hold q fixed and move only the document vectors in this row:</p>
 <table>
 <thead>
 <tr>
@@ -152,8 +150,8 @@
 <td>0.8808/0.1 = +8.808</td>
 </tr>
 </tbody></table>
-<p>The loss is −ln 0.1192 = 2.127.</p>
-<p>Next, how a cosine changes when a document vector moves. For unit vectors, stretching d along its own direction leaves the angle unchanged, so only movement across d counts, and the gradient of the cosine with respect to d is q minus the cosine times d:</p>
+<p>The loss is −ln 0.1192 = 2.127. Displayed values are rounded; calculations retain full precision.</p>
+<p>For unit vectors, the cosine&#39;s gradient with respect to d is q − cos × d. Movement along d changes its length without changing its direction, so this gradient removes that component. Multiply by the loss gradient, then subtract a step with learning rate 0.05, the multiplier controlling the update size:</p>
 <table>
 <thead>
 <tr>
@@ -188,7 +186,7 @@
 <td>0.6415 / 1.0343 = 0.620</td>
 </tr>
 </tbody></table>
-<p>One step moves the match from 0.6 to 0.832 and the negative from 0.8 to 0.620. The order has flipped, and the right title now ranks first.</p>
+<p>The match rises from 0.6 to 0.832; the negative falls from 0.8 to 0.620. The right title now ranks first.</p>
 <figure class="diagram">
 <svg viewBox="0 0 480 240" width="100%" role="img" aria-label="Unit circle with the query q along the horizontal axis; d1 rotates from 53 degrees down to 34 degrees, towards q; d2 rotates from minus 37 degrees down to minus 52 degrees, away from q" style="max-width:480px;font-family:inherit;font-size:13px">
   <defs>
@@ -220,15 +218,16 @@
 <figcaption>The step from the tables, drawn to scale. The match rotates towards the query and the negative away from it; both are renormalised onto the circle.</figcaption>
 </figure>
 
-<p>At realistic size the table grows but the step does not change. A batch of 64 pairs gives 64 × 64 = 4,096 cosines, 63 negatives per query, each a comparison of two 384-number vectors. The gradient does not land on free-standing vectors: it flows back through the encoder into weights every text shares. The loss needs large batches so each query meets enough negatives; one image–text model was trained with batches of 32,768 pairs.</p>
-<h2 id="what-the-pairs-never-showed">What the pairs never showed</h2>
-<p>The gradient in that example exists only because q and d<sub>1</sub> sat in the same row. A pair type that never appears in any batch, a Spanish query next to an English title, contributes no term to any loss, so nothing pulls its two sides together. In an encoder built from a lookup table this is literal: the rows for words that occur in no training pair receive a zero gradient on every step and, with no weight decay, finish exactly where initialisation put them. The exercise shows it.</p>
-<p>In a transformer encoder the weights are shared, so untrained pairings do move, as a side effect of training on other pairs. They may land where they belong or not; nothing in the loss checked. The same limit appears outside text: an image–text encoder trained on web pairs does noticeably worse on satellite and medical images.</p>
-<p>A second consequence comes from the temperature. The loss is satisfied once the true pair beats the others by enough, and at τ = 0.1 a small gap is enough: in the exercise the loss falls to 0.0061 while one matching cosine is still 0.33. A threshold such as &quot;above 0.8 means relevant&quot; belongs to one model and its training temperature, not to another model.</p>
-<p>The opening problem becomes questions you can answer. Read the training-data section of the model card and ask whether your pair type is in it; names mislead: in the Sentence Transformers checkpoint name <code>multi-qa-MiniLM</code>, &quot;multi&quot; denoted question–answer pairs from many sources, while multilingual checkpoints said <code>multilingual</code> explicitly. Build a few hundred of your own query–title pairs and measure how often the right title ranks first. If it does not, the remedy is pairs of your type: fine-tuning on target-domain data with the same loss. Measuring retrieval properly is a separate essay in Part III.</p>
+<h2 id="scale-and-limits">Scale and limits</h2>
+<p>A MiniLM sentence-encoder checkpoint had about 22 million parameters and emitted 384 numbers per text. A catalogue of 1.8 million titles becomes a 1.8 million × 384 matrix; comparison with a 384-number query can run on a CPU. A batch of 64 pairs gives 64 × 64 = 4,096 cosines and 64 − 1 = 63 negatives per query. Larger batches supply more negatives; an image–text model used batches of 32,768 pairs.</p>
+<p>In an encoder, gradients update shared parameters rather than independent document vectors. A transformer, a neural network that combines information across text positions, produces vectors for tokens, the pieces into which text is split. Mean pooling averages these vectors, excluding padding positions added to equalise input lengths.</p>
+<p>A name alone does not establish training coverage: in the Sentence Transformers checkpoint name <code>multi-qa-MiniLM</code>, “multi” denoted question–answer pairs from multiple sources; multilingual checkpoints said <code>multilingual</code> explicitly.</p>
+<p>Missing pair types contribute no direct matching term to the loss. Shared parameters can still change their vectors through other pairs, but that loss does not test whether the missing pairs align. Training on web image–text pairs likewise can leave weaker results on satellite and medical images.</p>
+<p>The exercise makes the omission exact: a lookup table stores a separate vector for each word. Words absent from training receive zero gradients. Without weight decay, an additional update that shrinks parameters, their vectors remain at their initial values. Adding the missing pairs supplies a training signal; success on those pairs does not establish performance on unseen ones.</p>
+<p>Temperature also limits interpretation. At τ = 0.1, the exercise reaches loss 0.0061 while a matching cosine remains 0.33. A relevance threshold of 0.8 cannot be assumed to transfer between models with different training.</p>
 <section class="mission" data-mission="embeddings-are-coordinates"><div class="mission__label">Try the exercise</div>
 <h2 id="exercise-train-a-tiny-encoder-and-leave-a-pair-type-out">Exercise: train a tiny encoder and leave a pair type out</h2>
-<p>The script checks the worked step with autograd, then trains a tiny text encoder with the in-batch loss. PyTorch on a CPU, no downloads, a few seconds.</p>
+<p>Run the script with PyTorch on a CPU. Autograd, its automatic gradient calculation, first checks the hand-worked step. No model download is needed.</p>
 <pre><code class="language-python">import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -306,16 +305,24 @@ print(&quot;spanish vectors changed by training:&quot;, not torch.equal(spanish_
 enc2 = train([(english, titles), (spanish, titles)])
 print(&quot;with the pairs, spanish queries -&gt;&quot;, top_hits(enc2, spanish))
 </code></pre>
-<p>What each part does:</p>
-<ul>
-<li><strong>Part 1</strong> is the worked example. <code>F.normalize</code> divides each row by its length, so the matrix product is a table of cosines. <code>F.cross_entropy(sims / tau, target)</code> is the loss formula in one call: a log-softmax over each row, then minus the log-probability at the target column. <code>loss.backward()</code> differentiates through the normalisation, which produces the &quot;q minus cosine times d&quot; of the second table.</li>
-<li><strong><code>nn.EmbeddingBag(..., mode=&quot;mean&quot;)</code></strong> is a lookup table with one learnable row of 8 numbers per word, plus the averaging: each text becomes the mean of its words&#39; rows. It stands in for a transformer and its pooling, and makes a missing pair visible row by row.</li>
-<li><strong><code>contrastive_loss</code></strong> is the in-batch loss from the essay: a B × B cosine matrix, divided by τ, cross-entropy per row with <code>torch.arange(B)</code> as the targets, which puts every correct answer on the diagonal. Adding <code>F.cross_entropy(sim.T / tau, target)</code> and halving gives the symmetric version that also runs the columns.</li>
-<li><strong><code>train</code></strong> is an ordinary SGD loop. Each call restarts from the same seeded table, so the two runs differ only in their pairs. Each batch holds a title once; a duplicate would make one row&#39;s correct answer another row&#39;s negative.</li>
-<li><strong>Parts 3 and 4</strong> query with Spanish words from no training pair, check whether their vectors moved, then add Spanish–English pairs as a second batch and retrain.</li>
-</ul>
-<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the full output is in the essay&#39;s corpus. Part 1 prints <code>cosines before: [0.6, 0.8]  loss: 2.1269</code>, <code>gradient on docs: [[-5.6371, 4.2278], [3.1709, 4.2278]]</code> and <code>cosines after one step: [0.8317, 0.6202]</code>, the tables to four places. Training starts at <code>loss 4.3275  matching [-0.73, -0.1, 0.21, 0.38, 0.44, 0.02]</code> and ends at <code>loss 0.0061  matching [0.33, 0.89, 0.63, 0.76, 0.76, 0.52]  non-matching mean -0.10</code>: matching pairs moved together, though not to 1. All six English queries find their titles, <code>6</code>, though none shares a word with its title. The Spanish queries score <code>1</code>, chance for six titles (<code>mochila</code> finds the backpack), and the script prints <code>spanish vectors changed by training: False</code>. With the Spanish pairs added, they score <code>6</code>.</p>
-<p>One thing to try: set <code>tau = 1.0</code>. The matching cosines climb to between 0.85 and 0.96 by step 200, but the loss is still about 1.02, because at that temperature no arrangement of the vectors can drive it near zero. The Spanish queries still score 1, with their vectors unchanged.</p>
+<p><code>F.normalize</code> makes rows unit length; <code>F.cross_entropy</code> applies the row loss; <code>loss.backward()</code> calculates gradients through normalisation. <code>EmbeddingBag</code> learns 8 numbers per word and averages word vectors. <code>contrastive_loss</code> puts correct titles on the diagonal. Its symmetric version adds <code>F.cross_entropy(sim.T / tau, target)</code> and halves the sum to average row and column losses.</p>
+<p><code>train</code> uses SGD, a gradient-descent update over training batches, and restarts from the same seeded values. Each title appears once per batch to avoid treating a duplicate match as a negative. Parts 3 and 4 compare Spanish queries before and after adding Spanish–English pairs.</p>
+<p>Expected output, recorded with PyTorch 2.14 on a CPU:</p>
+<pre><code class="language-text">cosines before: [0.6, 0.8]  loss: 2.1269
+gradient on docs: [[-5.6371, 4.2278], [3.1709, 4.2278]]
+cosines after one step: [0.8317, 0.6202]
+step   0  loss 4.3275  matching [-0.73, -0.1, 0.21, 0.38, 0.44, 0.02]  non-matching mean 0.05
+step   1  loss 3.0909  matching [-0.65, 0.08, 0.25, 0.47, 0.51, 0.09]  non-matching mean 0.03
+step  10  loss 0.1245  matching [0.01, 0.74, 0.42, 0.64, 0.61, 0.26]  non-matching mean -0.04
+step  50  loss 0.0220  matching [0.19, 0.84, 0.54, 0.71, 0.7, 0.4]  non-matching mean -0.07
+step 200  loss 0.0061  matching [0.33, 0.89, 0.63, 0.76, 0.76, 0.52]  non-matching mean -0.10
+english queries -&gt; ([&#39;wireless keyboard&#39;, &#39;graphite pencil&#39;, &#39;steel kettle&#39;, &#39;leather watch&#39;, &#39;canvas backpack&#39;, &#39;chef knife&#39;], 6)
+spanish queries -&gt; ([&#39;graphite pencil&#39;, &#39;chef knife&#39;, &#39;wireless keyboard&#39;, &#39;steel kettle&#39;, &#39;canvas backpack&#39;, &#39;graphite pencil&#39;], 1)
+spanish vectors changed by training: False
+with the pairs, spanish queries -&gt; ([&#39;wireless keyboard&#39;, &#39;graphite pencil&#39;, &#39;steel kettle&#39;, &#39;leather watch&#39;, &#39;canvas backpack&#39;, &#39;chef knife&#39;], 6)
+</code></pre>
+<p>All six English queries retrieve their titles without sharing words with them. Only one Spanish query does: <code>mochila</code> retrieves the backpack. Spanish vectors remain unchanged. Adding their pairs raises the count to six.</p>
+<p>Try <code>tau = 1.0</code>: matching cosines reach 0.85–0.96 by step 200, but loss remains about 1.02 because the bounded cosine range prevents it approaching zero. Spanish queries still score 1, with their vectors unchanged.</p>
 <p><em>Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 25.1, 34.2 and 34.4, and AI Engineer Core Track: LLM Engineering (Ed Donner, Udemy), lectures 5.4 and 5.5, paraphrased as study material; Sebastian Raschka, Machine Learning Q and AI, Leanpub edition of 2023-05-21, pp. 27–29 and 218 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 702–704 (physical), the CLIP contrastive loss.</em></p>
 </section></article>
     <div class="mission-action" data-mission-action="embeddings-are-coordinates">
