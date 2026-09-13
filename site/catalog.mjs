@@ -64,9 +64,12 @@ export const essays = [
     [C("6538601", "02-02"), C("6100015", "03-18"), C("4735368", "28-02"), B("raschka-qai", "pp. 117–126"), B("llm-deep-dive", "pp. 63–68, 81")],
     { status: "published",
       payoff: "The score table inside every attention layer, the mask that hides the future in it, and why that mask makes training on whole documents and generating one token at a time the same computation." }),
-  E("embeddings-are-coordinates", "I", "Nearest Neighbour in 384 Dimensions Is the Whole Trick",
-    "An encoder maps text to a vector; cosine similarity ranks; contrastive training pulls matching pairs together.",
-    [C("4735368", "34-02", "34-04", "25-01"), C("6100015", "05-04", "05-05"), B("raschka-qai")]),
+  E("embeddings-are-coordinates", "I", "Similar Means Whatever the Training Pairs Said",
+    "Cosine similarity ranks stored vectors; an in-batch contrastive loss with a temperature pulls each training pair together and pushes the rest of the batch apart, so only pair types present in training are arranged.",
+    [C("4735368", "34-02", "34-04", "25-01"), C("6100015", "05-04", "05-05"), B("raschka-qai", "pp. 27–29, 218"), B("geron-pytorch", "pp. 702–704")],
+    { status: "drafted",
+      payoff: "How an embedding model comes to put matching texts close together, worked through one training step by hand, and why queries of a kind it never trained on can come back as noise.",
+      caution: "Worked numbers and the toy encoder are the book's own. In the exercise's lookup-table encoder an untrained pair's vectors do not move at all; in a transformer encoder they move as a side effect of other pairs, so real failures are less clean." }),
 
   // ── II. Data and training ───────────────────────────────────────────────
   E("validation-set-is-a-budget", "II", "You Only Get to Look at the Test Set Once",
