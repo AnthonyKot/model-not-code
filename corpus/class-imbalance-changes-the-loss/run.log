@@ -1,0 +1,16 @@
+pos_weight  1.0: per-row loss [negative, positive] = [0.6931, 0.6931]
+pos_weight 19.0: per-row loss [negative, positive] = [0.6931, 13.1698]
+mean over the two rows: BCEWithLogitsLoss 6.9315, CrossEntropyLoss 0.6931
+pos_weight  1.0: bias -2.9443, constant prediction 0.0500
+pos_weight 19.0: bias 0.0000, constant prediction 0.5000
+pos_weight from the counts: 19.0
+
+unweighted: weights [1.605, 1.193], bias -5.090
+  mean predicted probability on test rows: 0.044
+  confusion matrix at 0.5 (rows = actual neg, pos; cols = predicted neg, pos): [[1890, 10], [74, 26]]
+  recall: negative 0.995, positive 0.260; accuracy 0.958
+
+pos_weight: weights [1.518, 1.185], bias -2.050
+  mean predicted probability on test rows: 0.238
+  confusion matrix at 0.5 (rows = actual neg, pos; cols = predicted neg, pos): [[1623, 277], [23, 77]]
+  recall: negative 0.854, positive 0.770; accuracy 0.850

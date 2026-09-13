@@ -1,0 +1,19 @@
+Part A: four identical episodes, alpha = 1 for Q-learning
+episode 1: Q-learning Q(s, right) [0.0, 0.0, 0.0, 1.0]   Monte Carlo [0.729, 0.81, 0.9, 1.0]
+episode 2: Q-learning Q(s, right) [0.0, 0.0, 0.9, 1.0]   Monte Carlo [0.729, 0.81, 0.9, 1.0]
+episode 3: Q-learning Q(s, right) [0.0, 0.81, 0.9, 1.0]   Monte Carlo [0.729, 0.81, 0.9, 1.0]
+episode 4: Q-learning Q(s, right) [0.729, 0.81, 0.9, 1.0]   Monte Carlo [0.729, 0.81, 0.9, 1.0]
+
+Part B: alpha = 0.5, episodes until Q(S0, right) is within 10% of 0.729
+episode 1: Q-learning Q(s, right) [0.0, 0.0, 0.0, 0.5]
+episode 4: Q-learning Q(s, right) [0.0456, 0.2531, 0.6187, 0.9375]
+episode 5: Q-learning Q(s, right) [0.1367, 0.405, 0.7312, 0.9688]
+episode 8: Q-learning Q(s, right) [0.4642, 0.6929, 0.8684, 0.9961]
+episode 12: Q-learning Q(s, right) [0.6758, 0.7944, 0.8971, 0.9998]
+
+Part C: a wandering behaviour (right with probability 0.7), same episodes for both
+episode    1: Q-learning Q(S0, right) 0.0000   Monte Carlo Q(S0, right) 0.5905
+episode   10: Q-learning Q(S0, right) 0.0366   Monte Carlo Q(S0, right) 0.5263
+episode  100: Q-learning Q(S0, right) 0.7286   Monte Carlo Q(S0, right) 0.5420
+episode 2000: Q-learning Q(S0, right) 0.7290   Monte Carlo Q(S0, right) 0.5373
+exact Q(S0, right) of the wandering policy 0.5361; of always-right 0.7290

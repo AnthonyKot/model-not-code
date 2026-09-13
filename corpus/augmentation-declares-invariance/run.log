@@ -1,0 +1,4 @@
+hook: [[1.0, 1.0, 1.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0]]
+flipped: [[1.0, 1.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]
+shape  task, validation accuracy [no flip, flip]: [0.762, 1.0]   on left-facing images only: [0.531, 1.0]
+facing task, validation accuracy [no flip, flip]: [1.0, 0.492]   on left-facing images only: [1.0, 0.513]
