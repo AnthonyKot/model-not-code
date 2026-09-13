@@ -53,7 +53,7 @@ button { font: inherit; }
 .book-nav__skips { display: block; margin: 1rem .6rem; padding-top: 1rem; color: var(--muted); font-size: .72rem; text-decoration: none; border-top: 1px solid var(--line); }
 
 .home-page { min-width: 0; overflow: hidden; }
-.home-hero { min-height: calc(100vh - 76px); padding: clamp(5rem, 10vw, 9rem) clamp(2rem, 8vw, 9rem) 5rem; color: var(--white); background: var(--forest); position: relative; isolation: isolate; }
+.home-hero { min-height: calc(100vh - 76px); padding: clamp(5rem, 10vw, 9rem) clamp(2rem, 8vw, 9rem) 5rem; color: var(--white); background: var(--forest); position: relative; isolation: isolate; overflow: hidden; }
 .home-hero::before { content: ""; position: absolute; z-index: -1; inset: 0; opacity: .18; background-image: linear-gradient(90deg, transparent 49.8%, rgba(255,255,255,.12) 50%, transparent 50.2%), linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px); background-size: 180px 100%, 100% 76px; }
 .home-hero::after { content: "←"; position: absolute; z-index: -1; right: -2vw; bottom: -12vw; color: rgba(245, 217, 189, .08); font-family: var(--serif); font-size: min(58vw, 760px); line-height: .7; }
 .home-hero__eyebrow, .section-label, .essay-kicker, .review-label { color: var(--amber-pale); font-size: .73rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
@@ -77,9 +77,10 @@ button { font: inherit; }
 .start-card > a span { color: var(--amber); }
 
 .shelf-section, .skip-section { padding: 7rem clamp(1.5rem, 6vw, 6rem); }
-.section-heading { display: flex; justify-content: space-between; gap: 3rem; align-items: end; margin-bottom: 2.5rem; }
-.section-heading h2, .how-section h2 { max-width: 650px; margin: .45rem 0 0; font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 500; letter-spacing: -.045em; line-height: .98; }
-.section-heading > p { max-width: 390px; margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; line-height: 1.55; }
+.section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 3rem; align-items: end; margin-bottom: 2.5rem; }
+.section-heading > div { flex: 1 1 20rem; min-width: 0; }
+.section-heading h2, .how-section h2 { max-width: 650px; margin: .45rem 0 0; padding: 0 .08em .08em 0; font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 500; letter-spacing: -.03em; line-height: 1.05; overflow-wrap: break-word; }
+.section-heading > p { flex: 0 1 390px; max-width: 390px; margin: 0; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; line-height: 1.55; }
 .shelf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .shelf-card { display: flex; flex-direction: column; min-height: 390px; padding: 2rem; background: rgba(255,253,248,.35); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background .2s, transform .2s; }
 .shelf-card:hover { position: relative; z-index: 1; background: var(--white); box-shadow: var(--shadow); transform: translateY(-2px); }
