@@ -1,0 +1,23 @@
+ N  n_val  SE      reported  test    inflation  inflation/SE
+  1   200  0.0283  0.7999    0.8002  -0.0003    -0.01
+  5   200  0.0283  0.8325    0.7998  +0.0328    1.16
+ 20   200  0.0283  0.8514    0.7997  +0.0517    1.83
+100   200  0.0283  0.8679    0.7999  +0.0680    2.40
+  1  2000  0.0089  0.8000    0.8000  -0.0000    -0.00
+  5  2000  0.0089  0.8104    0.8000  +0.0104    1.16
+ 20  2000  0.0089  0.8165    0.8000  +0.0165    1.85
+100  2000  0.0089  0.8222    0.8000  +0.0221    2.47
+
+20 checkpoints, n_val 2000, inflation by churn between checkpoints
+churn 1.00: +0.0166
+churn 0.30: +0.0120
+churn 0.10: +0.0072
+churn 0.02: +0.0032
+
+spread 0.78..0.80, N 20, n_val 2000
+reported 0.8103 winner's true 0.7959 test 0.796 picked the truly best 0.186
+
+# variants (workspace/validation-set-is-a-budget/variants.py, seed 0, 20 candidates)
+n_test 50: test mean 0.8003 test std 0.0562 SE 0.0566
+n 200 test after peeking 0.8367 fresh third 0.8001
+n 2000 test after peeking 0.8118 fresh third 0.8001
