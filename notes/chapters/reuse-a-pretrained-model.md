@@ -30,3 +30,4 @@ change the printed labels; (8) running_mean[0] is a post-Linear feature; (9) Ada
 (10) lora_dropout removed from the PEFT snippet; (11) Keras 0.99 momentum clause removed, the receipted trainable=False
 coupling kept and dated in the catalog caution; (12) runtime kept, measured and logged (5.97 s → "about six seconds").
 Also from the chapter 1 review: "Which W? A real attention layer has four" (chapter 1 builds three).
+- Gemini second round (proposal2.md): 1 proposal, applied — the exercise docstring no longer says chapter 1's block had four projections (docstring only; output unchanged).

@@ -41,3 +41,4 @@
   step-4 row, ln 2 = 0.69315, 4-decimal one-step table, 0.44/3.44, heading "Where the training pairs come from",
   output projection sentence (and ch 3's "chapter 1's attention layer has four" fixed), q − cos×d explained,
   approximate nearest-neighbour sentence (stc-36), no anthropomorphism in the gradient sentence, ch 2 tense.
+- Gemini second round (proposal2.md, 2026-09-14): no proposals survived; it confirmed the codex fixes.

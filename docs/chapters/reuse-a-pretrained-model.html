@@ -467,7 +467,7 @@ def batch(texts):
     return torch.tensor([[ids[w] for w in r] + [0] * (width - len(r)) for r in rows])
 
 class Writer(nn.Module):
-    &quot;&quot;&quot;Chapter 1&#39;s block with its four attention projections named q, k, v, o.&quot;&quot;&quot;
+    &quot;&quot;&quot;Chapter 1&#39;s block plus an output projection, named q, k, v, o.&quot;&quot;&quot;
     def __init__(self, n_vocab, dim=32, max_len=12):
         super().__init__()
         self.tok, self.pos = nn.Embedding(n_vocab, dim), nn.Embedding(max_len, dim)
