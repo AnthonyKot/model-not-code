@@ -148,7 +148,7 @@ x is the layer's input, d<sub>in</sub> numbers. W·x is what the frozen layer co
 <figcaption>The frozen path and the adapter path. W is used as downloaded; the correction squeezes x to r numbers through A and stretches them back through B, so B·A is never built.</figcaption>
 </figure>
 
-Which W? Chapter 1's attention layer has four: the projections that compute queries, keys and values, and the one that maps the blended result back, usually named `q_proj`, `k_proj`, `v_proj` and `o_proj`. The usual first targets are those four in every layer; the feed-forward matrices can be added when attention alone is not enough, at the cost of a larger adapter.
+Which W? A real attention layer has four: chapter 1's three projections that compute queries, keys and values, and the output projection that maps the blended result back, usually named `q_proj`, `k_proj`, `v_proj` and `o_proj`. The usual first targets are those four in every layer; the feed-forward matrices can be added when attention alone is not enough, at the cost of a larger adapter.
 
 **A worked diff of rank 1.** Take a 4 × 4 layer and r = 1, with A = [2, −1, 0, 1] and B = [1, 0, 3, −1]<sup>T</sup>. Eight trainable numbers produce a 4 × 4 diff whose row i is B<sub>i</sub> times the row A:
 

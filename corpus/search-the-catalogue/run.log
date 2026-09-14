@@ -5,14 +5,19 @@ step 300  loss 0.0002  english top-1 6/6
 spanish top-1: 1/6
 rows of spanish-only words changed: False
 spanish query vectors changed: True
-generator step   0  next-token loss 4.0101
-generator step 300  next-token loss 0.1855
-after 'the': [('slim', 0.2499), ('leather', 0.2499), ('steel', 0.2499), ('canvas', 0.2499)]
-T=0: the slim wireless keyboard fits a laptop bag </s>
-T=2 seed 0: the canvas backpack carries school books </s>
-T=2 seed 1: the canvas backpack carries school books </s>
-T=2 seed 2: the leather wireless keyboard fits leather laptop bag time
+generator step   0  next-token loss 4.3681
+generator step 300  next-token loss 0.1435
+typing device for laptop -> slim wireless keyboard -> the slim wireless keyboard fits a laptop bag </s>
+boil water fast -> steel kettle -> the steel kettle boils water fast </s>
+tell the time -> leather watch -> the leather watch tells the time </s>
+carry books to school -> canvas backpack -> the canvas backpack carries school books </s>
+cut bread -> chef knife -> the leather watch tells the time </s>
+light for reading -> desk lamp -> the steel kettle boils water fast </s>
+teclado para portatil -> leather watch -> the leather watch tells the time </s>
+hervir agua -> leather watch -> the leather watch tells the time </s>
+T=2 seed 0: the slim wireless keyboard fits a laptop bag </s>
+T=2 seed 1: the slim wireless keyboard fits a laptop bag </s>
+T=2 seed 2: the leather carries water leather keyboard fits the boils keyboard
 T=2 seed 3: the slim wireless keyboard fits a laptop bag </s>
-T=2 seed 4: the leather watch tells the time </s>
 causal=True: largest change in the first four positions after appending: 0.00e+00
-causal=False: largest change in the first four positions after appending: 5.01e+00
+causal=False: largest change in the first four positions after appending: 1.35e-01

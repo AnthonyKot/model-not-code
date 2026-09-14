@@ -33,3 +33,11 @@
   design, not trained weights (CHAPTER-PLAN ch 1 amended). Prose that implies one fitted model ("the same
   machine used twice", "The top row is shared") is proposal 2, still to be applied with the other proposals.
 
+- **Applied 2026-09-14** (author: "let's apply improvements"): all 9 codex proposals — (1) exercise Part 2 rewritten
+  so search's top title prompts a separately trained generator (Part 1 byte-identical; new output in run.log);
+  (2) shared design, not weights, in intro, figure, caption and §5; (3) in-batch false negatives; (4) loss-floor
+  sentence; (5) "chance" removed; (6) no determinism promise at temperature 0; (7) "a few hundred" removed;
+  (8) forward link to ch 2/6 fixed; (9) "millions of weights" removed. Plus the Gemini findings accepted earlier:
+  step-4 row, ln 2 = 0.69315, 4-decimal one-step table, 0.44/3.44, heading "Where the training pairs come from",
+  output projection sentence (and ch 3's "chapter 1's attention layer has four" fixed), q − cos×d explained,
+  approximate nearest-neighbour sentence (stc-36), no anthropomorphism in the gradient sentence, ch 2 tense.
