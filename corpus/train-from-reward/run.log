@@ -8,9 +8,9 @@ clip check: 0.25 -> 0.50, advantage +1: loss -1.20, gradient +0.00
 clip check: 0.25 -> 0.50, advantage -1: loss +2.00, gradient +2.00
 clip check: 0.50 -> 0.35, advantage -1: loss +0.80, gradient +0.00
 clip check: 0.50 -> 0.35, advantage +1: loss -0.70, gradient -0.70
-policy round  1: mean steps to the end 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
-policy round 10: mean steps to the end  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
-policy round 30: mean steps to the end  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
+policy round  1: mean episode length 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
+policy round 10: mean episode length  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
+policy round 30: mean episode length  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
 
 preference pairs: 600; where the hidden scores differ (374), the label picks the better answer 0.904 of the time
 reward model: held-out pair accuracy 0.770; ranks the better answer first in 1.000 of 64 held-out pairs that differ

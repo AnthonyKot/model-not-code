@@ -60,9 +60,9 @@ max<sub>a′</sub> Q(s′, a′) is the larger of the table's two entries for th
 
 In episode 1, every step before the last reads a next cell whose entries are still 0, so its target is 0; only the step into cell 4 learns 1. In episode 2 the step from cell 2 reads that 1 and learns 0.9, and so on back. Q-learning moved the reward one cell per episode, because each update looks one step ahead. The zeros in the first three rows are not random noise but an error in the same direction every time, a **bias**, and it lasts as long as the estimates are wrong.
 
-Measurement has the opposite cost. A measured return is right on average for the policy that played, but when actions are random or the agent explores, each return is a sum of many random rewards, so it varies from episode to episode, and nothing is learned until the episode ends. Bootstrapping learns every step, with only one random reward in each target, and pays for it with the bias while the table is wrong. The longer and noisier the episodes, the more that trade is worth making.
+Measurement has the opposite cost. A measured return is right on average for the policy that played, but when actions are random or the agent explores, each return is a sum of many random rewards, so it varies from episode to episode, and nothing is learned until the episode ends. Bootstrapping learns after every step from one sampled transition, a reward and a next state, instead of a whole sampled return, and pays for it with the bias while the table is wrong. The longer and noisier the episodes, the more that trade is worth making.
 
-Two consequences matter once the table becomes a network. Network outputs share weights, so a step that moves the prediction for one state also moves the estimate for the next, which is the target the prediction was aimed at. Deep Q-learning holds the target still with a **target network**, a frozen copy used only to compute targets and re-copied periodically. And because Q-learning's target uses the best action in s′ rather than the action actually taken next, its transitions stay usable after the policy has changed, so it samples random batches from a **replay memory** of past steps. A measured return needs no target network, because nothing inside it is an estimate, and it cannot be replayed: it describes the policy that played the episode, and that policy is gone after the next update.
+Two consequences matter once the table becomes a network. Network outputs share weights, so a step that moves the prediction for one state also moves the estimate for the next, which is the target the prediction was aimed at. Deep Q-learning holds the target still with a **target network**, a frozen copy used only to compute targets and re-copied periodically. And because Q-learning's target uses the best action in s′ rather than the action actually taken next, its transitions stay usable after the policy has changed, so it samples random batches from a **replay memory** of past steps. A measured return needs no target network, because nothing inside it is an estimate. And an update built on it cannot reuse old episodes as they are: they were sampled by the policy that played them, which is gone after the next update. PPO, below, reuses one fresh batch a few times by correcting for exactly that, with the ratio of new to old probabilities; it keeps no replay memory of old steps.
 
 The answer writer will take the measured route. One answer is one short episode, and its reward arrives when the answer ends.
 
@@ -114,9 +114,9 @@ def ppo_loss(new_logp, old_logp, advantage, mask, eps=0.2):
 
 In the first row a good action has already doubled its probability; the min picks the clipped constant 1.2, a constant has no slope, and this sample stops pushing. In the second row the action doubled despite a negative advantage; the min keeps the full −2, and the sample pulls it back with gradient +2, which is ratio × A with its sign flipped. Rows three and four mirror them. The clip only switches off a sample that has already moved more than ε *in the direction its advantage asked for*; a sample that moved the wrong way keeps its full gradient.
 
-Two limits come with it. The clip removes the incentive to move further; it does not cap the move. One large optimiser step can carry a ratio well past 1.2, and because all samples share the same weights, samples that are still pushing keep moving the ones that have stopped. So the number of epochs and the learning rate still bound the real change. And after the epochs, the updated policy becomes the new π<sub>old</sub>, every ratio resets to 1, and the next batch may move the policy again: the clip limits each batch, not training as a whole. One PyTorch implementation reuses each batch for 10 epochs in minibatches of 64.
+Two limits come with it. The clip removes the incentive to move further; it does not cap the move. One large optimiser step can carry a ratio well past 1.2, and because all samples share the same weights, samples that are still pushing keep moving the ones that have stopped. So the number of epochs and the learning rate still control the real change; the clip supplies no hard bound. And after the epochs, the updated policy becomes the new π<sub>old</sub>, every ratio resets to 1, and the next batch may move the policy again: the clip limits the incentive within each batch, not training as a whole. One PyTorch implementation reuses each batch for 10 epochs in minibatches of 64.
 
-In the exercise the corridor's policy starts at a coin flip per cell and takes 16.5 steps on average to reach the end. It collects 16 episodes per round and reuses each batch for 4 epochs through `ppo_loss`. By round 10 it takes 4.2 steps, and by round 30 it walks straight, 4.0 steps, with right at 0.99 or above in every cell.
+In the exercise the corridor's policy starts at a coin flip per cell. Episodes are cut off at 20 steps, and its first 16 average 16.5 steps, and only 7 of them reach the end. It collects 16 episodes per round and reuses each batch for 4 epochs through `ppo_loss`. By round 10 the episodes average 4.2 steps, and by round 30 it walks straight, 4.0 steps, with right at 0.99 or above in every cell.
 
 ## The answer writer is a policy
 
@@ -133,21 +133,21 @@ Nothing in `ppo_loss` knows it was written for a corridor. The writer fits the s
 
 The writer's episode is the shortest kind: one prompt, one answer, one reward, done. There is no next prompt whose value needs estimating, and in the exercise every token of an answer shares that answer's advantage. Sampling temperature from chapter 1 plays no part in this objective: the writer collects its answers at temperature 1, so the stored probabilities are the policy's own, and training changes the logits themselves.
 
-What is missing is the reward. The corridor had one built in. For answers, somebody has to supply it, and this is where the order of training matters. A language model is pretrained on large amounts of text, then fine-tuned on demonstrations, curated prompts with good answers written out, as chapter 3 did. Only then does it learn from preferences, which can be collected in far larger numbers than demonstrations, because comparing two answers is much easier than writing a good one. The exercise's writer is chapter 3's block with a small feed-forward layer added, fine-tuned for 400 steps on 39 demonstrations. Each demonstration is a product followed by one or two of four phrases: *in stock*, *ships today*, *great value*, *buy now*.
+What is missing is the reward. The corridor had one built in. For answers, somebody has to supply it, and this is where the order of training matters. A language model is pretrained on large amounts of text, then fine-tuned on demonstrations, curated prompts with good answers written out, as chapter 3 did. Only then does it learn from preferences, which can be collected in far larger numbers than demonstrations, because comparing two answers is much easier than writing a good one. The exercise leaves pretraining out: its writer is chapter 3's block with a small feed-forward layer added, trained from random weights for 400 steps on 48 demonstrations, and that supervised writer is the starting point for learning from preferences. Each demonstration is a product followed by one or two of four phrases: *in stock*, *ships today*, *great value*, *buy now*.
 
 ## Where people's preferences enter
 
-People are shown two answers to the same prompt and pick the better one. In one well-documented setup they rank between 4 and 9 answers at once, and every pair in the ranking becomes a comparison. Comparisons have two properties worth designing around. They carry negative feedback as well as positive, which demonstrations cannot: a demonstration shows what to do, a lost comparison shows what not to. And they are noisy. In that same setup, the labellers who produced the training data agreed with each other on about 73% of comparisons, and a separate group of labellers agreed among themselves on about 77%, rates its authors counted as high.
+People are shown two answers to the same prompt and pick the better one. Some pipelines ask people to rank between 4 and 9 answers at once, and every pair in the ranking becomes a comparison. Comparisons have two properties worth designing around. They carry negative feedback as well as positive, which demonstrations cannot: a demonstration shows what to do, a lost comparison shows what not to. And they are noisy. In one such pipeline, the labellers who produced the training data agreed with each other on about 73% of comparisons, and a separate group of labellers agreed among themselves on about 77%.
 
 The exercise has no people. A hidden scoring function stands in for them: +1 if the answer says *in stock* or *ships today*, −1 for every *buy now*, and −0.3 for every word beyond four. It is never shown to the learner. To make the labels noisy the way people's are, each of 600 pairs of answers sampled from the writer is labelled at random, preferring the first answer with probability σ(2 × (score<sub>first</sub> − score<sub>second</sub>)). σ, the sigmoid, maps any number to a probability between 0 and 1: pairs one point apart are labelled the right way round 88% of the time, and pairs with equal scores are a coin flip. Where the hidden scores differed, 374 pairs, the label picked the better answer 0.904 of the time.
 
-The labels train a **reward model**: a network that reads a prompt and an answer and outputs one number, r. In the documented pipeline it starts from the fine-tuned language model itself, with the layer that outputs token scores removed and a single number output in its place, which is chapter 3's new head on a pretrained backbone. It is trained on each pair with:
+The labels train a **reward model**: a network that reads a prompt and an answer and outputs one number, r. A common design starts it from the fine-tuned language model itself, with the layer that outputs token scores removed and a single number output in its place, which is chapter 3's new head on a pretrained backbone. It is trained on each pair with:
 
 <p class="formula">loss = −ln σ(r<sub>w</sub> − r<sub>l</sub>)</p>
 
 r<sub>w</sub> is the reward model's score for the answer people chose, the winner, and r<sub>l</sub> its score for the loser. σ(r<sub>w</sub> − r<sub>l</sub>) is the probability the model gives to the chosen answer being preferred. This is not a new loss. Put the two scores through chapter 1's softmax and the probability of the first is e<sup>r<sub>w</sub></sup> / (e<sup>r<sub>w</sub></sup> + e<sup>r<sub>l</sub></sup>), which equals σ(r<sub>w</sub> − r<sub>l</sub>). So the reward model is a two-way classifier trained with cross-entropy, the chosen answer as the label, and its slope is p − y again. A label of "both equally good" fits the same loss with y = 0.5 for each.
 
-A worked pair: the model scores the chosen answer 0.5 and the rejected one 1.0. Then σ(−0.5) = 0.3775, the loss is −ln 0.3775 = 0.9741, and the slope is −0.6225 on r<sub>w</sub> and +0.6225 on r<sub>l</sub>: raise the winner, lower the loser. Only the difference enters the loss, so adding the same constant to every score changes nothing. The scale's zero is arbitrary; the documented pipeline sets it with a bias so that the demonstrations score 0 on average. In the exercise the reward model's own bias receives no gradient at all and stays at 0.
+A worked pair: the model scores the chosen answer 0.5 and the rejected one 1.0. Then σ(−0.5) = 0.3775, the loss is −ln 0.3775 = 0.9741, and the slope is −0.6225 on r<sub>w</sub> and +0.6225 on r<sub>l</sub>: raise the winner, lower the loser. Only the difference enters the loss, so adding the same constant to every score changes nothing. The scale's zero is arbitrary, and a bias can fix it, for example so that the demonstrations score 0 on average. In the exercise the reward model's own bias receives no gradient at all and stays at 0.
 
 The exercise's reward model is deliberately the smallest that can learn from pairs: one learned number per word, summed over the answer. Trained on 500 pairs and scored on the 100 held back, it agrees with the labels on 0.770 of them. That looks mediocre and is not: on the 64 held-out pairs whose hidden scores differ, it ranks the better answer first every time. The rest of the gap is the labels' own noise, including the tied pairs where the label was a coin flip. A held-out agreement with noisy labels measures the model and the labels together, which is chapter 2's warning about test sets in another form. The learned weights are readable: *buy* −2.20, *stock* +0.84, *ships* +0.68, *today* +0.58, *in* +0.24.
 
@@ -213,7 +213,7 @@ The first run uses the reward model's score alone. After 40 rounds, averaged ove
 | Fine-tuned writer, before tuning | 0.34 | 0.33 | 3.5 | 0.00 | buy now ships today |
 | Reward model only, clip 0.2, 4 epochs | 6.12 | −0.20 | 8.0 | 49.51 | in stock stock stock stock stock stock stock |
 
-The reward model's score went up eighteen-fold and the hidden score, the thing it stood for, went down. Eight words is the length limit: the answers no longer end. The mechanism is plain in the weights. The reward model sums one number per word. The answers in its pairs came from the fine-tuned writer, and every one of the 1,200 had two or four words; one of them repeated a word. Nothing in that data could teach it that a second *stock* is worth less than the first, or that a sixth word costs anything. Each extra *stock* adds 0.84, and PPO found it.
+The mean reward-model score rose from 0.34 to 6.12 while the mean hidden score, the thing it stood for, fell from 0.33 to −0.20. Eight words is the length limit: the answers no longer end. The mechanism is plain in the weights. The reward model sums one number per word. The answers in its pairs came from the fine-tuned writer, and every one of the 1,200 had two or four words; one of them repeated a word. Nothing in that data could teach it that a second *stock* is worth less than the first, or that a sixth word costs anything. Each extra *stock* adds 0.84, and PPO found it.
 
 This failure was built in, and it should be read that way. A word-sum reward model cannot express "say it once" or "stop at four words", so it was certain to be exploitable. A real reward model is a large network and fails less transparently. What carries over is the assumed row of the table: the writer being tuned produces answers unlike anything in the pairs, and the reward model's score on those answers was never checked against anyone. Across ten different random seeds for the tuning run, this one ended in repeated words every time.
 
@@ -232,7 +232,7 @@ The reward model's score is far lower than in the unguarded run, and the hidden 
 
 ## The clip and the penalty are different guards
 
-It is tempting to see the KL penalty as a second clip. They guard different things. The clip compares the writer with π<sub>old</sub>, the writer that collected *this batch*, which changes every round. The penalty compares it with the reference, which never changes. The clip stops one batch from pushing too far; the penalty stops many rounds from adding up to a writer far from where it started.
+It is tempting to see the KL penalty as a second clip. They guard different things. The clip compares the writer with π<sub>old</sub>, the writer that collected *this batch*, which changes every round. The penalty compares it with the reference, which never changes. The clip removes a sample's incentive to push further within one batch; the penalty discourages many rounds from adding up to a writer far from where it started.
 
 The exercise's last run takes the clip away and keeps the penalty, with the batch reused for 10 epochs:
 
@@ -248,13 +248,13 @@ One seed is an anecdote, so the comparison was repeated across ten seeds for the
 
 The synthetic run shows the mechanism and every failure in it; a real tuning run has to establish things the run assumed.
 
-**The labels are the product.** Who labels, with what instructions, and how often they disagree decide what the reward model can learn. When trained labellers disagree on a quarter of comparisons, a reward model's agreement with held-out labels has a ceiling set by the labellers, as the exercise's 0.770 showed, and that ceiling is worth measuring on a sample labelled twice.
+**The labels are the product.** Who labels, with what instructions, and how often they disagree decide what the reward model can learn. When trained labellers disagree on about a quarter of comparisons, held-out labels are noisy, and a reward model's agreement with them measures the labels as well as the model, as the exercise's 0.770 showed. Measure how often two labellers agree on a sample labelled twice, and report it beside the reward model's agreement.
 
 **The reward model is a model with errors.** Evaluate it as chapter 2 evaluates a classifier: pairs held out, split by prompt so that no prompt appears on both sides, scored once. Then check it where it will be used: sample answers from partly tuned writers and have people compare those too, because those are the answers the reward model has never seen.
 
 **The tuned writer is judged by people, not by its reward.** A rising reward model score during tuning is expected and proves nothing; in the unguarded run it rose the most. The release comparison is people choosing between the tuned writer's answers and the reference's, on fresh prompts.
 
-**The pieces are larger.** The documented pipeline adds a value network, initialised from the reward model, to estimate advantages instead of normalising over the batch. One variant mixes the original pretraining objective back into the loss, to win back performance the tuning had cost on public benchmarks. The risk of losing what a model already knew shows up even in a game: when an agent already trained on a game's own score was fine-tuned from a learned reward, it quickly unlearned what it knew unless its convolution layers were frozen and its learning rate lowered tenfold, which is chapter 3's freeze and smaller rate again.
+**The pieces are larger.** A full pipeline can add a value network, initialised from the reward model, to estimate advantages instead of normalising over the batch. One variant mixes the original pretraining objective back into the loss, to win back performance the tuning had cost on public benchmarks. The risk of losing what a model already knew shows up even in a game: when an agent already trained on a game's own score was fine-tuned from a learned reward, it quickly unlearned what it knew unless its convolution layers were frozen and its learning rate lowered tenfold, which is chapter 3's freeze and smaller rate again.
 
 **Hosted services hide most of it.** Fine-tuning services offer preference tuning, direct preference optimisation or DPO, as a job type: you upload good and bad answers to the same prompts, such as users' thumbs up and down on alternatives, and the service does the rest. Reinforcement fine-tuning replaces the labels with a grader you write, a program or another model that scores each answer. A grader is a reward function, and this chapter's warning applies to it unchanged: the tuned model learns what the grader rewards, whether or not it is what you meant.
 
@@ -263,7 +263,7 @@ The writer is now tuned. Chapter 5 follows the shop's models after launch, where
 <!--mission-->
 ## Exercise: learn from reward, then from preferences
 
-The script fills the corridor's value table both ways, checks the four clip rows, trains the corridor policy with `ppo_loss`, then fine-tunes a tiny answer writer, labels 600 pairs with a hidden scorer, fits a reward model, and tunes the writer with PPO four ways. PyTorch on a CPU, about eleven seconds.
+The script fills the corridor's value table both ways, checks the four clip rows, trains the corridor policy with `ppo_loss`, then trains a tiny answer writer on demonstrations, labels 600 pairs with a hidden scorer, fits a reward model, and tunes the writer with PPO four ways. PyTorch on a CPU, about eleven seconds.
 
 ```python
 import copy
@@ -336,7 +336,7 @@ for rnd in range(1, 31):
         opt.zero_grad(); loss.backward(); opt.step()
     if rnd in (1, 10, 30):
         p_right = F.softmax(logits, -1)[:4, 1].tolist()
-        print(f"policy round {rnd:2d}: mean steps to the end {sum(lengths) / len(lengths):4.1f}, P(right) by cell {[round(p, 2) for p in p_right]}")
+        print(f"policy round {rnd:2d}: mean episode length {sum(lengths) / len(lengths):4.1f}, P(right) by cell {[round(p, 2) for p in p_right]}")
 
 # ---------- Part 2: preferences, a reward model, and PPO on the answer writer ----------
 PRODUCTS = ["kettle", "watch", "lamp"]
@@ -382,7 +382,7 @@ torch.manual_seed(0)
 policy = Writer()
 opt = torch.optim.Adam(policy.parameters(), lr=3e-3)
 data = pad([d + ["</s>"] for d in demonstrations])
-for _ in range(400):                                           # supervised fine-tuning on demonstrations
+for _ in range(400):                                           # supervised training on demonstrations, from random weights
     logits = policy(data[:, :-1])
     loss = F.cross_entropy(logits.reshape(-1, len(vocab)), data[:, 1:].reshape(-1), ignore_index=0)
     opt.zero_grad(); loss.backward(); opt.step()
@@ -501,8 +501,8 @@ What each part does in real reinforcement-learning and preference-tuning code:
 - **The Monte Carlo loop** walks the episode backwards with G = r + γ·G; **the Q-learning loop** replaces each entry by one reward plus γ times the next cell's larger entry, inside the step loop, so the table changes mid-episode. With α = 1 both write their target directly.
 - **The clip check** calls `ppo_loss` on one sample per row of the chapter's table and prints the loss and its slope with respect to the current log-probability.
 - **The corridor policy** is a table of two scores per cell. Each round collects 16 episodes, turns returns into advantages by normalising over the batch, stores the old log-probabilities under `torch.no_grad()`, and reuses the batch for 4 epochs.
-- **`hidden_score`** stands in for people and is used only to label pairs and to report; the learner never calls it. **`demonstrations`** are the 39 curated answers.
-- **`Writer`** is chapter 3's block plus a feed-forward layer, fine-tuned on the demonstrations with chapter 1's next-token cross-entropy. **`reference`** is its frozen copy and **`start_state`** lets every tuning run start from the same writer.
+- **`hidden_score`** stands in for people and is used only to label pairs and to report; the learner never calls it. **`demonstrations`** are the 48 curated answers.
+- **`Writer`** is chapter 3's block plus a feed-forward layer, trained from random weights on the demonstrations with chapter 1's next-token cross-entropy. **`reference`** is its frozen copy and **`start_state`** lets every tuning run start from the same writer.
 - **`sample`** generates at temperature 1 up to `MAX_NEW` tokens; **`token_logps`** returns the log-probability of every generated token and a mask over them, the per-token numbers PPO and the KL penalty need.
 - **The pair loop** samples two answers per product from the fine-tuned writer and labels them with probability σ(2 × score difference), counting how often the label agrees with the hidden score.
 - **`RewardModel`** sums one learned weight per word. It trains on 500 pairs with `-F.logsigmoid(r_w - r_l)`, the chapter's loss, and is scored on the other 100, both against the labels and against the hidden order.
@@ -520,9 +520,9 @@ clip check: 0.25 -> 0.50, advantage +1: loss -1.20, gradient +0.00
 clip check: 0.25 -> 0.50, advantage -1: loss +2.00, gradient +2.00
 clip check: 0.50 -> 0.35, advantage -1: loss +0.80, gradient +0.00
 clip check: 0.50 -> 0.35, advantage +1: loss -0.70, gradient -0.70
-policy round  1: mean steps to the end 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
-policy round 10: mean steps to the end  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
-policy round 30: mean steps to the end  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
+policy round  1: mean episode length 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
+policy round 10: mean episode length  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
+policy round 30: mean episode length  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
 
 preference pairs: 600; where the hidden scores differ (374), the label picks the better answer 0.904 of the time
 reward model: held-out pair accuracy 0.770; ranks the better answer first in 1.000 of 64 held-out pairs that differ

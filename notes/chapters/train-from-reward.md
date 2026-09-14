@@ -27,3 +27,14 @@
 - Checks: 32 receipts passed, 2 unchecked (papers); paraphrase 0/0 (one 12-word run from 4635836 13-01 reworded
   into the formula A = r + γ·V(s′) − V(s)). Build + site check green.
 - Not done: review lanes; the author's read. Prototype log removed from corpus (superseded by run.log).
+
+## Review decisions (2026-09-14)
+
+Codex actionable review `checks/reviews/train-from-reward/codex-actionable.md` (9 proposals), all applied:
+(1) demonstrations are 48, not 39 (my count error), and the exercise trains the writer from random weights — pretraining
+is omitted and now said so; (2) measured returns cannot reuse old episodes as they are, PPO reuses one batch via the
+ratio, no replay memory; (3) the clip removes incentive, no hard bound (three sentences); (4) corridor output relabelled
+"mean episode length" (20-step cap; 7 of 16 first episodes reach the end, replayed), exercise rerun twice, identical;
+(5) labeller agreement is not a ceiling; (6) bootstrapping samples a reward and a next state; (7) "eighteen-fold" on an
+arbitrary-origin score replaced by the four numbers; (8) timing kept, now logged (10.7 s) and repeatability re-verified;
+(9) source narration removed ("documented pipeline", "its authors").
