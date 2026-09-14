@@ -13,7 +13,7 @@ choice to run the image classifier on the shop's product photos, so the whole bo
 1. **Generation was missing.** Revision 1 called chapter 6 "the chapter 1 model at volume", but
    chapter 1 built a search *encoder*, and a KV cache belongs to an autoregressive *generator* — a
    different workload. Nothing before chapter 6 introduced generation, yet chapter 4's RLHF bridge
-   needed it too. Fix: chapter 1 ends by turning the encoder into a generator (the causal-mask material
+   needed it too. Fix: chapter 1 ends with a generator built from the same kind of blocks as the encoder but trained separately (the causal-mask material
    from essay 3 already lives there, unused by a search encoder), and the assistant chapter now comes
    *before* the serving chapter, so the reader sees what the generator does before paying for it.
 2. **LoRA's project resolved.** Freeze/thaw stays on the classifier; LoRA is shown on the shop's
@@ -77,7 +77,8 @@ answer written from the products found.
    different stage; forward to ch 4 (tuning this generator) and ch 7 (its cost).
 6. Where search breaks: a pair type the training never showed → forward to ch 6 (measure retrieval).
 One exercise: a tiny encoder over a toy catalogue, tokenize → rank, then the missing-pair failure;
-then the same weights with a mask generating a few tokens. Synthetic; labelled so.
+then a separately trained generator, the same block design with a causal mask, generating a few tokens.
+Synthetic; labelled so. (Amended 2026-09-14, author: the two models share a design, not trained weights.)
 
 ### 2. Trust the number before you ship the classifier  *(essays 5–8 + Part III 1, 2, 3; ~35k chars)*
 Project: product photos in, category out, for a catalogue where most categories are rare.

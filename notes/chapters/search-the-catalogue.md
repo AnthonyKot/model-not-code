@@ -25,3 +25,11 @@
 - Checks: receipts 31 passed, 4 unchecked (paper/URL), 0 failed; paraphrase 0/0 after one rewording.
 - Not done yet: review lanes (`scripts/review.sh`, `readers.sh` take essay slugs and paths — need a
   chapters/ path before they can run); the author's read.
+
+## Review decisions (2026-09-14)
+
+- Codex actionable review: `checks/reviews/search-the-catalogue/codex-actionable.md` (9 proposals).
+- **Author's decision:** amend the plan, not the exercise. Search encoder and answer generator share a block
+  design, not trained weights (CHAPTER-PLAN ch 1 amended). Prose that implies one fitted model ("the same
+  machine used twice", "The top row is shared") is proposal 2, still to be applied with the other proposals.
+
