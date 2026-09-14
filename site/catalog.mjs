@@ -222,7 +222,7 @@ export const chapters = [
   CH(2, "trust-the-number", "Trust the Number Before You Ship the Classifier",
     "The shop's product-photo classifier evaluated before release: the split, leakage, rare categories, the threshold as a cost, augmentation and the input pipeline.",
     ["validation-set-is-a-budget", "class-imbalance-changes-the-loss", "augmentation-declares-invariance", "input-pipeline-is-the-bottleneck"],
-    [C("4735368", "03-09", "03-11", "06-02", "06-03", "06-04", "07-04", "08-05", "11-04", "11-05", "15-02"), C("6100015", "04-04", "07-20"),
+    [C("4735368", "03-09", "03-11", "04-03", "06-02", "06-03", "06-04", "07-04", "08-05", "11-04", "11-05", "15-02"), C("6100015", "04-04", "07-20"),
      B("huyen-dmls", "pp. 116, 120–133, 163–166, 223"), B("ds-hard-parts", "pp. 139–143"), B("geron-pytorch", "pp. 146–151, 367, 468–469"), B("dist-ml-patterns", "pp. 29, 59–60"),
      P("https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html"), P("https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py")],
     { status: "published",

@@ -1,4 +1,4 @@
-# PyTorch 2.14.0+cpu, CPU only; workspace/trust-the-number/exercise.py (the chapter exercise, verbatim)
+# PyTorch 2.14.0+cpu, CPU only; workspace/trust-the-number/exercise.py (the chapter exercise, verbatim); about 12 s on this CPU (11.7 s measured 2026-09-14)
 held-out photos whose product has a photo in training: 0.994
 split by photo:   held-out accuracy 0.924
 split by product: held-out accuracy 0.878

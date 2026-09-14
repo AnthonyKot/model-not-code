@@ -27,3 +27,16 @@
   years" softened; the third "thing to try" no longer asserts an unmeasured result.
 - Checks: receipts 32 passed, 2 unchecked (URLs); paraphrase 0/0.
 - Not done: review lanes; the author's read (author asked to review chapters 1 and 2 together).
+
+## Review decisions (2026-09-14)
+
+Codex actionable review `checks/reviews/trust-the-number/codex-actionable.md` (9 proposals), applied at the author's
+request ("let's apply improvements"):
+- (1) Unit of decision: NOT a full rebuild of the exercise per listing. The photo-level walkthrough stays with its unit
+  named ("73 photos", "52 blade photos"); a new paragraph measures per-listing scoring (mean of four softmax vectors,
+  threshold on validation listings: 0.946, 13/19 blades, cost 258 vs 310; `listing_check.py`, run-variations.log), and
+  the release record now reports listings. Open: the author may still want the whole exercise per listing.
+- (2) Winner's curse: exact binomial numbers (0.0932, 0.6909, 0.9031) and the independence caveat; table 69.6% → 69.1%.
+- (3) Class-count table. (4) "one-loading-process". (5) Rotation advice conditional on real uploads.
+- (6) Chapter 1's forward link to chapter 2 fixed (both sentences). (7) Balanced malaria dataset sentence (04-03, ttn-38).
+- (8) "every layer" overclaim removed. (9) Runtime kept and now logged in run.log's header (11.7 s).

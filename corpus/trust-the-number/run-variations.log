@@ -8,3 +8,11 @@ blade score in [0.5, 1.0):   44 photos, share that are blades 0.523
 # MISS_COST = 5.0 (try_miss5.py)
 validation cost by blade threshold: {0.5: 547.0, 0.2: 479.0, 0.1: 511.0, 0.05: 574.0, 0.02: 756.0, 0.01: 959.0, 0.005: 1177.0, 0.002: 1527.0, 0.001: 1831.0} -> chosen 0.2
 TEST: shipped, blade threshold 0.2 category accuracy 0.886  blade recall 0.316  false flags  73  missed blades 52  cost   406.0
+
+# per-listing scoring (workspace/trust-the-number/listing_check.py, 2026-09-14): mean of each product's four softmax vectors; threshold chosen on 500 validation listings
+train counts [3996, 2472, 1116, 416]
+listing val blades 31 test blades 19
+listing accuracy val 0.932 test 0.946
+listing val sweep {0.5: 564.0, 0.2: 326.0, 0.1: 238.0, 0.05: 214.0, 0.02: 256.0, 0.01: 328.0, 0.005: 438.0, 0.002: 560.0, 0.001: 638.0}
+LISTING TEST argmax                category accuracy 0.946  blade recall 0.211  false flags   5  missed blades 15  cost   310.0
+LISTING TEST threshold 0.05        category accuracy 0.946  blade recall 0.684  false flags  69  missed blades  6  cost   258.0
