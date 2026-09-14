@@ -38,3 +38,4 @@ ratio, no replay memory; (3) the clip removes incentive, no hard bound (three se
 (5) labeller agreement is not a ceiling; (6) bootstrapping samples a reward and a next state; (7) "eighteen-fold" on an
 arbitrary-origin score replaced by the four numbers; (8) timing kept, now logged (10.7 s) and repeatability re-verified;
 (9) source narration removed ("documented pipeline", "its authors").
+- Gemini second round (proposal2.md, 2026-09-14): no proposals; it re-verified every run.log number and the codex fixes.

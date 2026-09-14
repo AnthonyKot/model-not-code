@@ -1,6 +1,6 @@
 # RESUME — The Program Is Now a Model (book20)
 
-Read this first in any new session, then only the files it names. Updated 2026-09-14.
+Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
 ## Where the book is
 
@@ -9,10 +9,10 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 
 | Ch | Slug | State |
 |---|---|---|
-| 1 | `search-the-catalogue` | published; Gemini review in, findings verified, **not applied** |
-| 2 | `trust-the-number` | published; Gemini review + 3 readers finished (2026-09-13 22:54), findings not yet verified |
-| 3 | `reuse-a-pretrained-model` | published; Gemini review + 3 readers finished, findings not yet verified |
-| 4 | `train-from-reward` | published 2026-09-14 (before the review); not yet through review lanes; notes `notes/chapters/train-from-reward.md` |
+| 1 | `search-the-catalogue` | published; codex actionable review + verified Gemini findings applied, exercise Part 2 now retrieval → generator (2026-09-14); Gemini round 2: 0 proposals |
+| 2 | `trust-the-number` | published; codex review applied (release reported per listing; exercise stays per photo — author may want a full per-listing rebuild); Gemini round 2: 2 applied |
+| 3 | `reuse-a-pretrained-model` | published; codex review applied (12) incl. new "What the synthetic run leaves out"; Gemini round 2: 1 applied |
+| 4 | `train-from-reward` | published 2026-09-14; codex review applied (48 demonstrations, corridor label, clip wording); Gemini round 2: 0 proposals |
 | 5–8 | see plan | not started; each needs a one-page outline approved by the author before prose |
 
 Live: https://anthonykot.github.io/model-not-code/ (chapters) · `/old/` (archive).
