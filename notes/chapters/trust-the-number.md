@@ -40,3 +40,6 @@ request ("let's apply improvements"):
 - (3) Class-count table. (4) "one-loading-process". (5) Rotation advice conditional on real uploads.
 - (6) Chapter 1's forward link to chapter 2 fixed (both sentences). (7) Balanced malaria dataset sentence (04-03, ttn-38).
 - (8) "every layer" overclaim removed. (9) Runtime kept and now logged in run.log's header (11.7 s).
+- Gemini second round (`checks/reviews/trust-the-number/proposal2.md`, 2 proposals), both applied: the unlogged third
+  "thing to try" (workers past free cores) removed; release-record column renamed "Measured value, synthetic" because it
+  now mixes the exercise's photo numbers with the per-listing variation.

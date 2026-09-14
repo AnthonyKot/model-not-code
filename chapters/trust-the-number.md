@@ -172,7 +172,7 @@ In PyTorch the loading side is `DataLoader`. `num_workers` is W; with the defaul
 
 The number that started the chapter, 92.4% on random photos, is replaced by a record like this one, each line tied to a decision:
 
-| Claim | How it was measured | Exercise value |
+| Claim | How it was measured | Measured value, synthetic |
 |---|---|---|
 | Category accuracy on new products | Split by product (and by listing date on real data), scored per listing, test scored once | 0.946 on 500 test listings (0.886 per photo) |
 | Its uncertainty | Standard error on listings, not photos | about ±0.010 |
@@ -357,6 +357,6 @@ num_workers=4: forecast  20.0 ms/step, measured  21.8
 
 Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The loader's measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.
 
-Three things to try. First, add a random horizontal flip to the training loop, `xb = x[idx].clone(); flip = torch.rand(len(idx)) < 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])`, and train on `xb`: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change `MISS_COST` to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the shipped row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406. Third, replace the sleep in `__getitem__` with real CPU work, such as a few matrix multiplications, and raise `num_workers` past the number of free cores on your machine: L/W assumes a free core per worker, so from that point the forecast no longer applies, and the measured column shows by how much.
+Two things to try. First, add a random horizontal flip to the training loop, `xb = x[idx].clone(); flip = torch.rand(len(idx)) < 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])`, and train on `xb`: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change `MISS_COST` to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the shipped row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.
 
 *Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9, 3.11, 4.3, 6.2, 6.3, 6.4, 7.4, 8.5, 11.4, 11.5 and 15.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 4.4 and 7.20; all paraphrased as study material. Chip Huyen, Designing Machine Learning Systems, early release, pp. 116, 120–133, 163–166 and 223 (physical); Daniel Vaughan, Data Science: The Hard Parts, pp. 139–143 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367 and 468–469 (physical); Yuan Tang, Distributed Machine Learning Patterns, pp. 29 and 59–60; the PyTorch 2.14 documentation and source for CrossEntropyLoss and DataLoader.*

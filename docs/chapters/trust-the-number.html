@@ -375,7 +375,7 @@
 <tr>
 <th>Claim</th>
 <th>How it was measured</th>
-<th>Exercise value</th>
+<th>Measured value, synthetic</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -580,7 +580,7 @@ num_workers=2: forecast  32.0 ms/step, measured  34.2
 num_workers=4: forecast  20.0 ms/step, measured  21.8
 </code></pre>
 <p>Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The loader&#39;s measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.</p>
-<p>Three things to try. First, add a random horizontal flip to the training loop, <code>xb = x[idx].clone(); flip = torch.rand(len(idx)) &lt; 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])</code>, and train on <code>xb</code>: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change <code>MISS_COST</code> to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the shipped row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406. Third, replace the sleep in <code>__getitem__</code> with real CPU work, such as a few matrix multiplications, and raise <code>num_workers</code> past the number of free cores on your machine: L/W assumes a free core per worker, so from that point the forecast no longer applies, and the measured column shows by how much.</p>
+<p>Two things to try. First, add a random horizontal flip to the training loop, <code>xb = x[idx].clone(); flip = torch.rand(len(idx)) &lt; 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])</code>, and train on <code>xb</code>: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change <code>MISS_COST</code> to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the shipped row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.</p>
 <p><em>Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9, 3.11, 4.3, 6.2, 6.3, 6.4, 7.4, 8.5, 11.4, 11.5 and 15.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 4.4 and 7.20; all paraphrased as study material. Chip Huyen, Designing Machine Learning Systems, early release, pp. 116, 120–133, 163–166 and 223 (physical); Daniel Vaughan, Data Science: The Hard Parts, pp. 139–143 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367 and 468–469 (physical); Yuan Tang, Distributed Machine Learning Patterns, pp. 29 and 59–60; the PyTorch 2.14 documentation and source for CrossEntropyLoss and DataLoader.</em></p>
 </section></article>
     <div class="mission-action" data-mission-action="trust-the-number">
