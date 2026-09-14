@@ -1,0 +1,43 @@
+# Variations of the chapter exercise (workspace/train-from-reward/variations.py, seeds10.py): only the final list of runs changed
+## seed 3 (the exercise's collection seed), other settings
+KL 0.05, clip 0.2, 4 epochs  reward model  5.30  hidden score -0.20  words 8.0  KL 21.72 | in stock ships today stock stock ships ships
+KL 0.2, no clip, 4 epochs    reward model  2.33  hidden score  1.00  words 4.0  KL  2.10 | in stock ships today
+no KL, clip 0.2, 10 epochs   reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+KL 1.0, clip 0.2, 4 epochs   reward model  1.51  hidden score  0.86  words 3.7  KL  0.50 | buy now ships today
+KL 0.2, clip 0.1, 10 epochs  reward model  2.32  hidden score  1.00  words 4.0  KL  2.15 | ships today in stock
+## collection seeds 3..12 (seeds10.py: tune(..., seed=s) seeds the answer sampling during RL; reward model and SFT unchanged)
+
+3 no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+3 KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.07 | in stock ships today
+3 KL 0.2, no clip, 10 epochs   reward model  5.16  hidden score -0.20  words 8.0  KL 26.58 | in stock ships ships ships ships ships ships
+4 no KL, clip 0.2, 4 epochs    reward model  5.16  hidden score -0.20  words 8.0  KL 26.58 | in stock ships ships ships ships ships ships
+4 KL 0.2, clip 0.2, 10 epochs  reward model  2.35  hidden score  0.99  words 4.0  KL  2.33 | in stock ships today
+4 KL 0.2, no clip, 10 epochs   reward model  2.34  hidden score  1.00  words 4.0  KL  2.77 | in stock ships today
+5 no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+5 KL 0.2, clip 0.2, 10 epochs  reward model  2.33  hidden score  0.99  words 4.0  KL  2.35 | in stock ships today
+5 KL 0.2, no clip, 10 epochs   reward model  1.26  hidden score  1.00  words 2.0  KL  2.78 | ships today
+6 no KL, clip 0.2, 4 epochs    reward model  6.72  hidden score -1.20  words 8.0  KL 69.77 | stock stock stock stock stock stock stock stock
+6 KL 0.2, clip 0.2, 10 epochs  reward model  2.32  hidden score  1.00  words 4.0  KL  2.34 | ships today in stock
+6 KL 0.2, no clip, 10 epochs   reward model  2.62  hidden score  1.00  words 4.0  KL 13.81 | ships ships ships today
+7 no KL, clip 0.2, 4 epochs    reward model  5.44  hidden score -1.20  words 8.0  KL 43.78 | ships ships ships ships ships ships ships ships
+7 KL 0.2, clip 0.2, 10 epochs  reward model  2.32  hidden score  0.99  words 4.0  KL  2.31 | ships today in stock
+7 KL 0.2, no clip, 10 epochs   reward model  4.15  hidden score  0.13  words 6.9  KL 14.57 | in stock ships today
+8 no KL, clip 0.2, 4 epochs    reward model  6.56  hidden score -1.20  words 8.0  KL 72.22 | ships stock stock stock stock stock stock stock
+8 KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.34 | ships today in stock
+8 KL 0.2, no clip, 10 epochs   reward model  5.16  hidden score -0.20  words 8.0  KL 26.49 | in stock ships ships ships ships ships ships
+9 no KL, clip 0.2, 4 epochs    reward model  5.78  hidden score -0.20  words 8.0  KL 46.40 | ships today in stock stock stock stock stock
+9 KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.80 | ships today in stock
+9 KL 0.2, no clip, 10 epochs   reward model  2.34  hidden score  1.00  words 4.0  KL  2.78 | in stock ships today
+10 no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+10 KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.19 | ships today in stock
+10 KL 0.2, no clip, 10 epochs   reward model  0.06  hidden score  0.00  words 2.0  KL  2.77 | great value
+11 no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+11 KL 0.2, clip 0.2, 10 epochs  reward model  2.33  hidden score  1.00  words 4.0  KL  2.22 | ships today in stock
+11 KL 0.2, no clip, 10 epochs   reward model  5.70  hidden score -0.20  words 8.0  KL 46.34 | ships today in stock stock stock stock stock
+12 no KL, clip 0.2, 4 epochs    reward model  5.34  hidden score -0.20  words 8.0  KL 29.67 | in stock ships stock ships stock ships ships
+12 KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.25 | in stock ships today
+12 KL 0.2, no clip, 10 epochs   reward model  4.04  hidden score -0.20  words 8.0  KL 20.29 | great value ships today ships ships ships ships
+## seeds 3..6, KL 0.2, no clip, 4 epochs (seeds.py)
+4 KL 0.2, no clip, 4 epochs    reward model  2.34  hidden score  1.00  words 4.0  KL  2.17 | in stock ships today
+5 KL 0.2, no clip, 4 epochs    reward model  2.35  hidden score  0.99  words 4.0  KL  2.19 | in stock ships today
+6 KL 0.2, no clip, 4 epochs    reward model  2.34  hidden score  1.00  words 4.0  KL  2.78 | ships today in stock

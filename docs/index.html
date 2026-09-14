@@ -23,13 +23,13 @@
     </a>
     <div class="header-actions">
       <a href="about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 3 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro"><a href="index.html">The chapters</a><p>One shop, eight chapters. 3 of 8 written. <a href="old/index.html">Archived essays →</a></p></div>
+      <div class="book-nav__intro"><a href="index.html">The chapters</a><p>One shop, eight chapters. 4 of 8 written. <a href="old/index.html">Archived essays →</a></p></div>
       <nav aria-label="Book contents">
     <a class="book-nav__item" href="chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
       <span class="book-nav__number">01</span>
@@ -46,11 +46,11 @@
       <span>Reuse a Pretrained Model</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <span class="book-nav__item book-nav__item--planned">
+    <a class="book-nav__item" href="chapters/train-from-reward.html" data-mission-link="train-from-reward">
       <span class="book-nav__number">04</span>
-      <span>Train From Reward<small class="book-nav__planned">in writing</small></span>
-      <span></span>
-    </span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
     <span class="book-nav__item book-nav__item--planned">
       <span class="book-nav__number">05</span>
       <span>Keep It Right After Launch<small class="book-nav__planned">in writing</small></span>
@@ -81,7 +81,7 @@
         <a class="button button--primary" href="chapters/search-the-catalogue.html">Start with chapter 1</a>
         <a class="button button--quiet" href="old/index.html">Archived essays</a>
       </div>
-      <div class="home-proof"><span><strong>3</strong> of 8 chapters written</span></div>
+      <div class="home-proof"><span><strong>4</strong> of 8 chapters written</span></div>
     </section>
     <section class="shelf-section" id="the-chapters">
       <div class="section-heading"><div><span class="section-label">The chapters</span><h2>Reading order</h2></div><p>Read in order: each chapter builds on the shop the previous one left.</p></div>
@@ -100,11 +100,11 @@
     <h3><a href="chapters/reuse-a-pretrained-model.html">Reuse a Pretrained Model</a></h3>
     <p>Freeze and thaw a pretrained backbone for the photo classifier; then adapt the shop's language model with a low-rank diff.</p>
     <a class="shelf-card__action" href="chapters/reuse-a-pretrained-model.html">Read the chapter <span>→</span></a>
-  </article><article class="shelf-card shelf-card--planned">
-    <div class="shelf-card__top"><span>Chapter 4</span><span class="shelf-card__status">In writing</span></div>
-    <h3>Train From Reward</h3>
+  </article><article class="shelf-card shelf-card--recommended" data-mission-card="train-from-reward">
+    <div class="shelf-card__top"><span>Chapter 4</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="chapters/train-from-reward.html">Train From Reward</a></h3>
     <p>A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.</p>
-    
+    <a class="shelf-card__action" href="chapters/train-from-reward.html">Read the chapter <span>→</span></a>
   </article><article class="shelf-card shelf-card--planned">
     <div class="shelf-card__top"><span>Chapter 5</span><span class="shelf-card__status">In writing</span></div>
     <h3>Keep It Right After Launch</h3>

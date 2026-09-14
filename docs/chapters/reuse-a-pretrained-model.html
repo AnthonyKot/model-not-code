@@ -23,13 +23,13 @@
     </a>
     <div class="header-actions">
       <a href="../about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 3 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 3 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 4 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
       <nav aria-label="Book contents">
     <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
       <span class="book-nav__number">01</span>
@@ -46,11 +46,11 @@
       <span>Reuse a Pretrained Model</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <span class="book-nav__item book-nav__item--planned">
+    <a class="book-nav__item" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
       <span class="book-nav__number">04</span>
-      <span>Train From Reward<small class="book-nav__planned">in writing</small></span>
-      <span></span>
-    </span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
     <span class="book-nav__item book-nav__item--planned">
       <span class="book-nav__number">05</span>
       <span>Keep It Right After Launch<small class="book-nav__planned">in writing</small></span>
@@ -593,7 +593,7 @@ full fine-tune: trainable 6428  | shop-format loss 0.1934, own-text loss 5.4382
     </div>
     <nav class="essay-pager" aria-label="Adjacent chapters">
     <a href="trust-the-number.html"><span>Previous</span>Trust the Number Before You Ship the Classifier</a>
-    <a class="essay-pager__next" href="../index.html"><span>Chapter 4 is in writing</span>The chapters</a>
+    <a class="essay-pager__next" href="train-from-reward.html"><span>Next</span>Train From Reward</a>
   </nav>
     <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 13.1–13.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 7.2–7.6, 7.12, 7.20</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 406–409, 414–416, 436, 492–493</li><li>Machine Learning Q and AI, pp. 132–134</li><li>arXiv:2106.09685, 4.1</li></ul><p>The backbone, the product-line shift and the answer writer are synthetic and tiny. Model sizes for Llama 3.2 are as of the recording they come from; PyTorch behaviour as of 2.14; PEFT and torchvision snippets are illustrative.</p></details>
     <p class="archive-note">Earlier standalone essays on this ground, kept for reference: <a href="../old/essays/transfer-learning-freeze-then-thaw.html">Borrow the Eyes, Retrain the Judgement</a> · <a href="../old/essays/lora-is-a-low-rank-diff.html">Fine-Tuning Without Touching the Weights</a>.</p>

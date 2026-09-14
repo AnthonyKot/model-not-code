@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Train From Reward">
+  <meta property="og:description" content="A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.">
+  <meta property="og:type" content="website">
+  <title>Train From Reward · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script defer src="../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="train-from-reward">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 4 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 4 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <nav aria-label="Book contents">
+    <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
+      <span class="book-nav__number">01</span>
+      <span>Search the Catalogue, Then Answer From It</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
+      <span class="book-nav__number">02</span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
+      <span class="book-nav__number">03</span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
+      <span class="book-nav__number">04</span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <span class="book-nav__item book-nav__item--planned">
+      <span class="book-nav__number">05</span>
+      <span>Keep It Right After Launch<small class="book-nav__planned">in writing</small></span>
+      <span></span>
+    </span>
+    <span class="book-nav__item book-nav__item--planned">
+      <span class="book-nav__number">06</span>
+      <span>Build the Assistant<small class="book-nav__planned">in writing</small></span>
+      <span></span>
+    </span>
+    <span class="book-nav__item book-nav__item--planned">
+      <span class="book-nav__number">07</span>
+      <span>Serve the Assistant Cheaply<small class="book-nav__planned">in writing</small></span>
+      <span></span>
+    </span>
+    <span class="book-nav__item book-nav__item--planned">
+      <span class="book-nav__number">08</span>
+      <span>Did the Shop Need a Model?<small class="book-nav__planned">in writing</small></span>
+      <span></span>
+    </span></nav>
+    </aside>
+    <main id="main" class="essay-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>04</span>Chapter 4 of 8</div>
+      <h1 class="essay-title">Train From Reward</h1>
+      <p class="essay-payoff">A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.</p>
+    </header>
+    <article class="prose"><p>Chapter 3 taught the shop&#39;s answer writer a format. This chapter&#39;s answers are shorter still, a product and one or two phrases, <code>kettle : in stock ships today</code>, and the shop now wants them to be <em>good</em>, which nobody can write down as a label. A customer asking about a kettle is served by knowing it is in stock, not by being told to buy now, and a short answer beats a long one. People reading two answers can say which of them they prefer. They cannot produce, for every question, the one correct answer that chapter 1&#39;s cross-entropy needs at every position.</p>
+<p>A signal that says &quot;this was better&quot; without saying what the right output was is a <strong>reward</strong>, and learning from rewards is reinforcement learning. The method was worked out on games and robots, where the reward is a score and nothing says which move earned it. This chapter builds it on a five-cell corridor small enough to follow by hand, then carries the same code to the answer writer: people&#39;s comparisons become a learned reward, and the learned reward tunes the writer. It ends with a run in which the writer learns to please the reward and stops pleasing the people the reward stood for.</p>
+<p>Everything here is synthetic. The corridor is invented, and a hidden scoring function stands in for the people. The exercise runs both halves on a CPU in about eleven seconds.</p>
+<h2 id="no-label-only-a-reward-at-the-end">No label, only a reward at the end</h2>
+<p>The corridor has five cells, numbered 0 to 4. An episode starts in cell 0. At each step the agent chooses left or right; moving into cell 4 pays a reward of 1 and ends the episode, and every other step pays 0. Moving left from cell 0 leaves the agent where it is.</p>
+<figure class="diagram">
+<svg viewBox="0 0 660 150" width="100%" role="img" aria-label="A corridor of five cells, 0 to 4. Arrows to the right between them carry reward 0, 0, 0 and plus 1 into cell 4, which ends the episode. Under cells 0 to 3, the return after moving right: 0.729, 0.81, 0.9 and 1." style="max-width:660px;font-family:inherit;font-size:14px">
+  <defs><marker id="tfr-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="20" y="36" width="60" height="48" rx="4"/><rect x="150" y="36" width="60" height="48" rx="4"/><rect x="280" y="36" width="60" height="48" rx="4"/><rect x="410" y="36" width="60" height="48" rx="4"/>
+    <rect x="560" y="36" width="80" height="48" rx="4" stroke-width="2.5"/>
+  </g>
+  <g stroke="currentColor" stroke-width="1.3" fill="none">
+    <path d="M80,60 H146" marker-end="url(#tfr-arrow)"/><path d="M210,60 H276" marker-end="url(#tfr-arrow)"/><path d="M340,60 H406" marker-end="url(#tfr-arrow)"/><path d="M470,60 H556" marker-end="url(#tfr-arrow)"/>
+  </g>
+  <g fill="currentColor" text-anchor="middle">
+    <text x="50" y="65">cell 0</text><text x="180" y="65">cell 1</text><text x="310" y="65">cell 2</text><text x="440" y="65">cell 3</text><text x="600" y="65">cell 4, end</text>
+    <text x="113" y="50" font-size="12">r = 0</text><text x="243" y="50" font-size="12">r = 0</text><text x="373" y="50" font-size="12">r = 0</text><text x="513" y="50" font-size="12">r = +1</text>
+    <text x="50" y="112" font-size="12">G = 0.729</text><text x="180" y="112" font-size="12">G = 0.81</text><text x="310" y="112" font-size="12">G = 0.9</text><text x="440" y="112" font-size="12">G = 1</text>
+  </g>
+</svg>
+<figcaption>The corridor, moving right at every step. Rewards are on the arrows; under each cell is the discounted return that follows moving right from it, with γ = 0.9.</figcaption>
+</figure>
+
+<p>A reward of 1 arrives after the fourth step, and nothing says the first step deserved any of it. What the agent maximises is the <strong>return</strong>, the discounted sum of rewards from a step to the end of the episode:</p>
+<p class="formula">G<sub>t</sub> = r<sub>t</sub> + γ·r<sub>t+1</sub> + γ<sup>2</sup>·r<sub>t+2</sub> + … = r<sub>t</sub> + γ·G<sub>t+1</sub></p>
+
+<p>G<sub>t</sub> is the return counted from step t, r<sub>t</sub> the reward for the action at step t. γ, the <strong>discount factor</strong>, is a number between 0 and 1 that you choose; each reward one step further away is multiplied by one more γ, so a reward sooner counts for more. The right-hand form computes returns from the back: the last step&#39;s return is its reward, and every earlier return is its reward plus γ times the next one. With γ = 0.9 the four steps right have returns 1, 0.9, 0.81 and 0.729, as in the figure.</p>
+<p>The value of an action is written <strong>Q(s, a)</strong>: the return you expect from state s if you take action a there and then carry on as you do. A table of Q with a row per cell and a column per action is enough to act: in each cell, take the action with the larger entry. What is missing is the entries, and there are two ways to fill them.</p>
+<h2 id="measure-the-return-or-estimate-it-from-the-next-cell">Measure the return, or estimate it from the next cell</h2>
+<p>A <strong>Monte Carlo</strong> method plays an episode to its end, computes every return from the back, and moves each visited entry towards the return that actually followed:</p>
+<p class="formula">Q(s, a) ← Q(s, a) + α · (G − Q(s, a))</p>
+
+<p>G is the measured return after taking a in s, G − Q(s, a) the error, and α the fraction of the error applied, a learning rate. With α = 1 the entry is replaced by G. After a single episode straight down the corridor, the column for right holds exactly 0.729, 0.81, 0.9 and 1.</p>
+<p><strong>Q-learning</strong> does not wait. After every step, with the reward r and the next state s′ in hand, it updates towards one real reward plus its own current estimate of what comes after:</p>
+<p class="formula">Q(s, a) ← Q(s, a) + α · (r + γ · max<sub>a′</sub> Q(s′, a′) − Q(s, a))</p>
+
+<p>max<sub>a′</sub> Q(s′, a′) is the larger of the table&#39;s two entries for the next cell, its opinion of s′ if the best-looking action is taken there. If the step ended the episode, the target is r alone. Updating one estimate from another is called <strong>bootstrapping</strong>. Run the same straight episode four times with α = 1 and watch the reward travel:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>After episode</th>
+<th>Q(0, right)</th>
+<th>Q(1, right)</th>
+<th>Q(2, right)</th>
+<th>Q(3, right)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.9</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>0.81</td>
+<td>0.9</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.729</td>
+<td>0.81</td>
+<td>0.9</td>
+<td>1</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>In episode 1, every step before the last reads a next cell whose entries are still 0, so its target is 0; only the step into cell 4 learns 1. In episode 2 the step from cell 2 reads that 1 and learns 0.9, and so on back. Q-learning moved the reward one cell per episode, because each update looks one step ahead. The zeros in the first three rows are not random noise but an error in the same direction every time, a <strong>bias</strong>, and it lasts as long as the estimates are wrong.</p>
+<p>Measurement has the opposite cost. A measured return is right on average for the policy that played, but when actions are random or the agent explores, each return is a sum of many random rewards, so it varies from episode to episode, and nothing is learned until the episode ends. Bootstrapping learns every step, with only one random reward in each target, and pays for it with the bias while the table is wrong. The longer and noisier the episodes, the more that trade is worth making.</p>
+<p>Two consequences matter once the table becomes a network. Network outputs share weights, so a step that moves the prediction for one state also moves the estimate for the next, which is the target the prediction was aimed at. Deep Q-learning holds the target still with a <strong>target network</strong>, a frozen copy used only to compute targets and re-copied periodically. And because Q-learning&#39;s target uses the best action in s′ rather than the action actually taken next, its transitions stay usable after the policy has changed, so it samples random batches from a <strong>replay memory</strong> of past steps. A measured return needs no target network, because nothing inside it is an estimate, and it cannot be replayed: it describes the policy that played the episode, and that policy is gone after the next update.</p>
+<p>The answer writer will take the measured route. One answer is one short episode, and its reward arrives when the answer ends.</p>
+<h2 id="learn-the-action-not-its-worth">Learn the action, not its worth</h2>
+<p>A <strong>policy</strong> skips the value table and outputs the probability of each action directly: a score per action, turned into probabilities by a softmax. That is exactly what chapter 1&#39;s generator does at every position, with the vocabulary as the actions.</p>
+<p>The policy-gradient update makes an action that turned out well more likely and one that turned out badly less likely. For one step where action a was taken in state s, the loss is:</p>
+<p class="formula">loss = −A · ln π(a | s)</p>
+
+<p>π(a | s) is the probability the policy gives to the action it took. A, the <strong>advantage</strong>, says how much better that action turned out than expected. Read the formula next to chapter 1. With A = 1 it is the cross-entropy loss that would treat the sampled action as the correct label; its slope with respect to the scores is p − y. The advantage multiplies that slope, so the update is cross-entropy on the policy&#39;s own actions, pushed towards them when A is positive and away from them when A is negative.</p>
+<p>Take one cell with both action scores at 0, so each action has probability 0.5, and the agent moved right. The slope p − y is (0.5, −0.5) for (left, right). With A = +1 and a step of size 1, the scores become (−0.5, +0.5) and the probability of right rises to 0.731. With A = −1 the same step goes the other way, and right falls to 0.269.</p>
+<p>What counts as &quot;better than expected&quot; needs a baseline. The simplest method, REINFORCE, uses the measured return G itself. The exercise uses the return minus the batch&#39;s average return, divided by the batch&#39;s standard deviation: an action followed by more return than is usual in this batch gets a positive advantage, the rest a negative one. In the corridor that favours the steps of short walks. Other methods also train a value network V, which estimates a state&#39;s return, and set A = r + γ·V(s′) − V(s): what the step earned and led to, against what the network expected from s.</p>
+<p>Measured returns tie the policy to fresh data: an episode collected by an earlier policy measures that policy, not this one. Collecting episodes is the slow part, so the obvious move is to train on each batch more than once. That move needs a guard.</p>
+<h2 id="reuse-the-batch-but-not-too-far">Reuse the batch, but not too far</h2>
+<p>Train on one batch for many epochs and the policy can fit that batch too closely: it makes some actions far more likely than the batch justified. In supervised learning the next batch would correct it. Here the next batch is collected by the overfitted policy, whose poor actions lead to states where little is learned, so the damage feeds itself. <strong>Proximal policy optimisation</strong>, PPO, lets you reuse a batch while limiting how hard any one sample can push.</p>
+<p>At collection time, store the log-probability of every action taken. On each later pass, compare the current probability with the stored one:</p>
+<p class="formula">ratio = π<sub>θ</sub>(a | s) / π<sub>old</sub>(a | s) = e<sup>ln π<sub>θ</sub>(a | s) − ln π<sub>old</sub>(a | s)</sup></p>
+
+<p>π<sub>θ</sub> is the policy with its current weights θ, and π<sub>old</sub> the stored probability from collection, fixed for all epochs on this batch. The ratio is 1 on the first pass, 2 if the action has become twice as likely, 0.7 if it has lost 30% of its probability. Code computes it from log-probabilities, which the network already produces. The clipped objective is:</p>
+<p class="formula">L = min( ratio · A,&nbsp; clip(ratio, 1 − ε, 1 + ε) · A )</p>
+
+<p>ε is a setting you choose, commonly 0.2, which makes the band [0.8, 1.2]. clip returns the ratio if it lies inside the band and the nearer edge otherwise. min takes the lower of the two terms, the more pessimistic estimate of how good the change is. Training maximises L averaged over the batch, so the loss is its negative. In code:</p>
+<pre><code class="language-python">def ppo_loss(new_logp, old_logp, advantage, mask, eps=0.2):
+    ratio = torch.exp(new_logp - old_logp)                     # pi_new(action) / pi_old(action)
+    clipped = torch.clamp(ratio, 1 - eps, 1 + eps)
+    return -(torch.min(ratio * advantage, clipped * advantage) * mask).sum() / mask.sum()
+</code></pre>
+<p><code>mask</code> marks which positions count, all of them in the corridor and only the answer&#39;s tokens in the writer. Four samples show what the min does, at ε = 0.2. The gradient column is the slope of the loss with respect to the current log-probability:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stored → current probability</th>
+<th>A</th>
+<th>ratio</th>
+<th>ratio · A</th>
+<th>clip · A</th>
+<th>Loss</th>
+<th>Gradient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.25 → 0.50</td>
+<td>+1</td>
+<td>2</td>
+<td>2</td>
+<td>1.2</td>
+<td>−1.20</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0.25 → 0.50</td>
+<td>−1</td>
+<td>2</td>
+<td>−2</td>
+<td>−1.2</td>
+<td>+2.00</td>
+<td>+2.00</td>
+</tr>
+<tr>
+<td>0.50 → 0.35</td>
+<td>−1</td>
+<td>0.7</td>
+<td>−0.7</td>
+<td>−0.8</td>
+<td>+0.80</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0.50 → 0.35</td>
+<td>+1</td>
+<td>0.7</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>−0.70</td>
+<td>−0.70</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>In the first row a good action has already doubled its probability; the min picks the clipped constant 1.2, a constant has no slope, and this sample stops pushing. In the second row the action doubled despite a negative advantage; the min keeps the full −2, and the sample pulls it back with gradient +2, which is ratio × A with its sign flipped. Rows three and four mirror them. The clip only switches off a sample that has already moved more than ε <em>in the direction its advantage asked for</em>; a sample that moved the wrong way keeps its full gradient.</p>
+<p>Two limits come with it. The clip removes the incentive to move further; it does not cap the move. One large optimiser step can carry a ratio well past 1.2, and because all samples share the same weights, samples that are still pushing keep moving the ones that have stopped. So the number of epochs and the learning rate still bound the real change. And after the epochs, the updated policy becomes the new π<sub>old</sub>, every ratio resets to 1, and the next batch may move the policy again: the clip limits each batch, not training as a whole. One PyTorch implementation reuses each batch for 10 epochs in minibatches of 64.</p>
+<p>In the exercise the corridor&#39;s policy starts at a coin flip per cell and takes 16.5 steps on average to reach the end. It collects 16 episodes per round and reuses each batch for 4 epochs through <code>ppo_loss</code>. By round 10 it takes 4.2 steps, and by round 30 it walks straight, 4.0 steps, with right at 0.99 or above in every cell.</p>
+<h2 id="the-answer-writer-is-a-policy">The answer writer is a policy</h2>
+<p>Nothing in <code>ppo_loss</code> knows it was written for a corridor. The writer fits the same frame, piece by piece:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Corridor</th>
+<th>Answer writer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>State</td>
+<td>The current cell</td>
+<td>The prompt and the tokens written so far</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>Left or right</td>
+<td>The next token, from the whole vocabulary</td>
+</tr>
+<tr>
+<td>Policy</td>
+<td>A softmax over two scores</td>
+<td>Chapter 1&#39;s softmax over the vocabulary</td>
+</tr>
+<tr>
+<td>Episode</td>
+<td>A walk to cell 4</td>
+<td>One answer, up to <code>&lt;/s&gt;</code> or the length limit</td>
+</tr>
+<tr>
+<td>Reward</td>
+<td>1 on reaching the end</td>
+<td>One number for the finished answer</td>
+</tr>
+<tr>
+<td>Stored at collection</td>
+<td>Log-probability of each move</td>
+<td>Log-probability of each token</td>
+</tr>
+</tbody></table>
+<p>The writer&#39;s episode is the shortest kind: one prompt, one answer, one reward, done. There is no next prompt whose value needs estimating, and in the exercise every token of an answer shares that answer&#39;s advantage. Sampling temperature from chapter 1 plays no part in this objective: the writer collects its answers at temperature 1, so the stored probabilities are the policy&#39;s own, and training changes the logits themselves.</p>
+<p>What is missing is the reward. The corridor had one built in. For answers, somebody has to supply it, and this is where the order of training matters. A language model is pretrained on large amounts of text, then fine-tuned on demonstrations, curated prompts with good answers written out, as chapter 3 did. Only then does it learn from preferences, which can be collected in far larger numbers than demonstrations, because comparing two answers is much easier than writing a good one. The exercise&#39;s writer is chapter 3&#39;s block with a small feed-forward layer added, fine-tuned for 400 steps on 39 demonstrations. Each demonstration is a product followed by one or two of four phrases: <em>in stock</em>, <em>ships today</em>, <em>great value</em>, <em>buy now</em>.</p>
+<h2 id="where-people-39-s-preferences-enter">Where people&#39;s preferences enter</h2>
+<p>People are shown two answers to the same prompt and pick the better one. In one well-documented setup they rank between 4 and 9 answers at once, and every pair in the ranking becomes a comparison. Comparisons have two properties worth designing around. They carry negative feedback as well as positive, which demonstrations cannot: a demonstration shows what to do, a lost comparison shows what not to. And they are noisy. In that same setup, the labellers who produced the training data agreed with each other on about 73% of comparisons, and a separate group of labellers agreed among themselves on about 77%, rates its authors counted as high.</p>
+<p>The exercise has no people. A hidden scoring function stands in for them: +1 if the answer says <em>in stock</em> or <em>ships today</em>, −1 for every <em>buy now</em>, and −0.3 for every word beyond four. It is never shown to the learner. To make the labels noisy the way people&#39;s are, each of 600 pairs of answers sampled from the writer is labelled at random, preferring the first answer with probability σ(2 × (score<sub>first</sub> − score<sub>second</sub>)). σ, the sigmoid, maps any number to a probability between 0 and 1: pairs one point apart are labelled the right way round 88% of the time, and pairs with equal scores are a coin flip. Where the hidden scores differed, 374 pairs, the label picked the better answer 0.904 of the time.</p>
+<p>The labels train a <strong>reward model</strong>: a network that reads a prompt and an answer and outputs one number, r. In the documented pipeline it starts from the fine-tuned language model itself, with the layer that outputs token scores removed and a single number output in its place, which is chapter 3&#39;s new head on a pretrained backbone. It is trained on each pair with:</p>
+<p class="formula">loss = −ln σ(r<sub>w</sub> − r<sub>l</sub>)</p>
+
+<p>r<sub>w</sub> is the reward model&#39;s score for the answer people chose, the winner, and r<sub>l</sub> its score for the loser. σ(r<sub>w</sub> − r<sub>l</sub>) is the probability the model gives to the chosen answer being preferred. This is not a new loss. Put the two scores through chapter 1&#39;s softmax and the probability of the first is e<sup>r<sub>w</sub></sup> / (e<sup>r<sub>w</sub></sup> + e<sup>r<sub>l</sub></sup>), which equals σ(r<sub>w</sub> − r<sub>l</sub>). So the reward model is a two-way classifier trained with cross-entropy, the chosen answer as the label, and its slope is p − y again. A label of &quot;both equally good&quot; fits the same loss with y = 0.5 for each.</p>
+<p>A worked pair: the model scores the chosen answer 0.5 and the rejected one 1.0. Then σ(−0.5) = 0.3775, the loss is −ln 0.3775 = 0.9741, and the slope is −0.6225 on r<sub>w</sub> and +0.6225 on r<sub>l</sub>: raise the winner, lower the loser. Only the difference enters the loss, so adding the same constant to every score changes nothing. The scale&#39;s zero is arbitrary; the documented pipeline sets it with a bias so that the demonstrations score 0 on average. In the exercise the reward model&#39;s own bias receives no gradient at all and stays at 0.</p>
+<p>The exercise&#39;s reward model is deliberately the smallest that can learn from pairs: one learned number per word, summed over the answer. Trained on 500 pairs and scored on the 100 held back, it agrees with the labels on 0.770 of them. That looks mediocre and is not: on the 64 held-out pairs whose hidden scores differ, it ranks the better answer first every time. The rest of the gap is the labels&#39; own noise, including the tied pairs where the label was a coin flip. A held-out agreement with noisy labels measures the model and the labels together, which is chapter 2&#39;s warning about test sets in another form. The learned weights are readable: <em>buy</em> −2.20, <em>stock</em> +0.84, <em>ships</em> +0.68, <em>today</em> +0.58, <em>in</em> +0.24.</p>
+<p>Three different things are now in play, and the rest of the chapter depends on keeping them apart:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>What it is</th>
+<th>In the exercise</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Measured</td>
+<td>Which of two answers a person preferred; noisy</td>
+<td>600 labels, 0.904 right where scores differ</td>
+</tr>
+<tr>
+<td>Learned</td>
+<td>A score r fitted so that σ(r<sub>w</sub> − r<sub>l</sub>) matches the labels</td>
+<td>One weight per word; 1.000 on held-out pairs that differ</td>
+</tr>
+<tr>
+<td>Assumed</td>
+<td>That r keeps ranking answers correctly on answers unlike the ones in the pairs</td>
+<td>Not tested yet</td>
+</tr>
+</tbody></table>
+<h2 id="tune-the-writer-and-watch-it-game-the-reward">Tune the writer, and watch it game the reward</h2>
+<p>The tuning loop is PPO with the reward model in place of the corridor. Each round, the writer answers 64 prompts; each answer gets a reward; the advantages are normalised across the 64; and the batch is reused for a few epochs through <code>ppo_loss</code>.</p>
+<figure class="diagram">
+<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="Two stages. Stage one, top row: the fine-tuned writer answers prompts twice; people choose one answer of each pair; the pairs train the reward model with minus log sigma of r winner minus r loser. Stage two, a loop below: the writer being tuned writes 64 answers; each is scored by the reward model minus beta times its summed log-probability ratio against a frozen reference copy of the fine-tuned writer; the scores become advantages normalised over the 64; ppo_loss updates the writer being tuned, and the loop repeats." style="max-width:720px;font-family:inherit;font-size:12px">
+  <defs><marker id="tfr-arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.3">
+    <rect x="10" y="20" width="130" height="46" rx="5"/>
+    <rect x="190" y="20" width="130" height="46" rx="5"/>
+    <rect x="370" y="20" width="130" height="46" rx="5"/>
+    <rect x="550" y="20" width="160" height="46" rx="5" stroke-width="2.2"/>
+    <rect x="10" y="160" width="150" height="46" rx="5" stroke-dasharray="5 3"/>
+    <rect x="280" y="160" width="190" height="46" rx="5"/>
+    <rect x="540" y="160" width="170" height="46" rx="5" stroke-width="2.2"/>
+    <rect x="280" y="250" width="190" height="46" rx="5"/>
+    <rect x="540" y="250" width="170" height="46" rx="5"/>
+  </g>
+  <g stroke="currentColor" stroke-width="1.2" fill="none">
+    <path d="M140,43 H186" marker-end="url(#tfr-arrow2)"/>
+    <path d="M320,43 H366" marker-end="url(#tfr-arrow2)"/>
+    <path d="M500,43 H546" marker-end="url(#tfr-arrow2)"/>
+    <path d="M75,66 V156" stroke-dasharray="4 3" marker-end="url(#tfr-arrow2)"/>
+    <path d="M630,66 V115 H375 V156" marker-end="url(#tfr-arrow2)"/>
+    <path d="M160,183 H276" marker-end="url(#tfr-arrow2)"/>
+    <path d="M540,183 H474" marker-end="url(#tfr-arrow2)"/>
+    <path d="M375,206 V246" marker-end="url(#tfr-arrow2)"/>
+    <path d="M470,273 H536" marker-end="url(#tfr-arrow2)"/>
+    <path d="M625,250 V210" marker-end="url(#tfr-arrow2)"/>
+  </g>
+  <g fill="currentColor" text-anchor="middle">
+    <text x="75" y="40">fine-tuned writer</text><text x="75" y="56" font-size="11">answers twice</text>
+    <text x="255" y="40">people choose</text><text x="255" y="56" font-size="11">one of each pair</text>
+    <text x="435" y="40">pairs</text><text x="435" y="56" font-size="11">(chosen, rejected)</text>
+    <text x="630" y="40">reward model r</text><text x="630" y="56" font-size="11">−ln σ(r<tspan baseline-shift="sub" font-size="8">w</tspan> − r<tspan baseline-shift="sub" font-size="8">l</tspan>)</text>
+    <text x="85" y="180">frozen reference</text><text x="85" y="196" font-size="11">copy, never updated</text>
+    <text x="375" y="180">r(answer) − β · Σ log ratio</text><text x="375" y="196" font-size="11">one reward per answer</text>
+    <text x="625" y="180">writer being tuned</text><text x="625" y="196" font-size="11">writes 64 answers</text>
+    <text x="375" y="270">advantages</text><text x="375" y="286" font-size="11">normalised over the 64</text>
+    <text x="625" y="270">ppo_loss</text><text x="625" y="286" font-size="11">a few epochs, then repeat</text>
+    <text x="250" y="105" font-size="11">stage 1: the reward is learned</text>
+    <text x="495" y="320" font-size="11">stage 2: the writer is tuned, round after round</text>
+  </g>
+</svg>
+<figcaption>Where people and the learned reward enter. People only label pairs; the reward model turns their labels into a score; PPO tunes another copy of the fine-tuned writer against that score, held near a frozen reference copy.</figcaption>
+</figure>
+
+<p>The first run uses the reward model&#39;s score alone. After 40 rounds, averaged over 300 fresh answers:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Reward model</th>
+<th>Hidden score</th>
+<th>Words</th>
+<th>KL to reference</th>
+<th>A sample answer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fine-tuned writer, before tuning</td>
+<td>0.34</td>
+<td>0.33</td>
+<td>3.5</td>
+<td>0.00</td>
+<td>buy now ships today</td>
+</tr>
+<tr>
+<td>Reward model only, clip 0.2, 4 epochs</td>
+<td>6.12</td>
+<td>−0.20</td>
+<td>8.0</td>
+<td>49.51</td>
+<td>in stock stock stock stock stock stock stock</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The reward model&#39;s score went up eighteen-fold and the hidden score, the thing it stood for, went down. Eight words is the length limit: the answers no longer end. The mechanism is plain in the weights. The reward model sums one number per word. The answers in its pairs came from the fine-tuned writer, and every one of the 1,200 had two or four words; one of them repeated a word. Nothing in that data could teach it that a second <em>stock</em> is worth less than the first, or that a sixth word costs anything. Each extra <em>stock</em> adds 0.84, and PPO found it.</p>
+<p>This failure was built in, and it should be read that way. A word-sum reward model cannot express &quot;say it once&quot; or &quot;stop at four words&quot;, so it was certain to be exploitable. A real reward model is a large network and fails less transparently. What carries over is the assumed row of the table: the writer being tuned produces answers unlike anything in the pairs, and the reward model&#39;s score on those answers was never checked against anyone. Across ten different random seeds for the tuning run, this one ended in repeated words every time.</p>
+<p>The standard guard keeps the writer near where it started. Keep a frozen copy of the fine-tuned writer, the <strong>reference</strong>, and subtract a penalty from each answer&#39;s reward:</p>
+<p class="formula">reward = r(prompt, answer) − β · Σ<sub>t</sub> ( ln π<sub>θ</sub>(token<sub>t</sub> | earlier tokens) − ln π<sub>ref</sub>(token<sub>t</sub> | earlier tokens) )</p>
+
+<p>r is the reward model&#39;s score for the whole answer. The sum runs over the answer&#39;s tokens; each term is how much more likely, in log terms, the writer being tuned made that token than the reference would have. Averaged over the answers the writer produces, the sum is the <strong>KL divergence</strong> between the two writers, one number for how differently they spread probability, and it is 0 while they are the same. β sets how hard the penalty pulls; it is a setting you choose. The penalty is part of the reward, so it is computed once per answer, when the batch is collected.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Reward model</th>
+<th>Hidden score</th>
+<th>Words</th>
+<th>KL to reference</th>
+<th>A sample answer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>β = 0.2, clip 0.2, 4 epochs</td>
+<td>2.39</td>
+<td>0.97</td>
+<td>4.1</td>
+<td>2.34</td>
+<td>in stock ships today</td>
+</tr>
+<tr>
+<td>β = 0.2, clip 0.2, 10 epochs</td>
+<td>2.31</td>
+<td>1.00</td>
+<td>4.0</td>
+<td>2.07</td>
+<td>in stock ships today</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The reward model&#39;s score is far lower than in the unguarded run, and the hidden score is at its maximum of 1.00: say something useful, not pushy, in four words. β is a dial with a failure at each end. At β = 0.05 the run still ends in repeated words; at β = 1.0 the writer stays so close to the reference that the hidden score reaches only 0.86. Like chapter 2&#39;s threshold, the value is chosen by comparing runs on something other than the reward being maximised.</p>
+<h2 id="the-clip-and-the-penalty-are-different-guards">The clip and the penalty are different guards</h2>
+<p>It is tempting to see the KL penalty as a second clip. They guard different things. The clip compares the writer with π<sub>old</sub>, the writer that collected <em>this batch</em>, which changes every round. The penalty compares it with the reference, which never changes. The clip stops one batch from pushing too far; the penalty stops many rounds from adding up to a writer far from where it started.</p>
+<p>The exercise&#39;s last run takes the clip away and keeps the penalty, with the batch reused for 10 epochs:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Reward model</th>
+<th>Hidden score</th>
+<th>Words</th>
+<th>KL to reference</th>
+<th>A sample answer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>β = 0.2, no clip, 10 epochs</td>
+<td>5.16</td>
+<td>−0.20</td>
+<td>8.0</td>
+<td>26.58</td>
+<td>in stock ships ships ships ships ships ships</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>With the penalty on, the writer still escaped into repetition. The penalty cannot stop that alone, because of where it sits: it was folded into the reward when the batch was collected, so during the ten epochs nothing in the loss measures the distance from the reference, and without the clip nothing stops the reused batch from pushing its favoured tokens as far as the optimiser will take them. The next batch is then collected from the pushed writer, and the penalty arrives a round too late. This is the collapse from the PPO section, now with a learned reward.</p>
+<p>One seed is an anecdote, so the comparison was repeated across ten seeds for the tuning run. With the clip, all ten ended with a hidden score of 0.99 or 1.00 and a KL between 2.07 and 2.80. Without it, four reached the maximum, one of them by writing <em>ships ships ships today</em>, which the hidden score happens not to penalise; five ended with long answers, 6.9 to 8 words on average, and hidden scores of 0.13 or below; and one collapsed onto <em>great value</em>, an answer with a hidden score of 0. With only 4 epochs of reuse, the unclipped runs on four seeds all ended well. In this run the clip mattered once each batch was reused heavily.</p>
+<h2 id="what-a-real-project-adds">What a real project adds</h2>
+<p>The synthetic run shows the mechanism and every failure in it; a real tuning run has to establish things the run assumed.</p>
+<p><strong>The labels are the product.</strong> Who labels, with what instructions, and how often they disagree decide what the reward model can learn. When trained labellers disagree on a quarter of comparisons, a reward model&#39;s agreement with held-out labels has a ceiling set by the labellers, as the exercise&#39;s 0.770 showed, and that ceiling is worth measuring on a sample labelled twice.</p>
+<p><strong>The reward model is a model with errors.</strong> Evaluate it as chapter 2 evaluates a classifier: pairs held out, split by prompt so that no prompt appears on both sides, scored once. Then check it where it will be used: sample answers from partly tuned writers and have people compare those too, because those are the answers the reward model has never seen.</p>
+<p><strong>The tuned writer is judged by people, not by its reward.</strong> A rising reward model score during tuning is expected and proves nothing; in the unguarded run it rose the most. The release comparison is people choosing between the tuned writer&#39;s answers and the reference&#39;s, on fresh prompts.</p>
+<p><strong>The pieces are larger.</strong> The documented pipeline adds a value network, initialised from the reward model, to estimate advantages instead of normalising over the batch. One variant mixes the original pretraining objective back into the loss, to win back performance the tuning had cost on public benchmarks. The risk of losing what a model already knew shows up even in a game: when an agent already trained on a game&#39;s own score was fine-tuned from a learned reward, it quickly unlearned what it knew unless its convolution layers were frozen and its learning rate lowered tenfold, which is chapter 3&#39;s freeze and smaller rate again.</p>
+<p><strong>Hosted services hide most of it.</strong> Fine-tuning services offer preference tuning, direct preference optimisation or DPO, as a job type: you upload good and bad answers to the same prompts, such as users&#39; thumbs up and down on alternatives, and the service does the rest. Reinforcement fine-tuning replaces the labels with a grader you write, a program or another model that scores each answer. A grader is a reward function, and this chapter&#39;s warning applies to it unchanged: the tuned model learns what the grader rewards, whether or not it is what you meant.</p>
+<p>The writer is now tuned. Chapter 5 follows the shop&#39;s models after launch, where feedback such as a thumbs up exists only for answers that were shown. Chapter 6 puts the writer inside the assistant, next to chapter 1&#39;s search.</p>
+<section class="mission" data-mission="train-from-reward"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-learn-from-reward-then-from-preferences">Exercise: learn from reward, then from preferences</h2>
+<p>The script fills the corridor&#39;s value table both ways, checks the four clip rows, trains the corridor policy with <code>ppo_loss</code>, then fine-tunes a tiny answer writer, labels 600 pairs with a hidden scorer, fits a reward model, and tunes the writer with PPO four ways. PyTorch on a CPU, about eleven seconds.</p>
+<pre><code class="language-python">import copy
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+def ppo_loss(new_logp, old_logp, advantage, mask, eps=0.2):
+    &quot;&quot;&quot;PPO&#39;s clipped objective as a loss, averaged over the positions in mask. Used by both parts.&quot;&quot;&quot;
+    ratio = torch.exp(new_logp - old_logp)                     # pi_new(action) / pi_old(action)
+    clipped = torch.clamp(ratio, 1 - eps, 1 + eps)
+    return -(torch.min(ratio * advantage, clipped * advantage) * mask).sum() / mask.sum()
+
+# ---------- Part 1: a corridor with no labels, only a reward at the end ----------
+N, GAMMA = 5, 0.9                                              # cells 0..4; reaching cell 4 pays 1
+
+def step(cell, action):                                        # action 0 = left, 1 = right
+    nxt = max(0, min(N - 1, cell + (1 if action == 1 else -1)))
+    return nxt, float(nxt == N - 1), nxt == N - 1              # next cell, reward, episode over
+
+straight = [(0, 1), (1, 1), (2, 1), (3, 1)]                    # one episode: right four times
+
+mc = torch.zeros(N, 2)
+G = 0.0
+for cell, action in reversed(straight):                        # Monte Carlo: wait for the end, look back
+    _, reward, _ = step(cell, action)
+    G = reward + GAMMA * G
+    mc[cell, action] = G                                       # the measured return
+print(&quot;Monte Carlo after 1 episode:   Q(cell, right) =&quot;, [round(v, 3) for v in mc[:4, 1].tolist()])
+
+td = torch.zeros(N, 2)
+for episode in range(1, 5):
+    for cell, action in straight:                              # Q-learning: update after every step
+        nxt, reward, done = step(cell, action)
+        td[cell, action] = reward + (0.0 if done else GAMMA * td[nxt].max())   # uses its own estimate
+    print(f&quot;Q-learning after {episode} episode(s): Q(cell, right) =&quot;, [round(v, 3) for v in td[:4, 1].tolist()])
+
+for p_old, p_new, adv in [(0.25, 0.50, +1.0), (0.25, 0.50, -1.0), (0.50, 0.35, -1.0), (0.50, 0.35, +1.0)]:
+    new_logp = torch.tensor([p_new]).log().requires_grad_()
+    loss = ppo_loss(new_logp, torch.tensor([p_old]).log(), torch.tensor([adv]), torch.ones(1))
+    loss.backward()
+    print(f&quot;clip check: {p_old:.2f} -&gt; {p_new:.2f}, advantage {adv:+.0f}: loss {loss.item():+.2f}, gradient {new_logp.grad.item():+.2f}&quot;)
+
+torch.manual_seed(0)
+logits = torch.zeros(N, 2, requires_grad=True)                 # the policy: two action scores per cell
+opt = torch.optim.Adam([logits], lr=0.1)
+for rnd in range(1, 31):
+    cells, actions, returns, lengths = [], [], [], []
+    for _ in range(16):                                        # collect 16 episodes with the current policy
+        cell, trajectory = 0, []
+        for _ in range(20):
+            action = torch.multinomial(F.softmax(logits[cell], -1), 1).item()
+            nxt, reward, done = step(cell, action)
+            trajectory.append((cell, action, reward))
+            cell = nxt
+            if done:
+                break
+        G = 0.0
+        for c, a, r in reversed(trajectory):
+            G = r + GAMMA * G
+            cells.append(c); actions.append(a); returns.append(G)
+        lengths.append(len(trajectory))
+    S, A, R = torch.tensor(cells), torch.tensor(actions), torch.tensor(returns)
+    advantage = (R - R.mean()) / (R.std() + 1e-8)              # better or worse than this batch&#39;s average
+    with torch.no_grad():
+        old_logp = F.log_softmax(logits[S], -1).gather(1, A[:, None]).squeeze(1)   # stored at collection
+    for _ in range(4):                                         # reuse the batch four times
+        new_logp = F.log_softmax(logits[S], -1).gather(1, A[:, None]).squeeze(1)
+        loss = ppo_loss(new_logp, old_logp, advantage, torch.ones_like(advantage))
+        opt.zero_grad(); loss.backward(); opt.step()
+    if rnd in (1, 10, 30):
+        p_right = F.softmax(logits, -1)[:4, 1].tolist()
+        print(f&quot;policy round {rnd:2d}: mean steps to the end {sum(lengths) / len(lengths):4.1f}, P(right) by cell {[round(p, 2) for p in p_right]}&quot;)
+
+# ---------- Part 2: preferences, a reward model, and PPO on the answer writer ----------
+PRODUCTS = [&quot;kettle&quot;, &quot;watch&quot;, &quot;lamp&quot;]
+PHRASES = [[&quot;in&quot;, &quot;stock&quot;], [&quot;ships&quot;, &quot;today&quot;], [&quot;great&quot;, &quot;value&quot;], [&quot;buy&quot;, &quot;now&quot;]]
+vocab = [&quot;&lt;pad&gt;&quot;, &quot;&lt;/s&gt;&quot;, &quot;:&quot;] + PRODUCTS + sorted({w for p in PHRASES for w in p})
+ids = {w: i for i, w in enumerate(vocab)}
+MAX_NEW = 8
+
+def hidden_score(words):                                       # stands in for what people want
+    text = &quot; &quot;.join(words)
+    score = 1.0 * ((&quot;in stock&quot; in text) or (&quot;ships today&quot; in text))   # says something useful
+    score -= 1.0 * text.count(&quot;buy now&quot;)                                # pushy
+    score -= 0.3 * max(0, len(words) - 4)                               # long
+    return score
+
+demonstrations = []                                            # every product with one or two phrases
+for product in PRODUCTS:
+    for a in PHRASES:
+        demonstrations.append([product, &quot;:&quot;] + a)
+        for b in PHRASES:
+            if a != b:
+                demonstrations.append([product, &quot;:&quot;] + a + b)
+
+class Writer(nn.Module):
+    &quot;&quot;&quot;Chapter 3&#39;s writer (q, k, v, o) with a small feed-forward layer added.&quot;&quot;&quot;
+    def __init__(self, dim=32, max_len=12):
+        super().__init__()
+        self.tok, self.pos = nn.Embedding(len(vocab), dim), nn.Embedding(max_len, dim)
+        self.q, self.k, self.v, self.o = (nn.Linear(dim, dim) for _ in range(4))
+        self.ff = nn.Sequential(nn.Linear(dim, 64), nn.ReLU(), nn.Linear(64, dim))
+        self.head = nn.Linear(dim, len(vocab))
+    def forward(self, x):
+        h = self.tok(x) + self.pos(torch.arange(x.shape[1]))
+        h = h + self.o(F.scaled_dot_product_attention(self.q(h), self.k(h), self.v(h), is_causal=True))
+        h = h + self.ff(h)
+        return self.head(h)
+
+def pad(seqs):
+    width = max(map(len, seqs))
+    return torch.tensor([[ids[w] for w in s] + [0] * (width - len(s)) for s in seqs])
+
+torch.manual_seed(0)
+policy = Writer()
+opt = torch.optim.Adam(policy.parameters(), lr=3e-3)
+data = pad([d + [&quot;&lt;/s&gt;&quot;] for d in demonstrations])
+for _ in range(400):                                           # supervised fine-tuning on demonstrations
+    logits = policy(data[:, :-1])
+    loss = F.cross_entropy(logits.reshape(-1, len(vocab)), data[:, 1:].reshape(-1), ignore_index=0)
+    opt.zero_grad(); loss.backward(); opt.step()
+reference = copy.deepcopy(policy).eval()                       # the frozen starting writer
+for p in reference.parameters():
+    p.requires_grad = False
+start_state = copy.deepcopy(policy.state_dict())
+
+def sample(model, n, gen):
+    seqs = [[PRODUCTS[i], &quot;:&quot;] for i in torch.randint(0, 3, (n,), generator=gen).tolist()]
+    done = [False] * n
+    with torch.no_grad():
+        for _ in range(MAX_NEW):
+            logits = model(pad(seqs))
+            last = logits[torch.arange(n), torch.tensor([len(s) for s in seqs]) - 1]
+            nxt = torch.multinomial(F.softmax(last, -1), 1, generator=gen).squeeze(1).tolist()
+            for i in range(n):
+                if not done[i]:
+                    seqs[i].append(vocab[nxt[i]])
+                    done[i] = vocab[nxt[i]] == &quot;&lt;/s&gt;&quot;
+            if all(done):
+                break
+    return seqs
+
+def token_logps(model, seqs):
+    &quot;&quot;&quot;Log-probability of every generated token, and a mask that is 1 on those positions.&quot;&quot;&quot;
+    x = pad(seqs)
+    logp = F.log_softmax(model(x[:, :-1]), -1).gather(2, x[:, 1:].unsqueeze(2)).squeeze(2)
+    mask = torch.zeros_like(logp)
+    for i, s in enumerate(seqs):
+        mask[i, 1:len(s) - 1] = 1                              # predictions of the tokens after &quot;product :&quot;
+    return logp, mask
+
+words_of = lambda s: [w for w in s[2:] if w != &quot;&lt;/s&gt;&quot;]
+
+gen = torch.Generator().manual_seed(1)
+first, second = sample(policy, 600, gen), sample(policy, 600, gen)
+pairs, agree, differ = [], 0, 0
+for a, b in zip(first, second):                                # one comparison per pair, same product
+    b = [a[0]] + b[1:]
+    d = hidden_score(words_of(a)) - hidden_score(words_of(b))
+    prefer_a = torch.rand(1, generator=gen).item() &lt; torch.sigmoid(torch.tensor(2.0 * d)).item()
+    pairs.append((a, b) if prefer_a else (b, a))               # (chosen, rejected)
+    if d != 0:
+        differ += 1
+        agree += prefer_a == (d &gt; 0)
+print(f&quot;\npreference pairs: {len(pairs)}; where the hidden scores differ ({differ}), the label picks the better answer {agree / differ:.3f} of the time&quot;)
+
+class RewardModel(nn.Module):
+    &quot;&quot;&quot;One learned number per word, summed over the answer, plus a bias.&quot;&quot;&quot;
+    def __init__(self):
+        super().__init__()
+        self.w, self.b = nn.Embedding(len(vocab), 1), nn.Parameter(torch.zeros(1))
+    def forward(self, seqs):
+        return torch.stack([self.w(torch.tensor([ids[w] for w in words_of(s)] or [0])).sum() for s in seqs]) + self.b
+
+rm = RewardModel()
+ropt = torch.optim.Adam(rm.parameters(), lr=0.05)
+train_pairs, held_out = pairs[:500], pairs[500:]
+for _ in range(200):
+    chosen, rejected = zip(*train_pairs)
+    loss = -F.logsigmoid(rm(list(chosen)) - rm(list(rejected))).mean()   # -log sigma(r_w - r_l)
+    ropt.zero_grad(); loss.backward(); ropt.step()
+with torch.no_grad():
+    chosen, rejected = zip(*held_out)
+    accuracy = (rm(list(chosen)) &gt; rm(list(rejected))).float().mean().item()
+    better = [(a, b) if hidden_score(words_of(a)) &gt; hidden_score(words_of(b)) else (b, a)
+              for a, b in held_out if hidden_score(words_of(a)) != hidden_score(words_of(b))]
+    ranks_better = (rm([a for a, _ in better]) &gt; rm([b for _, b in better])).float().mean().item()
+print(f&quot;reward model: held-out pair accuracy {accuracy:.3f}; ranks the better answer first in {ranks_better:.3f} of {len(better)} held-out pairs that differ&quot;)
+print(&quot;  weights&quot;,
+      {t: round(rm.w.weight[ids[t]].item(), 2) for t in [&quot;in&quot;, &quot;stock&quot;, &quot;ships&quot;, &quot;today&quot;, &quot;great&quot;, &quot;value&quot;, &quot;buy&quot;, &quot;now&quot;]})
+
+def evaluate(model, n=300):
+    seqs = sample(model, n, torch.Generator().manual_seed(7))
+    words = [words_of(s) for s in seqs]
+    with torch.no_grad():
+        reward = rm(seqs).mean().item()
+        logp, mask = token_logps(model, seqs)
+        ref_logp, _ = token_logps(reference, seqs)
+    kl = ((logp - ref_logp) * mask).sum(1).mean().item()
+    return reward, sum(map(hidden_score, words)) / n, sum(map(len, words)) / n, kl, &quot; &quot;.join(words[0])
+
+REPORT = &quot;%-28s reward model %5.2f  hidden score %5.2f  words %.1f  KL %5.2f | %s&quot;
+print(REPORT % ((&quot;before RL&quot;,) + evaluate(policy)))
+
+def tune(beta, eps, epochs, rounds=40):
+    policy.load_state_dict(start_state)
+    popt = torch.optim.Adam(policy.parameters(), lr=1e-3)
+    gen = torch.Generator().manual_seed(3)
+    for _ in range(rounds):
+        seqs = sample(policy, 64, gen)                         # 64 answers from the current writer
+        with torch.no_grad():
+            old_logp, mask = token_logps(policy, seqs)
+            ref_logp, _ = token_logps(reference, seqs)
+            kl = ((old_logp - ref_logp) * mask).sum(1)         # how far each answer is from the reference
+            reward = rm(seqs) - beta * kl                      # learned reward minus the KL penalty
+            advantage = (reward - reward.mean()) / (reward.std() + 1e-8)
+        for _ in range(epochs):
+            new_logp, _ = token_logps(policy, seqs)
+            loss = ppo_loss(new_logp, old_logp, advantage[:, None], mask, eps)   # tokens share the answer&#39;s advantage
+            popt.zero_grad(); loss.backward(); popt.step()
+    return evaluate(policy)
+
+for label, beta, eps, epochs in [(&quot;no KL, clip 0.2, 4 epochs&quot;, 0.0, 0.2, 4),
+                                 (&quot;KL 0.2, clip 0.2, 4 epochs&quot;, 0.2, 0.2, 4),
+                                 (&quot;KL 0.2, clip 0.2, 10 epochs&quot;, 0.2, 0.2, 10),
+                                 (&quot;KL 0.2, no clip, 10 epochs&quot;, 0.2, float(&quot;inf&quot;), 10)]:
+    print(REPORT % ((label,) + tune(beta, eps, epochs)))
+</code></pre>
+<p>What each part does in real reinforcement-learning and preference-tuning code:</p>
+<ul>
+<li><strong><code>ppo_loss</code></strong> is the clipped objective as the negative mean over the positions in <code>mask</code>. Implementations commonly subtract an entropy bonus from it and train a value network alongside; the clip itself is these three lines.</li>
+<li><strong><code>step</code></strong> is the environment: a simulator&#39;s <code>step(action)</code> returns the next state, the reward and whether the episode is over, as this one does.</li>
+<li><strong>The Monte Carlo loop</strong> walks the episode backwards with G = r + γ·G; <strong>the Q-learning loop</strong> replaces each entry by one reward plus γ times the next cell&#39;s larger entry, inside the step loop, so the table changes mid-episode. With α = 1 both write their target directly.</li>
+<li><strong>The clip check</strong> calls <code>ppo_loss</code> on one sample per row of the chapter&#39;s table and prints the loss and its slope with respect to the current log-probability.</li>
+<li><strong>The corridor policy</strong> is a table of two scores per cell. Each round collects 16 episodes, turns returns into advantages by normalising over the batch, stores the old log-probabilities under <code>torch.no_grad()</code>, and reuses the batch for 4 epochs.</li>
+<li><strong><code>hidden_score</code></strong> stands in for people and is used only to label pairs and to report; the learner never calls it. <strong><code>demonstrations</code></strong> are the 39 curated answers.</li>
+<li><strong><code>Writer</code></strong> is chapter 3&#39;s block plus a feed-forward layer, fine-tuned on the demonstrations with chapter 1&#39;s next-token cross-entropy. <strong><code>reference</code></strong> is its frozen copy and <strong><code>start_state</code></strong> lets every tuning run start from the same writer.</li>
+<li><strong><code>sample</code></strong> generates at temperature 1 up to <code>MAX_NEW</code> tokens; <strong><code>token_logps</code></strong> returns the log-probability of every generated token and a mask over them, the per-token numbers PPO and the KL penalty need.</li>
+<li><strong>The pair loop</strong> samples two answers per product from the fine-tuned writer and labels them with probability σ(2 × score difference), counting how often the label agrees with the hidden score.</li>
+<li><strong><code>RewardModel</code></strong> sums one learned weight per word. It trains on 500 pairs with <code>-F.logsigmoid(r_w - r_l)</code>, the chapter&#39;s loss, and is scored on the other 100, both against the labels and against the hidden order.</li>
+<li><strong><code>tune</code></strong> is the preference-tuning loop: 64 answers per round, reward = reward model minus β times the summed log-ratio against the reference, normalised advantages shared by all tokens of an answer, then <code>epochs</code> passes through <code>ppo_loss</code>. <code>eps=float(&quot;inf&quot;)</code> removes the clip. <strong><code>evaluate</code></strong> reports on 300 fresh answers from a fixed seed.</li>
+</ul>
+<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus and is identical between runs.</p>
+<pre><code class="language-text">Monte Carlo after 1 episode:   Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+Q-learning after 1 episode(s): Q(cell, right) = [0.0, 0.0, 0.0, 1.0]
+Q-learning after 2 episode(s): Q(cell, right) = [0.0, 0.0, 0.9, 1.0]
+Q-learning after 3 episode(s): Q(cell, right) = [0.0, 0.81, 0.9, 1.0]
+Q-learning after 4 episode(s): Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+clip check: 0.25 -&gt; 0.50, advantage +1: loss -1.20, gradient +0.00
+clip check: 0.25 -&gt; 0.50, advantage -1: loss +2.00, gradient +2.00
+clip check: 0.50 -&gt; 0.35, advantage -1: loss +0.80, gradient +0.00
+clip check: 0.50 -&gt; 0.35, advantage +1: loss -0.70, gradient -0.70
+policy round  1: mean steps to the end 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
+policy round 10: mean steps to the end  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
+policy round 30: mean steps to the end  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
+
+preference pairs: 600; where the hidden scores differ (374), the label picks the better answer 0.904 of the time
+reward model: held-out pair accuracy 0.770; ranks the better answer first in 1.000 of 64 held-out pairs that differ
+  weights {&#39;in&#39;: 0.24, &#39;stock&#39;: 0.84, &#39;ships&#39;: 0.68, &#39;today&#39;: 0.58, &#39;great&#39;: 0.63, &#39;value&#39;: -0.57, &#39;buy&#39;: -2.2, &#39;now&#39;: 0.57}
+before RL                    reward model  0.34  hidden score  0.33  words 3.5  KL  0.00 | buy now ships today
+no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+KL 0.2, clip 0.2, 4 epochs   reward model  2.39  hidden score  0.97  words 4.1  KL  2.34 | in stock ships today
+KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.07 | in stock ships today
+KL 0.2, no clip, 10 epochs   reward model  5.16  hidden score -0.20  words 8.0  KL 26.58 | in stock ships ships ships ships ships ships
+</code></pre>
+<p>Read it against the chapter. The Monte Carlo column is right after one episode; Q-learning&#39;s reward walks back one cell per episode. The clip check zeroes the gradient exactly where the table says. The reward model is perfect on the pairs that differ and still only 0.770 against the labels. Its weights for <em>great</em> and <em>value</em> nearly cancel, +0.63 and −0.57, which matches the hidden score: the phrase is neither useful nor pushy. Its weights for <em>buy</em> and <em>now</em> do not separate the phrase&#39;s penalty evenly, −2.20 and +0.57, because the two words always appeared together and only their sum was ever tested. Without the penalty the reward model&#39;s score is the highest on the page and the hidden score the lowest; with the penalty and the clip, the writer says what a customer needs in four words; without the clip, the reused batches undo the penalty.</p>
+<p>Two things to try. Change β in the second run from <code>0.2</code> to <code>0.05</code>: the reward model&#39;s score reaches 5.30, the hidden score falls to −0.20, and the answers repeat again, so a weak penalty only slows the exploit. Then set it to <code>1.0</code>: the KL stays at 0.50, the hidden score reaches only 0.86, and the sample answer is still <em>buy now ships today</em>, so a strong penalty keeps the writer too close to the reference to fix what was wrong with it.</p>
+<p><em>Sources: Reinforcement Learning beginner to master — AI in Python (Udemy), lectures 2.5, 2.6, 2.8, 4.1, 5.3, 5.8, 6.3, 9.3, 9.4 and 11.5; Advanced Reinforcement Learning: policy gradient methods (Udemy), lectures 11.2, 12.1, 12.6 and 13.1; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lecture 6.22; all paraphrased as study material. Maxim Lapan, Deep Reinforcement Learning Hands-On, 3rd edition (EPUB), chapter 16, the PPO section, and chapter 19, &quot;Reinforcement Learning with Human Feedback&quot;; Schulman et al., Proximal Policy Optimization Algorithms, arXiv:1707.06347, §3 and §5; Ouyang et al., Training language models to follow instructions with human feedback, arXiv:2203.02155, §3.5 (pp. 8–9).</em></p>
+</section></article>
+    <div class="mission-action" data-mission-action="train-from-reward">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="train-from-reward">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Adjacent chapters">
+    <a href="reuse-a-pretrained-model.html"><span>Previous</span>Reuse a Pretrained Model</a>
+    <a class="essay-pager__next" href="../index.html"><span>Chapter 5 is in writing</span>The chapters</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Reinforcement Learning beginner to master — AI in Python</em> (Udemy, (Udemy instructor)), lectures 2.5–2.6, 2.8, 4.1, 5.3, 5.8, 6.3, 9.3–9.4, 11.5</li><li><em>Advanced Reinforcement Learning: policy gradient methods</em> (Udemy, (Udemy instructor)), lectures 11.2, 12.1, 12.6, 13.1</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lecture 6.22</li><li>Deep Reinforcement Learning Hands-On</li><li>arXiv:1707.06347, 3, 5</li><li>arXiv:2203.02155, 3.5, pp. 8–9</li></ul><p>The corridor, the answer writer, the hidden scorer that stands in for people, and the word-sum reward model are synthetic and tiny; the reward hack is built into that reward model's form. Hosted fine-tuning job types are as of the recording they come from; PyTorch behaviour as of 2.14.</p></details>
+    <p class="archive-note">Earlier standalone essays on this ground, kept for reference: <a href="../old/essays/learn-the-action-or-learn-its-worth.html">Measure the Return, or Guess It From the Next State</a> · <a href="../old/essays/ppo-clips-the-step.html">PPO: Reuse the Samples, But Not Too Much</a>.</p>
+  </main>
+  </div>
+</body>
+</html>

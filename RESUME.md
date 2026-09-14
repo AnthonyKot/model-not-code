@@ -1,6 +1,6 @@
 # RESUME — The Program Is Now a Model (book20)
 
-Read this first in any new session, then only the files it names. Updated 2026-09-13 (night).
+Read this first in any new session, then only the files it names. Updated 2026-09-14.
 
 ## Where the book is
 
@@ -12,7 +12,7 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 | 1 | `search-the-catalogue` | published; Gemini review in, findings verified, **not applied** |
 | 2 | `trust-the-number` | published; Gemini review + 3 readers finished (2026-09-13 22:54), findings not yet verified |
 | 3 | `reuse-a-pretrained-model` | published; Gemini review + 3 readers finished, findings not yet verified |
-| 4 | `train-from-reward` | **prepared, no prose**: `workspace/train-from-reward/NOTES.md`, `PROTOTYPE.md`, `exercise_proto.py`; draft receipts `corpus/train-from-reward/receipts.tsv` |
+| 4 | `train-from-reward` | published 2026-09-14 (before the review); not yet through review lanes; notes `notes/chapters/train-from-reward.md` |
 | 5–8 | see plan | not started; each needs a one-page outline approved by the author before prose |
 
 Live: https://anthonykot.github.io/model-not-code/ (chapters) · `/old/` (archive).
@@ -38,14 +38,12 @@ External review (Gemini lanes; codex consolidation failed on quota until 2026-09
   `notes/chapters/<slug>.md`.
 - After any edit: rerun the exercise if code changed, `npm run build && npm run check`, commit, push.
 
-## Next section after the review: chapter 4 prose
+## Next after the review
 
-Write `chapters/train-from-reward.md` from `workspace/train-from-reward/NOTES.md` + `PROTOTYPE.md`, applying
-the review feedback first. Re-run the final exercise into `corpus/train-from-reward/run.log` (the prototype
-log is not the final one); run every "thing to try" before stating it. Precision rules are in NOTES.md
-(measured vs learned vs assumed; clip vs KL penalty are different guards; the designed-in reward hack must
-be labelled as designed). Register the chapter in `site/catalog.mjs` (`status: "published"`, sources,
-caution), write `notes/chapters/train-from-reward.md`, update CONTEXT §9, this file and the plan's process list.
+Chapter 4 is written (2026-09-14). After the author's feedback on chapters 1–4: apply it (general rules to
+chapters 1–4 alike), run `scripts/review.sh train-from-reward` and `scripts/readers.sh train-from-reward`, and
+verify findings against `corpus/train-from-reward/run*.log`. Then chapter 5: a one-page outline (project +
+sections + exercise idea + sources) for the author's approval before any prose.
 
 ## Rules that bind every session (full text: CONTEXT.md §4–§5b, DRAFTING-BRIEF "The author's rules")
 

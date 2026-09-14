@@ -4,7 +4,7 @@
 > scratch in `chapters/<slug>.md` (register: `chapters[]` in `site/catalog.mjs`); the twelve essays are
 > an archive built to `docs/old/`, with redirects from `docs/essays/`. Chapter 1 `search-the-catalogue`
 > is published and awaits the author's read. Chapters 2 `trust-the-number` and 3 `reuse-a-pretrained-model` are published too; the author
-> reviews them. Do not edit essays; do not start chapter 4 until that review.
+> reviews them. Chapter 4 `train-from-reward` was published 2026-09-14 at the author's request. Do not edit essays; chapters 5–8 need an approved outline first.
 
 > **2026-09-13 night — read first:** the book is being restructured from standalone essays into
 > project chapters; plan in `notes/chapters/CHAPTER-PLAN.md`, awaiting the author's approval. Do not

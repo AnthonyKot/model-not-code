@@ -1,0 +1,22 @@
+# PyTorch 2.14.0+cpu, CPU only; workspace/train-from-reward/exercise.py (the chapter exercise, verbatim); identical on two runs
+Monte Carlo after 1 episode:   Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+Q-learning after 1 episode(s): Q(cell, right) = [0.0, 0.0, 0.0, 1.0]
+Q-learning after 2 episode(s): Q(cell, right) = [0.0, 0.0, 0.9, 1.0]
+Q-learning after 3 episode(s): Q(cell, right) = [0.0, 0.81, 0.9, 1.0]
+Q-learning after 4 episode(s): Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
+clip check: 0.25 -> 0.50, advantage +1: loss -1.20, gradient +0.00
+clip check: 0.25 -> 0.50, advantage -1: loss +2.00, gradient +2.00
+clip check: 0.50 -> 0.35, advantage -1: loss +0.80, gradient +0.00
+clip check: 0.50 -> 0.35, advantage +1: loss -0.70, gradient -0.70
+policy round  1: mean steps to the end 16.5, P(right) by cell [0.63, 0.64, 0.67, 0.68]
+policy round 10: mean steps to the end  4.2, P(right) by cell [0.85, 0.97, 0.99, 0.99]
+policy round 30: mean steps to the end  4.0, P(right) by cell [0.99, 1.0, 1.0, 1.0]
+
+preference pairs: 600; where the hidden scores differ (374), the label picks the better answer 0.904 of the time
+reward model: held-out pair accuracy 0.770; ranks the better answer first in 1.000 of 64 held-out pairs that differ
+  weights {'in': 0.24, 'stock': 0.84, 'ships': 0.68, 'today': 0.58, 'great': 0.63, 'value': -0.57, 'buy': -2.2, 'now': 0.57}
+before RL                    reward model  0.34  hidden score  0.33  words 3.5  KL  0.00 | buy now ships today
+no KL, clip 0.2, 4 epochs    reward model  6.12  hidden score -0.20  words 8.0  KL 49.51 | in stock stock stock stock stock stock stock
+KL 0.2, clip 0.2, 4 epochs   reward model  2.39  hidden score  0.97  words 4.1  KL  2.34 | in stock ships today
+KL 0.2, clip 0.2, 10 epochs  reward model  2.31  hidden score  1.00  words 4.0  KL  2.07 | in stock ships today
+KL 0.2, no clip, 10 epochs   reward model  5.16  hidden score -0.20  words 8.0  KL 26.58 | in stock ships ships ships ships ships ships

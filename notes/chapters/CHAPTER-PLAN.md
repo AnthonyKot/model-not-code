@@ -156,3 +156,4 @@ Original process, as amended:
 7. **Chapter 3 (`reuse-a-pretrained-model`) written and published 2026-09-13** at the author's request, before the review of 1–2.
 8. Chapter 4 prepared, not written (2026-09-13): research notes, verified exercise prototype and draft receipts;
    prose waits for the author's feedback on chapters 1–3.
+9. **Chapter 4 (`train-from-reward`) written and published 2026-09-14** at the author's request, before the review of 1–3.

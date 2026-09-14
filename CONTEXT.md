@@ -371,6 +371,12 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   held-out pair accuracy) → PPO; without the KL penalty the learned reward rises while the labeler's score
   falls (reward hacking); without the clip, 10 reused epochs escape even with KL on. Draft receipts in
   `corpus/train-from-reward/receipts.tsv`.
+- **2026-09-14** — At the author's request ("could we also start chapter 4?"), chapter 4, *Train From
+  Reward*, written from scratch and published before the review of chapters 1–3 (corridor → Monte Carlo vs
+  Q-learning → policy gradient as advantage-weighted cross-entropy → PPO clip → the writer as a policy →
+  preference pairs → reward model → PPO with a KL penalty; clip and KL shown as different guards across ten
+  seeds; ≈31.6k characters of prose; 34 receipts). Notes `notes/chapters/train-from-reward.md`. Chapters 5–8
+  still need an outline approved first.
 
 ## 10. Open questions
 
