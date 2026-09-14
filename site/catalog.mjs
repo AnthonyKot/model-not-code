@@ -233,7 +233,7 @@ export const chapters = [
     [C("4735368", "13-01", "13-02"), C("6100015", "07-02", "07-03", "07-04", "07-05", "07-06", "07-12", "07-20"),
      B("geron-pytorch", "pp. 406–409, 414–416, 436, 492–493"), B("raschka-qai", "pp. 132–134"), P("arXiv:2106.09685", "4.1")],
     { status: "published",
-      caution: "The backbone, the product-line shift and the answer writer are synthetic and tiny. Model sizes for Llama 3.2 are as of the recording they come from; PyTorch behaviour as of 2.14; PEFT and torchvision snippets are illustrative." }),
+      caution: "The backbone, the product-line shift and the answer writer are synthetic and tiny. Model sizes for Llama 3.2 are as of the recording they come from; PyTorch behaviour as of 2.14; PEFT and torchvision snippets are illustrative; the Keras BatchNormalization behaviour is as of TensorFlow 2." }),
   CH(4, "train-from-reward", "Train From Reward",
     "A game agent learns from reward; the same method, with a reward model fitted to people's preferences, tunes the shop's answer writer.",
     ["learn-the-action-or-learn-its-worth", "ppo-clips-the-step"],

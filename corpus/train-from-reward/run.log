@@ -1,4 +1,4 @@
-# PyTorch 2.14.0+cpu, CPU only; workspace/train-from-reward/exercise.py (the chapter exercise, verbatim); identical on two runs
+# PyTorch 2.14.0+cpu, CPU only; workspace/train-from-reward/exercise.py (the chapter exercise, verbatim); identical on two runs; about 11 s on this CPU (10.7 s measured 2026-09-14)
 Monte Carlo after 1 episode:   Q(cell, right) = [0.729, 0.81, 0.9, 1.0]
 Q-learning after 1 episode(s): Q(cell, right) = [0.0, 0.0, 0.0, 1.0]
 Q-learning after 2 episode(s): Q(cell, right) = [0.0, 0.0, 0.9, 1.0]

@@ -4,7 +4,7 @@ Chapter 2's classifier learned its categories from 10,000 labelled photos. A new
 
 Neither job is worth training from zero. Both start from a model somebody else trained on far more data, and both come down to deciding which of its numbers you let change. For the photo classifier the answer is a sequence: freeze the pretrained part, train a new output layer, then let the pretrained part move slowly. That sequence has a trap, a kind of state that the freeze does not freeze. For the language model the weights are too many to let move at all, and the answer is to leave them untouched and train a small diff beside chapter 1's attention matrices.
 
-As in the earlier chapters, the examples are synthetic and small enough to recompute. The exercise runs both halves on a CPU in about five seconds.
+As in the earlier chapters, the examples are synthetic and small enough to recompute. The exercise runs both halves on a CPU in about six seconds.
 
 ## What a pretrained backbone gives you
 
@@ -43,13 +43,13 @@ Most image backbones contain **batch normalisation** layers, BatchNorm for short
 
 μ<sub>B</sub> is the mean of the batch's m values and σ<sub>B</sub><sup>2</sup> their variance, so x̂<sub>i</sub> says how many standard deviations the value sits from the batch mean. ε is a tiny constant, 10<sup>−5</sup> by default, that keeps the division safe. γ and β are a learned scale and shift, one pair per feature; z<sub>i</sub> is the output. γ and β are **parameters**: they change only when an optimiser applies a gradient, and `requires_grad = False` stops them.
 
-A photo classified alone has no batch to take a mean over, and a prediction should not depend on what else happens to be in the batch. So the layer also keeps a running estimate of the mean and variance, used instead of μ<sub>B</sub> and σ<sub>B</sub><sup>2</sup> when the model is in evaluation mode. PyTorch updates the estimate on every forward pass in training mode:
+A photo classified alone has no batch to take a mean over, and a prediction should not depend on what else happens to be in the batch. So the layer also keeps a running estimate of the mean and variance, used instead of μ<sub>B</sub> and σ<sub>B</sub><sup>2</sup> when the model is in evaluation mode. PyTorch updates the estimate on every forward pass in training mode, using the batch's unbiased variance, m/(m − 1) times the one it normalises with:
 
 <p class="formula">μ̂ ← (1 − momentum) · μ̂ + momentum · μ<sub>B</sub>,&nbsp;&nbsp;&nbsp; σ̂<sup>2</sup> ← (1 − momentum) · σ̂<sup>2</sup> + momentum · σ<sub>B</sub><sup>2</sup></p>
 
-μ̂ is the stored `running_mean` and σ̂<sup>2</sup> the stored `running_var`. The momentum, 0.1 by default, is the share given to the newest batch: each pass keeps 90% of the old estimate. It has nothing to do with an optimiser's momentum, and Keras uses the complement under the same name (its 0.99 means "keep 99%"), so convert a value copied between frameworks. The running statistics are **buffers**, not parameters. They are saved in the checkpoint with the weights, they are changed by the forward pass, and nothing in their update reads `requires_grad`.
+μ̂ is the stored `running_mean` and σ̂<sup>2</sup> the stored `running_var`. The momentum, 0.1 by default, is the share given to the newest batch: each pass keeps 90% of the old estimate. It has nothing to do with an optimiser's momentum. The running statistics are **buffers**, not parameters. They are saved in the checkpoint with the weights, they are changed by the forward pass, and nothing in their update reads `requires_grad`.
 
-Follow one feature through stage one. The checkpoint left its running mean at 0 and running variance at 1. Garden photos from the new supplier give that feature a mean of 1.0 and a standard deviation of 0.6, a variance of 0.36. Training the head in training mode runs a batch through the frozen backbone at every step, and each run moves the buffers. Here is what the layer then does, in evaluation mode, to one fixed input value of 1.6, computed as (1.6 − running mean) / √(running variance):
+Follow one feature through stage one, with γ = 1 and β = 0 so the output is the normalised value itself. The checkpoint left its running mean at 0 and running variance at 1. Garden photos from the new supplier give that feature a mean of 1.0 and a standard deviation of 0.6; take every batch's contribution to the buffers as exactly that mean and a variance of 0.36. Training the head in training mode runs a batch through the frozen backbone at every step, and each run moves the buffers. Here is what the layer then does, in evaluation mode, to one fixed input value of 1.6, computed as (1.6 − running mean) / √(running variance), leaving out ε, which changes none of the three decimals shown:
 
 | Batches seen | Running mean | Running variance | Output for 1.6 |
 |---|---|---|---|
@@ -85,7 +85,7 @@ opt = torch.optim.Adam([
 ])
 ```
 
-A factor of 10 is a common starting point. How much it matters is easy to underestimate: on one small photo task, thawing at the unchanged learning rate dropped validation accuracy to 33%, and dividing the rate by 100 instead raised it to 72.2%. Keep the BatchNorm layers in `eval()` through the thaw as well; fine-tuning batches are small, and their statistics are a noisy estimate of what the checkpoint measured on far more photos.
+A factor of 10 is a common starting point. How much it matters is easy to underestimate: on one small photo task, thawing at the unchanged learning rate dropped validation accuracy to 33%, and dividing the rate by 100 instead raised it to 72.2%. The exercise keeps the BatchNorm layers in `eval()` through the thaw as well, the usual default: fine-tuning batches are small, and their statistics are a noisy estimate of what the checkpoint measured on far more photos. Re-estimating them on the new photos is a separate candidate, to compare on validation for both tasks rather than let `model.train()` choose by accident.
 
 In the exercise the thaw lifts the garden head from 0.824 to 0.980. The backbone's weights now move, by up to 0.215, and the old head's accuracy falls from 0.981 to 0.932, because it reads a backbone that is no longer the one it was trained on. Thawing at the head's own rate instead lands at 0.942 on garden photos and 0.882 on the old task: faster steps, worse on both. If the shop's existing categories and the garden range share one backbone, thawing for one changes the other, and both belong in the evaluation.
 
@@ -167,7 +167,7 @@ Four properties follow from the formula.
 
 **Only A and B cost training memory.** The frozen W gets no gradient and no Adam state; the two running averages exist only for A and B. The frozen weights still have to be held, and the activations still grow with the batch. LoRA removes three of the four rows of the memory table for everything except the adapter.
 
-**α/r keeps the correction's size from depending on the rank.** B·(A·x) is a sum of r terms and tends to grow as r grows; dividing by r keeps it roughly the same size, so a learning rate that worked at one rank still works at another. It is the same kind of fixed division as the √d<sub>k</sub> in chapter 1's attention, which stops scores from growing with the key width. It is not a temperature: τ and T were chosen to make a softmax sharper or flatter, while α/r only holds a size steady. Two consequences are worth checking before copying a configuration. With α = 16, rank 8 applies the correction at scale 2 and rank 64 at scale 0.25, eight times smaller from one changed number. The common rule α = 2r keeps the scale at 2 whatever r is. The scale is α/r in the original method; check that a codebase applies α the same way before copying a setting from it, or the copy is a different experiment.
+**α/r separates the adapter's scale from its rank.** B·(A·x) is a sum of r terms, and dividing by r, with α held fixed, reduces how much the other settings, such as the learning rate, need retuning when r changes. It does not guarantee a correction of the same size at every rank, because A and B are learned. It is the same kind of fixed division as the √d<sub>k</sub> in chapter 1's attention, which stops scores from growing with the key width. It is not a temperature: τ and T make a softmax sharper or flatter, while α/r scales the adapter's path directly. Two consequences are worth checking before copying a configuration. With α = 16, rank 8 applies the correction at scale 2 and rank 64 at scale 0.25, eight times smaller from one changed number. The common starting rule α = 2r does something different: it keeps the scale at 2 whatever r is, a configuration to validate rather than a consequence of dividing by r. The scale is α/r in the original method; check that a codebase applies α the same way before copying a setting from it, or the copy is a different experiment.
 
 **The diff is a separate file.** Count its size as (d<sub>in</sub> + d<sub>out</sub>) × r per target matrix, against d<sub>in</sub> × d<sub>out</sub> for the matrix itself. For Llama 3.2 with three billion weights, 28 layers, a width of 3072, and k and v projections that output 1024:
 
@@ -187,13 +187,13 @@ With the Hugging Face PEFT library, that configuration is one object:
 ```python
 # illustrative, not executed; PEFT API as of the time of writing
 from peft import LoraConfig, get_peft_model
-config = LoraConfig(r=32, lora_alpha=64, lora_dropout=0.1,
+config = LoraConfig(r=32, lora_alpha=64,
                     target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])
 model = get_peft_model(base_model, config)    # wraps each named nn.Linear the way the exercise does
 model.print_trainable_parameters()            # 18,350,080 for this model: 655,360 x 28
 ```
 
-LoRA is half of what usually runs on a single small card. The other half, **QLoRA**, stores the frozen base in four bits per weight, which brings the three-billion-weight base to about 2.2 GB, while the adapters stay at full precision, about 70 MB more. How four bits can stand in for 32 is part of chapter 7; what matters here is that only the frozen base is compressed, never the diff being trained.
+LoRA is half of what usually runs on a single small card. The other half, **QLoRA**, stores the frozen base's large linear layers, the attention projections among them, in four bits per weight, while layers such as the embedding table keep their original format. That brings the three-billion-weight base to about 2.2 GB, and the adapters stay at full precision, about 70 MB more. How four bits can stand in for 32 is part of chapter 7; what matters here is that only the frozen base is compressed, never the diff being trained.
 
 ## What the rank and the freeze cannot do
 
@@ -206,16 +206,20 @@ The adapter does not protect the old behaviour while it is plugged in. With the 
 | Situation | Change | Why |
 |---|---|---|
 | Few labels, the pretrained features already separate your classes | A new head on a frozen backbone; precompute features if nothing is augmented | Cheapest; nothing pretrained can drift |
-| More labels, and the model and its optimiser state fit in memory | Head first, then thaw with parameter groups at a smaller rate; BatchNorm in `eval()` | The backbone adapts; the head's early gradients never reach it |
-| The weights, gradients and optimiser state do not fit | LoRA on the attention projections; QLoRA if even the frozen base does not fit | Training memory scales with the adapter, not the model |
+| More labels, and the model and its optimiser state fit in memory | Head first, then thaw with parameter groups at a smaller rate; BatchNorm in `eval()` unless re-estimating it wins on validation | The backbone adapts; the head's early gradients never reach it |
+| The weights, gradients and optimiser state do not fit | LoRA on the attention projections; QLoRA if even the frozen base does not fit | Gradients and optimiser state scale with the adapter; the frozen weights and the activations still scale with the model |
 | Several tasks share one base | One adapter per task | The base file stays unchanged; adapters are swapped or merged per deployment |
 
 Every row ends in the same place as chapter 2: the old task and the new task measured on held-out products, with the choice made on validation and the test set scored once.
 
+## What the synthetic run leaves out
+
+The exercise shows the mechanics, not a release choice. A real photo project repeats chapter 2's split by product and compares head-only training, each BatchNorm policy and the thaw on validation, then scores the chosen pipeline once on test; cached features belong to the exact backbone weights and buffers that produced them. A real language-model project treats the target modules, rank, α, learning rate and training data as one versioned adapter configuration. It evaluates the new format and the old behaviour that must survive on held-out prompts, and it measures peak memory at the batch size and sequence length it will train with, because the activations are not in the adapter's budget.
+
 <!--mission-->
 ## Exercise: freeze three ways, thaw, then fit a LoRA adapter
 
-The script pretrains a small photo backbone with BatchNorm layers, adapts it to a shifted product line under each freeze and a thaw, then pretrains chapter 1's attention block as a tiny answer writer and adapts it to the shop's format with LoRA and with a full fine-tune. PyTorch on a CPU, about five seconds.
+The script pretrains a small photo backbone with BatchNorm layers, adapts it to a shifted product line under each freeze and a thaw, then pretrains chapter 1's attention block as a tiny answer writer and adapts it to the shop's format with LoRA and with a full fine-tune. PyTorch on a CPU, about six seconds.
 
 ```python
 import copy
@@ -430,8 +434,8 @@ merged into W: largest output difference 1.2e-05
 full fine-tune: trainable 6428  | shop-format loss 0.1934, own-text loss 5.4382
 ```
 
-Read it against the chapter. Under freeze A the running mean has moved from +0.162 to −0.044 with no weight changed, and the old head lost three points. Freeze C kept the buffers still and left the new head at 0.639, because it was trained on batch statistics and evaluated on stored ones. The rank-4 adapter trains 1,024 numbers, a sixth of the model, and writes the full format. Unplugged, the writer is its pretrained self again, tensor for tensor.
+Read it against the chapter. `running_mean[0]` belongs to a feature computed by the `nn.Linear` before the first BatchNorm, not to a raw input, so it is not expected to approach the worked table's 1.0. Under freeze A it has moved from +0.162 to −0.044 with no weight changed, and the old head lost three points. Freeze C kept the buffers still and left the new head at 0.639, because it was trained on batch statistics and evaluated on stored ones. The rank-4 adapter trains 1,024 numbers, a sixth of the model, and writes the full format. Unplugged, the writer is its pretrained self again, tensor for tensor.
 
-Two things to try. Give the backbone's parameter group the head's learning rate, `1e-2`: the thawed garden head reaches 0.942 instead of 0.980, and the old head falls to 0.882 instead of 0.932. Then wrap only `"qv"` instead of `"qkvo"`: at rank 4 the adapter halves to 512 numbers and the shop-format loss is 0.4027 against 0.3883, most of the effect for half the file, which is why query and value projections are a common minimal target.
+Two things to try. Give the backbone's parameter group the head's learning rate, `1e-2`, and change the printed label to match: the thawed garden head reaches 0.942 instead of 0.980, and the old head falls to 0.882 instead of 0.932. Then wrap only `"qv"` instead of `"qkvo"`, again changing the label that prints `q,k,v,o`: at rank 4 the adapter halves to 512 numbers and the shop-format loss is 0.4027 against 0.3883, most of the effect for half the file, which is why query and value projections are a common minimal target.
 
-*Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 13.1 and 13.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 7.2 to 7.6, 7.12 and 7.20; all paraphrased as study material. Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 406–409, 414–416, 436 and 492–493 (physical); Sebastian Raschka, Machine Learning Q and AI, pp. 132–134 (physical); Hu et al., LoRA: Low-Rank Adaptation of Large Language Models, arXiv:2106.09685, §4.1; the PyTorch 2.14 BatchNorm1d documentation.*
+*Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 13.1 and 13.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 7.2 to 7.6, 7.12 and 7.20; all paraphrased as study material. Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 406–409, 414–416, 424–425, 436 and 492–493 (physical); Sebastian Raschka, Machine Learning Q and AI, pp. 132–134 (physical); Hu et al., LoRA: Low-Rank Adaptation of Large Language Models, arXiv:2106.09685, §4.1; the PyTorch 2.14 BatchNorm1d documentation.*

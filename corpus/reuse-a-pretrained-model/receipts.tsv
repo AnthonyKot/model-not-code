@@ -11,8 +11,8 @@ rpm-09	Features can be computed once by the frozen model and a downstream model 
 rpm-10	BatchNorm worked table: mean 0.1/0.19/0.6513/0.8784/0.9948, var 0.936/0.8784/0.5832/0.4378/0.3633 after 1/2/10/20/50 batches; output for 1.6 falls 1.6 -> 1.55 -> 1.504 -> 1.242 -> 1.091 -> 1.004, towards 1.0; torch BatchNorm1d after 10 batches 0.6513, 0.5832, 1.2423	observed	geron-pytorch	pp. 406–409	the book's own numbers; run-worked.log
 rpm-11	Exercise part 1: freezes A/B/C all move 0 weights; A old task 0.952 new 0.765; B old 0.981 new 0.824; C new 0.639; thaw at 1/10 rate old 0.932 new 0.980, weights moved 0.215	observed	course-4735368	13-02	the book's own run; run.log
 rpm-12	A 3-billion-weight Llama 3.2 base needs 13 GB of GPU memory just to hold before training	reported	course-6100015	07-02	
-rpm-13	Adam keeps two exponentially decaying averages per parameter: of the gradients and of the squared gradients	inferred	geron-pytorch	p. 415	physical page
-rpm-14	Full fine-tune of 3 billion weights at 4 bytes: weights, gradients and two Adam moments are 12 GB each, 48 GB before activations	observed	geron-pytorch	p. 415	the book's own arithmetic; run-worked.log
+rpm-13	Adam keeps two exponentially decaying averages per parameter: of the gradients and of the squared gradients	inferred	geron-pytorch	pp. 424–425	physical page
+rpm-14	Full fine-tune of 3 billion weights at 4 bytes: weights, gradients and two Adam moments are 12 GB each, 48 GB before activations	observed	geron-pytorch	pp. 424–425	the book's own arithmetic; run-worked.log
 rpm-15	LoRA freezes all base weights; adapters A and B are multiplied, scaled and added to target modules	inferred	course-6100015	07-02	
 rpm-16	r of 8, 16, 32 common; alpha = 2r rule of thumb; start by targeting the attention projections, add MLP layers for slightly more capacity	inferred	course-6100015	07-03	
 rpm-17	h = W0 x + B A x; B d x r, A r x k; A Gaussian and B zero at initialisation; update scaled by alpha / r	inferred	arXiv:2106.09685	§4.1	some lecture descriptions treat alpha as a plain multiplier; the chapter follows the paper
@@ -25,3 +25,6 @@ rpm-23	Exercise part 2: pretrained writer loss 0.2502 on own text, 10.3556 on sh
 rpm-24	Optimisers of the Adam family keep running state per parameter and use more memory	inferred	course-6100015	07-12	
 rpm-25	A setting of r = 256 with alpha = 512 in a run comparison, consistent with alpha = 2r	reported	course-6100015	07-20	
 rpm-26	Freezing the whole pretrained model and training on top is the cheapest; finetuning all layers is most expensive and usually better	inferred	raschka-qai	pp. 133–134	physical pages
+rpm-27	QLoRA model printout: the embedding layer is unchanged while the attention projections are 4-bit linear layers carrying LoRA A and B	inferred	course-6100015	07-05	2.2 GB + ~70 MB as in rpm receipts; as of the recording
+rpm-28	PyTorch BatchNorm running_var is updated with the unbiased batch variance; normalisation in training mode uses the biased one	inferred	https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html		PyTorch 2.14 docstring
+rpm-29	LoRA scales the update by alpha/r with alpha constant in r; the scaling reduces the need to retune hyperparameters when r varies	inferred	arXiv:2106.09685	§4.1	

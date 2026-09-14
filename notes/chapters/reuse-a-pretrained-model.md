@@ -18,3 +18,15 @@
   text more than the full fine-tune did.
 - Checks: 23 receipts passed, 3 unchecked (paper); paraphrase 0/0.
 - Not done: review lanes; the author's read.
+
+## Review decisions (2026-09-14)
+
+Codex actionable review `checks/reviews/reuse-a-pretrained-model/codex-actionable.md` (12 proposals), applied at the
+author's request: (1) LoRA memory row; (2) BatchNorm worked table's assumptions (γ = 1, β = 0, unbiased running
+variance, ε left out; rpm-28); (3) α/r stated as reducing retuning, not guaranteeing equal size; α = 2r a rule to
+validate (rpm-29); (4) new section "What the synthetic run leaves out"; (5) BatchNorm in eval() as default, re-estimation
+a validated candidate; (6) QLoRA quantises large linear layers, embedding kept (rpm-27); (7) try-its tell the reader to
+change the printed labels; (8) running_mean[0] is a post-Linear feature; (9) Adam receipts → Géron pp. 424–425;
+(10) lora_dropout removed from the PEFT snippet; (11) Keras 0.99 momentum clause removed, the receipted trainable=False
+coupling kept and dated in the catalog caution; (12) runtime kept, measured and logged (5.97 s → "about six seconds").
+Also from the chapter 1 review: "Which W? A real attention layer has four" (chapter 1 builds three).

@@ -1,4 +1,4 @@
-# PyTorch 2.14.0+cpu, CPU only; workspace/reuse-a-pretrained-model/exercise.py (the chapter exercise, verbatim)
+# PyTorch 2.14.0+cpu, CPU only; workspace/reuse-a-pretrained-model/exercise.py (the chapter exercise, verbatim); about 6 s on this CPU (5.97 s measured 2026-09-14)
 pretrained: old-task accuracy 0.981
 A requires_grad=False only   weights moved 0.0e+00  running_mean[0] -0.044  old task 0.952  new task 0.765
 B + BatchNorm in eval()      weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.824
