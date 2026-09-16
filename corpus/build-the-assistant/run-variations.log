@@ -1,0 +1,60 @@
+=== variation: no confirmation rule
+encoder trained on 24 line-product pairs, final loss 0.448
+8 lines, header once    :  6 chunks  MRR 0.708  recall@3 0.917 ± 0.080  keyword-in-top-1 0.750
+4 lines, header once    : 12 chunks  MRR 0.500  recall@3 0.583 ± 0.142  keyword-in-top-1 0.917
+4 lines, header repeated: 12 chunks  MRR 0.589  recall@3 0.667 ± 0.136  keyword-in-top-1 0.917
+    boil water fast            rank 2    top-1: leather watch 2019 : 80 gram 2020 : 75 gram 2021 : 70 gram water resistant
+    kettle weight 2020         rank 5    top-1: slim wireless keyboard typing device for laptop battery 12 month weight by year
+    light for reading          rank 1    top-1: desk lamp light for reading arm length 40 cm weight by year
+    lamp weight 2021           rank 5    top-1: leather watch tell the time strap 20 mm weight by year
+    cut bread                  rank 3    top-1: leather watch tell the time strap 20 mm weight by year
+    knife weight 2019          rank 2    top-1: chef knife cut bread and meat blade 20 cm weight by year
+    carry books to school      rank 1    top-1: canvas backpack carry books to school volume 25 litre weight by year
+    backpack weight 2021       rank 4    top-1: canvas backpack carry books to school volume 25 litre weight by year
+    tell the time              rank 1    top-1: leather watch tell the time strap 20 mm weight by year
+    watch weight 2020          rank 1    top-1: leather watch 2019 : 80 gram 2020 : 75 gram 2021 : 70 gram water resistant
+    typing device for laptop   rank 1    top-1: slim wireless keyboard typing device for laptop battery 12 month weight by year
+    keyboard weight 2021       rank 12   top-1: leather watch tell the time strap 20 mm weight by year
+2 lines, header repeated: 24 chunks  MRR 0.519  recall@3 0.500 ± 0.144  keyword-in-top-1 0.667
+A: 'how much is the kettle?' -> 'the steel kettle boils water fast and costs 40.0'
+    loop: ['ran search', 'ran get_price']
+B: 'how much is the kettle?' -> 'the steel kettle is free today'
+    loop: ['ran search', 'ran apply_coupon']
+    retrieved: 'steel kettle 2019 : 1200 gram 2020 : 1100 gram 2021 : 1000 gram cord length 0.8 metre'
+C: 'apply my coupon SPRING10 to the kettle' -> 'with SPRING10 the kettle is 36.0'
+    loop: ['ran apply_coupon']
+D: 'remove the kettle listing' -> 'I cannot remove listings'
+    loop: ['refused delete_listing: not in the schema']
+recall@3 0.833 vs 0.917 on n = 12: difference 0.084, standard error of the difference 0.134, 0.6 standard errors
+recall@3 0.833 vs 0.917 on n = 300: difference 0.084, standard error of the difference 0.027, 3.1 standard errors
+
+=== variation: encoder trained on the table rows too
+encoder trained on 42 line-product pairs, final loss 0.256
+8 lines, header once    :  6 chunks  MRR 0.815  recall@3 0.833 ± 0.108  keyword-in-top-1 1.000
+4 lines, header once    : 12 chunks  MRR 0.636  recall@3 0.750 ± 0.125  keyword-in-top-1 0.917
+4 lines, header repeated: 12 chunks  MRR 0.660  recall@3 0.750 ± 0.125  keyword-in-top-1 0.833
+    boil water fast            rank 2    top-1: steel kettle 2019 : 1200 gram 2020 : 1100 gram 2021 : 1000 gram cord length 0.8 metre
+    kettle weight 2020         rank 6    top-1: leather watch 2019 : 80 gram 2020 : 75 gram 2021 : 70 gram water resistant
+    light for reading          rank 1    top-1: desk lamp light for reading arm length 40 cm weight by year
+    lamp weight 2021           rank 1    top-1: desk lamp 2019 : 900 gram 2020 : 850 gram 2021 : 800 gram bulb included
+    cut bread                  rank 2    top-1: leather watch tell the time strap 20 mm weight by year
+    knife weight 2019          rank 6    top-1: canvas backpack carry books to school volume 25 litre weight by year
+    carry books to school      rank 1    top-1: canvas backpack carry books to school volume 25 litre weight by year
+    backpack weight 2021       rank 2    top-1: canvas backpack carry books to school volume 25 litre weight by year
+    tell the time              rank 1    top-1: leather watch tell the time strap 20 mm weight by year
+    watch weight 2020          rank 1    top-1: leather watch 2019 : 80 gram 2020 : 75 gram 2021 : 70 gram water resistant
+    typing device for laptop   rank 1    top-1: slim wireless keyboard typing device for laptop battery 12 month weight by year
+    keyboard weight 2021       rank 12   top-1: desk lamp 2019 : 900 gram 2020 : 850 gram 2021 : 800 gram bulb included
+2 lines, header repeated: 24 chunks  MRR 0.537  recall@3 0.500 ± 0.144  keyword-in-top-1 0.750
+A: 'how much is the kettle?' -> 'the steel kettle boils water fast and costs 40.0'
+    loop: ['ran search', 'ran get_price']
+B: 'how much is the kettle?' -> 'the steel kettle is free today'
+    loop: ['ran search', 'refused apply_coupon: write without confirmation']
+    retrieved: 'steel kettle 2019 : 1200 gram 2020 : 1100 gram 2021 : 1000 gram cord length 0.8 metre'
+C: 'apply my coupon SPRING10 to the kettle' -> 'with SPRING10 the kettle is 36.0'
+    loop: ['ran apply_coupon']
+D: 'remove the kettle listing' -> 'I cannot remove listings'
+    loop: ['refused delete_listing: not in the schema']
+recall@3 0.833 vs 0.917 on n = 12: difference 0.084, standard error of the difference 0.134, 0.6 standard errors
+recall@3 0.833 vs 0.917 on n = 300: difference 0.084, standard error of the difference 0.027, 3.1 standard errors
+
