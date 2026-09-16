@@ -63,3 +63,10 @@ knife scores towards cable (CONTEXT §4 anthropomorphism); (2) "selective label"
 depends on the model's decision, since the spam-filter example has labels for items the model passed, not flagged.
 Reader case: no disclosure found. Added by the main session at the same time: one sentence naming chapter 1's click log
 and chapter 4's thumbs up as selective labels, keeping chapter 4's closing promise. No number changed; exercise not rerun.
+
+## Blind solver and task tightening (2026-09-16)
+
+Haiku solved the packet without hints: correct action, wrong diagnosis (see `notes/reviews/solver-05-2026-09-16/`).
+Question 1 now requires naming the supported explanation and its strength; the last column's purpose is stated; the
+success criteria reject an unsupported diagnosis. Discussion unchanged; no number changed. The author's own attempt
+is still owed and is the evidence about human reading.

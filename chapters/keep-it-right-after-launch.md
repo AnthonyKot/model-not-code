@@ -378,7 +378,7 @@ Two things to try. First, set `AUDIT_RATE` to `0.03`: the weeks are the same, th
 
 ### Your call: the same release in another quarter
 
-The same bundle is live in another quarter: same threshold, same alarm level, the sales banner in every photo since week 3, and the audit at 10% of unflagged listings for 3 each. This is the report the shop sees. The last column counts the extra listings that would have been flagged if the threshold had been 0.02, which the shop can compute from the logged scores.
+The same bundle is live in another quarter: same threshold, same alarm level, the sales banner in every photo since week 3, and the audit at 10% of unflagged listings for 3 each. This is the report the shop sees. The last column counts the extra listings that would have been flagged if the threshold had been 0.02, which the shop can compute from the logged scores; it is there so the proposal can be priced.
 
 | Week | Alarm share | Flags | Confirmed blades | Precision | Audited | Blades found | Unflagged | Extra flags at 0.02 |
 |---|---|---|---|---|---|---|---|---|
@@ -397,12 +397,12 @@ In weeks 6 to 10 the audit also checked 37 listings whose blade score was betwee
 
 Write down, before opening the discussion below:
 
-1. Whether the blade flag's quality has changed enough to justify any action, and the numbers that support your answer.
+1. Whether the blade flag's quality has changed enough to justify any action. Confirmed blades fell; say which explanation of that fall the audit supports, how strongly, and the numbers behind it.
 2. What you would do next week: for example keep everything, lower the threshold, retrain, roll back, or change the audit, or something else. "Keep the live model and gather more evidence" is an acceptable answer if you say what evidence and what it costs.
 3. One option you rejected, and why.
 4. What you would need to see in the next two weeks to change your decision.
 
-A sound answer uses the audit to judge the missed blades, prices both sides of any threshold change in the chapter's units, and does not treat the alarm share as evidence about the flag either way.
+A sound answer uses the audit to judge the missed blades rather than the confirmed count alone, prices both sides of any threshold change in the chapter's units, and does not treat the alarm share as evidence about the flag either way. Arriving at a defensible action by a diagnosis the numbers do not support is not a pass.
 
 <details>
 <summary>Hints, if you are stuck</summary>

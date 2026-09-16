@@ -106,3 +106,11 @@ Do not edit anything else, do not create files at the repo root, do not commit.
 
 Report back in under 200 words: word counts, the verified worked-example numbers, check status for
 your slug, deviations from the pitch, and any source problem.
+
+## Reader decision inside the mission (chapter 5 onward, 2026-09-16)
+
+One bounded decision after the guided run, on a changed case whose answer is not the lowest printed number. The task
+states the reasoning step it expects (which explanations to test, which trade to price), the purpose of every
+supplied figure, and the success criteria including "a defensible action reached by an unsupported diagnosis is
+not a pass". Hints and the worked discussion go in two separate `<details>` blocks after the attempt. Run a blind
+cheap-model solve on the packet before the author reads it; log it under `notes/reviews/solver-<NN>-<date>/`.

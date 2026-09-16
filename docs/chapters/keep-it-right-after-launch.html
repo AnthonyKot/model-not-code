@@ -591,7 +591,7 @@ audit: 167 listings, 3 blades, cost 501; shadow review of candidate-only flags: 
 <p>Read it against the chapter. The first line is the release from chapter 2, with the same threshold. The alarm column jumps at week 3 and ignores week 6; the confirmed and precision columns drop at week 6 and the true recall column says why. The audit line decides between the two explanations, and the last three lines are the gate: cheaper by about four standard errors, below the recall floor, and worse on folding knives than the model it would replace.</p>
 <p>Two things to try. First, set <code>AUDIT_RATE</code> to <code>0.03</code>: the weeks are the same, the audit finds 1 blade in 128 and then 3 in 145, the expected counts become 0.6 and 4.4 with probabilities 0.022 and 0.359, and in the shadow weeks 66 audited listings contain no blade, so the recall estimates jump to 0.769 and 0.910 while the truth stays at 0.484 and 0.573. A cheaper audit does not just blur the answer; it makes the floor look passed. Second, replace <code>labels = torch.where(fs | au, cs, presumed)</code> with <code>labels = cs</code>, as if every launch week had been labelled: the candidate catches 30 of 62 folding knives, its estimated recall is 0.793 (true 0.742), and the cost difference is −616 ± 130.</p>
 <h3 id="your-call-the-same-release-in-another-quarter">Your call: the same release in another quarter</h3>
-<p>The same bundle is live in another quarter: same threshold, same alarm level, the sales banner in every photo since week 3, and the audit at 10% of unflagged listings for 3 each. This is the report the shop sees. The last column counts the extra listings that would have been flagged if the threshold had been 0.02, which the shop can compute from the logged scores.</p>
+<p>The same bundle is live in another quarter: same threshold, same alarm level, the sales banner in every photo since week 3, and the audit at 10% of unflagged listings for 3 each. This is the report the shop sees. The last column counts the extra listings that would have been flagged if the threshold had been 0.02, which the shop can compute from the logged scores; it is there so the proposal can be priced.</p>
 <div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
 <thead>
 <tr>
@@ -720,12 +720,12 @@ audit: 167 listings, 3 blades, cost 501; shadow review of candidate-only flags: 
 </div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>In weeks 6 to 10 the audit also checked 37 listings whose blade score was between 0.02 and 0.05; 1 of them was a blade. The analytics team proposes lowering the threshold to 0.02 from next week &quot;to win back the confirmed blades&quot;.</p>
 <p>Write down, before opening the discussion below:</p>
 <ol>
-<li>Whether the blade flag&#39;s quality has changed enough to justify any action, and the numbers that support your answer.</li>
+<li>Whether the blade flag&#39;s quality has changed enough to justify any action. Confirmed blades fell; say which explanation of that fall the audit supports, how strongly, and the numbers behind it.</li>
 <li>What you would do next week: for example keep everything, lower the threshold, retrain, roll back, or change the audit, or something else. &quot;Keep the live model and gather more evidence&quot; is an acceptable answer if you say what evidence and what it costs.</li>
 <li>One option you rejected, and why.</li>
 <li>What you would need to see in the next two weeks to change your decision.</li>
 </ol>
-<p>A sound answer uses the audit to judge the missed blades, prices both sides of any threshold change in the chapter&#39;s units, and does not treat the alarm share as evidence about the flag either way.</p>
+<p>A sound answer uses the audit to judge the missed blades rather than the confirmed count alone, prices both sides of any threshold change in the chapter&#39;s units, and does not treat the alarm share as evidence about the flag either way. Arriving at a defensible action by a diagnosis the numbers do not support is not a pass.</p>
 <details>
 <summary>Hints, if you are stuck</summary>
 

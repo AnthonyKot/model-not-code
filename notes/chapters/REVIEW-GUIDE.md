@@ -106,3 +106,16 @@ without revealing the independent answer to an author who intends to attempt it.
 At handoff, record completed and outstanding work, evidence paths and next commands in the chapter
 note and `RESUME.md`. Explicitly identify stale prose or mismatched outputs. A model run, a passing
 reference and an author read are separate events; record only those that occurred.
+
+## Lessons from the chapter 5 reader case (2026-09-16)
+
+A cheap blind solver (Haiku, packet without hints; `notes/reviews/solver-05-2026-09-16/`) reached the right
+action by a wrong diagnosis and skipped the reasoning step the chapter had taught. Rules adopted from that:
+
+- **Name the reasoning step as a requirement.** State which question the reader must settle (here: which of two
+  explanations the audit supports, and how strongly) in the task itself. That does not disclose the answer; leaving
+  it implicit lets a reader reach a defensible action without the intended judgment.
+- **Say what every supplied column or number is for**, in one clause, when the reader is expected to use it.
+- **Right action, unsupported diagnosis is not a pass.** Put that in the success criteria before the attempt.
+- **Test one case with a cheap model first**, ten minutes, before spending the author's reading time. Record the
+  packet hashes and the model, and treat the result as solvability and disclosure evidence only.
