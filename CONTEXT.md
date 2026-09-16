@@ -398,6 +398,12 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   written from scratch, reviewed by Gemini (2 applied) and published with chapters 1–4's targeted fixes. ≈31.9k
   characters of prose; 44 receipts; exercise, variations, large-sample checks and reader case logged in `corpus/`.
 
+- **2026-09-16 (later)** — Chapter 5's reader case blind-solved by Haiku (right action, wrong diagnosis); task tightened
+  and the rules recorded in REVIEW-GUIDE and the drafting brief. Chapter 6, *Build the Assistant*, outlined (ladder cut
+  and banked for chapter 8; injected instruction targets the coupon tool), written, Gemini-reviewed (3 applied),
+  blind-solved clean and published. ≈20.7k characters of prose; 37 receipts. Chapter 7 outline approved with the
+  author's two picks. Chapter 2's loader detail made optional.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

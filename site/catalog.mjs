@@ -255,7 +255,7 @@ export const chapters = [
     [],
     [C("6100015", "02-15", "02-17", "05-16", "05-18", "05-19", "05-20", "05-21", "05-22", "05-25", "05-26", "05-28", "05-29", "05-30", "05-31", "06-13", "08-12", "08-16", "08-17"), C("6199297", "03-09"),
      B("owasp-llm", "pp. 9, 27"), B("llm-security-playbook", "p. 100"), B("llm-deep-dive", "pp. 324–325, 387")],
-    { status: "planned",
+    { status: "published",
       caution: "Six synthetic product sheets, a toy encoder and a scripted writer; the coupon injection is built into one sheet on purpose. Retrieval figures from the courses are single runs over keyword proxies, as of their recording; lecture 3.9 of the RAG course is machine-translated." }),
   CH(7, "serve-the-assistant-cheaply", "Serve the Assistant Cheaply",
     "What the generator costs per token and where it goes down: the KV cache, four bits per weight, batching.",

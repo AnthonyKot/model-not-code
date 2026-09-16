@@ -45,8 +45,7 @@ is the book's arithmetic; 03-09 is machine-translated; course MRR is per-keyword
 
 ## Owed
 
-- Gemini actionable review; blind Haiku solve of the reader case; the author's read; publish on the author's say.
-- RESUME.md and CONTEXT.md §9 entries at publish time.
+- The author's read. Published 2026-09-16.
 
 ## Review decisions (2026-09-16)
 

@@ -1,6 +1,6 @@
 # Chapter 7 outline — Serve the Assistant Cheaply (for the author's approval)
 
-**Status:** outline only, 2026-09-16. Plan: CHAPTER-PLAN rev 2 §7 (Part IV 10, 11, 12: `kv-cache`,
+**Status:** approved 2026-09-16 (choices: stop at the scale-and-zero-point mapping, NF4 named in one sentence at most; timings printed with a variability note). Plan: CHAPTER-PLAN rev 2 §7 (Part IV 10, 11, 12: `kv-cache`,
 `four-bits-per-weight`, `batching-is-where-throughput-comes-from`). Sources verified in the 2026-09-13 audit (#19, #21,
 #22); locators re-read before use. Chapter 6's reader-task rules apply (reasoning step named; every figure's purpose stated).
 
