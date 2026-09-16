@@ -1,0 +1,34 @@
+=== variation: two bits per weight
+generator trained, next-token loss 0.1430
+cache False: 'the steel kettle boils water fast </s>'; key/value rows computed 42; score matrices [(3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9)]
+cache True : 'the steel kettle boils water fast </s>'; key/value rows computed 9; score matrices [(3, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9)]
+cache False: 1.3 ms per 30-token generation from a 17-token prompt (measured)
+cache True : 0.9 ms per 30-token generation from a 17-token prompt (measured)
+one block: codes [2, 0, 2, 3, 1, 3, 0, 2], scale 0.19333, offset -0.31, largest error 0.0900 (half a step is 0.09667)
+with 2.4 in slot 3: codes [0, 0, 0, 3, 0, 1, 0, 0], scale 0.9033, largest error among the other seven 0.4300
+generator's 2240 weights in 2-bit blocks of 8: codes 1120 bytes + 1120 bytes of scales and offsets (16-bit weights: 4480); largest error 0.9611; answer 'the steel kettle boils water fast </s>'
+generator's 2240 weights in 2-bit blocks of 64: codes 1120 bytes + 140 bytes of scales and offsets (16-bit weights: 4480); largest error 1.0812; answer 'the leather slim boils water fast </s>'
+one 2048 x 2048 weight matrix, 8.4 MB at 2 bytes a weight; step time by batch size (measured):
+  B =   1:  0.513 ms per step,   512.6 us per token, arithmetic intensity 1 flop per byte
+  B =   4:  0.591 ms per step,   147.7 us per token, arithmetic intensity 4 flop per byte
+  B =  16:  0.861 ms per step,    53.8 us per token, arithmetic intensity 16 flop per byte
+  B =  64:  1.701 ms per step,    26.6 us per token, arithmetic intensity 64 flop per byte
+  B = 256:  4.631 ms per step,    18.1 us per token, arithmetic intensity 256 flop per byte
+
+=== variation: 512 x 512 matrix
+generator trained, next-token loss 0.1430
+cache False: 'the steel kettle boils water fast </s>'; key/value rows computed 42; score matrices [(3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9)]
+cache True : 'the steel kettle boils water fast </s>'; key/value rows computed 9; score matrices [(3, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9)]
+cache False: 2.2 ms per 30-token generation from a 17-token prompt (measured)
+cache True : 2.3 ms per 30-token generation from a 17-token prompt (measured)
+one block: codes [11, 0, 9, 15, 6, 13, 2, 9], scale 0.03867, offset -0.31, largest error 0.0180 (half a step is 0.01933)
+with 2.4 in slot 3: codes [2, 0, 2, 15, 1, 3, 0, 2], scale 0.1807, largest error among the other seven 0.0900
+generator's 2240 weights in 4-bit blocks of 8: codes 1120 bytes + 1120 bytes of scales and offsets (16-bit weights: 4480); largest error 0.1858; answer 'the steel kettle boils water fast </s>'
+generator's 2240 weights in 4-bit blocks of 64: codes 1120 bytes + 140 bytes of scales and offsets (16-bit weights: 4480); largest error 0.2151; answer 'the steel kettle boils water fast </s>'
+one 512 x 512 weight matrix, 0.5 MB at 2 bytes a weight; step time by batch size (measured):
+  B =   1:  0.025 ms per step,    24.6 us per token, arithmetic intensity 1 flop per byte
+  B =   4:  0.031 ms per step,     7.7 us per token, arithmetic intensity 4 flop per byte
+  B =  16:  0.037 ms per step,     2.3 us per token, arithmetic intensity 16 flop per byte
+  B =  64:  0.114 ms per step,     1.8 us per token, arithmetic intensity 64 flop per byte
+  B = 256:  0.295 ms per step,     1.2 us per token, arithmetic intensity 256 flop per byte
+

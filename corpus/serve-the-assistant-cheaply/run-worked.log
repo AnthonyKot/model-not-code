@@ -1,0 +1,13 @@
+cache per token 98304 bytes = 96 KB; at 1000 tokens 0.09 GB
+cache per token 98304 bytes = 96 KB; at 8000 tokens 0.73 GB
+cache per token 98304 bytes = 96 KB; at 32000 tokens 2.93 GB
+with 32 kv-heads instead of 8: 2.93 GB at 8000 tokens; window of 4096: 0.38 GB regardless of length
+3e9 weights: ['5.59 GB at 2 bytes', '2.79 GB at 1 bytes', '1.40 GB at 0.5 bytes'] + 4-bit block bookkeeping (block 64, two 16-bit numbers): 0.17 GB
+ops:byte ratio 200; matrix 33.6 MB
+  B=   1: memory time  111.8 us, compute time    0.6 us, step  111.8 us, per token 111.85 us
+  B=   8: memory time  111.8 us, compute time    4.5 us, step  111.8 us, per token  13.98 us
+  B=  64: memory time  111.8 us, compute time   35.8 us, step  111.8 us, per token   1.75 us
+  B= 200: memory time  111.8 us, compute time  111.8 us, step  111.8 us, per token   0.56 us
+  B= 400: memory time  111.8 us, compute time  223.7 us, step  223.7 us, per token   0.56 us
+static batching: 16 slot-steps, 10 used, 62% busy; continuous with a 5th request of length 3 arriving at step 2 fills freed slots: used 13 of 16 = 81%
+reader case: 7 GB per step at 28 steps/s = 196 GB/s of weight traffic; at 4 bits, 1.75 GB per step -> 112 steps/s if bandwidth-bound
