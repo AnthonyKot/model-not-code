@@ -2,6 +2,16 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
+## Chapter 5 published — 2026-09-16
+
+`keep-it-right-after-launch`: artifact bundle, three clocks, autoencoder alarm, banner (loud alarm, flag intact) and
+folding knives (silent, recall 0.763 → 0.491), audit priced at 3 per listing, feedback loop, shadow gate (margin and
+recall floor), reader decision on a second quarter. Evidence and decisions: `notes/chapters/keep-it-right-after-launch.md`.
+Chapters 1–4 targeted fixes committed and published in the same push. Proposed next (not started, author to confirm):
+move chapter 2's loader section after the release record as a practical aside; cut chapter 4's target-network/replay
+paragraph to one sentence; preview chapter 3's choice table near its opening; chapter 1's cosine derivation only if the
+author found it interrupting; one prediction pause per chapter 1–4.
+
 ## Local targeted fixes — 2026-09-16
 
 The author authorized small fixes from the learning-design reports. Chapter 2 now includes the listing-level release step in its mission, rerun with the expected release values; chapter 1 labels training-pair fit and has a readable, scrollable mobile pipeline; chapter 3 labels writer training-string losses; chapter 4 clarifies the policy and the same-product held-out pairs. Details and verification are appended to each chapter note. These changes are local and not published; the status table below describes the earlier published baseline. The author reports chapter 5 work proceeding separately; the old 5–8 row predates that work.
@@ -29,7 +39,8 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 | 2 | `trust-the-number` | published; codex review applied (release reported per listing; exercise stays per photo — author may want a full per-listing rebuild); Gemini round 2: 2 applied |
 | 3 | `reuse-a-pretrained-model` | published; codex review applied (12) incl. new "What the synthetic run leaves out"; Gemini round 2: 1 applied |
 | 4 | `train-from-reward` | published 2026-09-14; codex review applied (48 demonstrations, corridor label, clip wording); Gemini round 2: 0 proposals |
-| 5–8 | see plan | not started; each needs a one-page outline approved by the author before prose |
+| 5 | `keep-it-right-after-launch` | published 2026-09-16 from an approved outline (author's three decisions in `notes/chapters/keep-it-right-after-launch-outline.md`); Gemini first-round review: 2 proposals applied; first chapter with a bounded reader decision (hints and discussion collapsed); author's read owed |
+| 6–8 | see plan | not started; each needs a one-page outline approved by the author before prose |
 
 Live: https://anthonykot.github.io/model-not-code/ (chapters) · `/old/` (archive).
 

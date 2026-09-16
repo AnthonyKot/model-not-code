@@ -1,0 +1,11 @@
+launch normaliser: z = (140 - 100) / 20 = 2.00; logit = 1.0 x 2.00 -4.0 = -2.00; score = 0.1192; flag at 0.05: True
+refitted on this week's photos: z = (140 - 130) / 25 = 0.40; logit = 1.0 x 0.40 -4.0 = -3.60; score = 0.0266; flag at 0.05: False
+point (1.0, 1.2): code 1.5556, reconstruction (1.10, 1.10), mean squared error 0.0100, (x-y)^2/4 = 0.0100
+point (2.0, 1.8): code 2.6870, reconstruction (1.90, 1.90), mean squared error 0.0100, (x-y)^2/4 = 0.0100
+point (3.0, 3.1): code 4.3134, reconstruction (3.05, 3.05), mean squared error 0.0025, (x-y)^2/4 = 0.0025
+point (4.0, 3.9): code 5.5861, reconstruction (3.95, 3.95), mean squared error 0.0025, (x-y)^2/4 = 0.0025
+point (2.0, 0.5): code 1.7678, reconstruction (1.25, 1.25), mean squared error 0.5625, (x-y)^2/4 = 0.5625
+ordinary week, 1000 listings, threshold at 99th percentile of launch errors: expected alarms 10.0
+found 13 at rate 0.1: estimated unflagged blades 130, Poisson sd of that estimate 36
+found 3 at rate 0.1: estimated unflagged blades 30, Poisson sd of that estimate 17
+found 0 at rate 0.03: estimated unflagged blades 0, Poisson sd of that estimate 33

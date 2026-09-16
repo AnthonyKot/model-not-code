@@ -392,6 +392,12 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   seeds; ≈31.6k characters of prose; 34 receipts). Notes `notes/chapters/train-from-reward.md`. Chapters 5–8
   still need an outline approved first.
 
+- **2026-09-16** — Chapter 5, *Keep It Right After Launch*, outlined, approved with three author decisions (question:
+  has quality changed enough to justify action when labels arrive selectively; one harmless-alarm change and one hidden
+  consequential error, verified in runs; a bounded reader decision in this chapter; the random audit priced separately),
+  written from scratch, reviewed by Gemini (2 applied) and published with chapters 1–4's targeted fixes. ≈31.9k
+  characters of prose; 44 receipts; exercise, variations, large-sample checks and reader case logged in `corpus/`.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

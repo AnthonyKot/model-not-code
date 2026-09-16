@@ -1,0 +1,10 @@
+no change                        T=0.05: category accuracy 0.939, flags 0.150 of listings, blade recall 0.763, false flags 2157, missed 260, cost per 1,000 listings 476
+no change                        T=0.02: category accuracy 0.939, flags 0.238 of listings, blade recall 0.862, false flags 3822, missed 152, cost per 1,000 listings 534
+banner                           T=0.05: category accuracy 0.921, flags 0.137 of listings, blade recall 0.742, false flags 2005, missed 256, cost per 1,000 listings 456
+banner                           T=0.02: category accuracy 0.921, flags 0.220 of listings, blade recall 0.852, false flags 3559, missed 147, cost per 1,000 listings 503
+folding knives, half of blades   T=0.05: category accuracy 0.936, flags 0.130 of listings, blade recall 0.491, false flags 2115, missed 506, cost per 1,000 listings 718, folding knives caught 105 of 508
+folding knives, half of blades   T=0.02: category accuracy 0.936, flags 0.223 of listings, blade recall 0.614, false flags 3858, missed 384, cost per 1,000 listings 770, folding knives caught 180 of 508
+banner and folding knives        T=0.05: category accuracy 0.918, flags 0.124 of listings, blade recall 0.440, false flags 2034, missed 575, cost per 1,000 listings 778, folding knives caught 94 of 543
+banner and folding knives        T=0.02: category accuracy 0.918, flags 0.204 of listings, blade recall 0.548, false flags 3511, missed 464, cost per 1,000 listings 815, folding knives caught 152 of 543
+torch 2.14.0+cpu default torch.load of a dict with str, list, float, tensor: ['categories', 't', 'version', 'w']
+state_dict keys: ['mean', 'lin.weight', 'lin.bias']

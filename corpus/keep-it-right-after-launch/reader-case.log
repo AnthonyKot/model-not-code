@@ -1,0 +1,32 @@
+threshold 0.05, alarm level 1.820 (must match run.log)
+SHOP-VISIBLE REPORT
+week  alarm  flags  confirmed  precision  audited  found  unflagged  would add at 0.02
+   1  0.004    144         44       0.31       70      2        856                102
+   2  0.004    146         40       0.27       85      1        854                 90
+   3  0.169    163         41       0.25       81      2        837                 76
+   4  0.138    137         41       0.30       84      0        863                 71
+   5  0.130    123         40       0.33       83      1        877                 86
+   6  0.173    114         12       0.11       93      1        886                 80
+   7  0.152    130         14       0.11       85      1        870                 85
+   8  0.161    117         18       0.15       86      0        883                 94
+   9  0.142    108         16       0.15       75      1        892                 92
+  10  0.146    117         17       0.15       81      0        883                 75
+weeks 6-10: audited listings with blade score in [0.02, 0.05): 37, blades among them: 1
+audit cost per week at 10%: about 247
+DISCUSSION NUMBERS (derived from the visible report)
+weeks 1-5: confirmed 206, found 6 in 403, unflagged 4287; weeks 6-10: confirmed 77, found 3 in 420, unflagged 4414
+estimated recall weeks 1-5 0.763; expected finds weeks 6-10: fewer listed 2.34, more missed 18.35
+P(finds >= 3 | 2.34) = 0.414; P(finds <= 3 | 18.35) = 0.000013
+lowering to 0.02, weeks 6-10: 426 extra flags, review cost 852; blades expected among them 11.5 (from 1 in 37 audited), worth 230
+TRUTH (simulation only; never visible to the shop)
+week  1: blades  57  missed  13  recall 0.77  cost at 0.05  460  at 0.02  510
+week  2: blades  49  missed   9  recall 0.82  cost at 0.05  392  at 0.02  462
+week  3: blades  57  missed  16  recall 0.72  cost at 0.05  564  at 0.02  496
+week  4: blades  52  missed  11  recall 0.79  cost at 0.05  412  at 0.02  422
+week  5: blades  51  missed  11  recall 0.78  cost at 0.05  386  at 0.02  514
+week  6: blades  23  missed  11  recall 0.52  cost at 0.05  424  at 0.02  474
+week  7: blades  21  missed   7  recall 0.67  cost at 0.05  372  at 0.02  432
+week  8: blades  26  missed   8  recall 0.69  cost at 0.05  358  at 0.02  480
+week  9: blades  22  missed   6  recall 0.73  cost at 0.05  304  at 0.02  444
+week 10: blades  22  missed   5  recall 0.77  cost at 0.05  300  at 0.02  362
+weeks 6-10 totals: cost at 0.05 1758, at 0.02 2192
