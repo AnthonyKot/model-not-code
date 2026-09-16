@@ -315,6 +315,10 @@
 </div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>Augment only training batches, with a fresh random draw each time a photo is presented; validation and test photos stay as uploaded, because they stand in for what sellers send. Add one transform at a time and keep it only if validation recall improves for every category you care about, not only overall accuracy. And look at a batch of augmented photos before training on them.</p>
 <h2 id="the-gpu-waits-on-the-jpeg-decoder">The GPU waits on the JPEG decoder</h2>
 <p>Every section so far ends in &quot;train again and compare&quot;, so how fast one training run goes decides how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.</p>
+<p>When that CPU work is slower than the training step, the accelerator sits idle between batches, and the fix is more loading processes, <code>DataLoader(num_workers=…)</code> in PyTorch, until loading stops being the slower side. Measure the two sides before buying a faster accelerator: if loading is the bottleneck, the new accelerator waits just as long.</p>
+<details>
+<summary>Optional: forecast the step time and tune the loader</summary>
+
 <p>Split one training step in two. The <strong>load</strong> time L builds one batch on the CPU; the <strong>compute</strong> time C runs the forward pass, the loss, the backward pass and the optimiser step. A plain loop does them in turn, so a step takes L + C. With a separate loading process and a queue between the two, the next batch is built while the current one trains, and in steady state batches pass at the rate of the slower side:</p>
 <p class="formula">step = max(L / W, C)</p>
 
@@ -367,7 +371,9 @@
 </tr>
 </tbody></table>
 </div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The fourth process is the last one that helps. A faster accelerator that halves C leaves the one-loading-process pipeline at 320 ms a step, now busy 15.6% of the time. Measure before buying: in the plain loop, time the call that fetches a batch (L) and the training step (C), stopping the step&#39;s timer only after the accelerator has finished its queued work.</p>
-<p>In PyTorch the loading side is <code>DataLoader</code>. <code>num_workers</code> is W; with the default 0, batches are built in the training process itself, which is the L + C row. <code>prefetch_factor</code> is how many batches each worker keeps ready, a buffer against slow batches rather than a speed setting. <code>pin_memory=True</code> puts finished batches in page-locked memory so the copy to the accelerator is faster, and <code>persistent_workers=True</code> keeps the workers alive between epochs instead of starting them again. The exercise&#39;s last lines measure a real <code>DataLoader</code> against the forecast.</p>
+<p>In PyTorch the loading side is <code>DataLoader</code>. <code>num_workers</code> is W; with the default 0, batches are built in the training process itself, which is the L + C row. <code>prefetch_factor</code> is how many batches each worker keeps ready, a buffer against slow batches rather than a speed setting. <code>pin_memory=True</code> puts finished batches in page-locked memory so the copy to the accelerator is faster, and <code>persistent_workers=True</code> keeps the workers alive between epochs instead of starting them again. The exercise&#39;s optional last part measures a real <code>DataLoader</code> against the forecast.</p>
+</details>
+
 <h2 id="what-the-release-evaluation-reports">What the release evaluation reports</h2>
 <p>The number that started the chapter, 92.4% on random photos, is replaced by a record like this one, each line tied to a decision:</p>
 <table>
@@ -416,7 +422,7 @@
 </tbody></table>
 <p>Synthetic photos cannot tell you four things a real release needs. Real photos vary in ways no generator was told about: phone cameras, lighting, a seller&#39;s watermark. Real labels are noisy, because sellers miscategorise and reviewers disagree, so the test set&#39;s labels need their own check. The prices of the two mistakes are guesses until the people who pay them name them. And the mix of listings changes after launch, with new product lines, which is where chapter 5 picks the classifier up again.</p>
 <section class="mission" data-mission="trust-the-number"><div class="mission__label">Try the exercise</div>
-<h2 id="exercise-split-weight-threshold-then-time-the-loader">Exercise: split, weight, threshold, then time the loader</h2>
+<h2 id="exercise-split-weight-threshold-then-score-the-release">Exercise: split, weight, threshold, then score the release</h2>
 <p>The script builds a synthetic catalogue, trains the same small network several ways and prints every number the release record above uses. It needs PyTorch on a CPU and runs in about 10 seconds.</p>
 <pre><code class="language-python">import time
 import torch
@@ -583,7 +589,7 @@ if __name__ == &quot;__main__&quot;:
 <li><strong>Part 3</strong> is the cost sweep: for each candidate threshold, count false flags and missed blades on validation, price them, and keep the cheapest. Nothing in this part touches the test photos.</li>
 <li><strong>Part 4</strong> averages the four softmax vectors per listing and chooses a separate threshold on validation listings. This synthetic generator keeps each product&#39;s four photos together, so reshaping is sufficient; real data must be grouped by product ID.</li>
 <li><strong>Part 5</strong> scores the test data after both thresholds are fixed. The photo rows and listing argmax row are guided comparisons; the <code>LISTING TEST: shipped</code> row is the release result. The final line gives the listing count, accuracy standard error and caught/total blades. In a real release report only the chosen listing pipeline, without using the comparison rows to retune.</li>
-<li><strong>Part 6</strong> is a real <code>DataLoader</code> over a <code>Dataset</code> whose <code>__getitem__</code> sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. <code>ms_per_step</code> discards four warm-up steps, then averages twelve. The <code>if __name__ == &quot;__main__&quot;:</code> guard is required where worker processes start by importing the script.</li>
+<li><strong>Part 6</strong> (optional; nothing above depends on it) is a real <code>DataLoader</code> over a <code>Dataset</code> whose <code>__getitem__</code> sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. <code>ms_per_step</code> discards four warm-up steps, then averages twelve. The <code>if __name__ == &quot;__main__&quot;:</code> guard is required where worker processes start by importing the script.</li>
 </ul>
 <p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus. The recorded run used eight CPU threads. Training results can vary with the thread count or environment; the four measured timing lines also vary between runs.</p>
 <pre><code class="language-text">held-out photos whose product has a photo in training: 0.994

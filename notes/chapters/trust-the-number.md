@@ -50,3 +50,12 @@ request ("let's apply improvements"):
 Added the listing-level stage to the existing mission and matching workspace script. Average four softmax vectors per listing; choose threshold on validation listings before test scoring; print listing accuracy, recall, false flags, missed blades, cost, standard error and caught/total blades. Fresh run with PyTorch 2.14.0+cpu and default eight CPU threads reproduced the prior photo results and listing release record: threshold 0.05, accuracy 0.946, recall 0.684 (13/19), 69 false flags, 6 misses, cost 258 vs 310, SE 0.010. Updated expected output from that run and clarified the per-photo comparison row. The prior canonical log is preserved as corpus/trust-the-number/run-before-listing-step-2026-09-16.log. A one-thread sandbox attempt produced slightly different photo counts and then blocked on DataLoader sockets; the complete approved run used the original default eight-thread configuration. The expected-output note now acknowledges environment/thread effects.
 
 Authorized targeted fixes only. No independent task added and no optional-section restructuring. Chapter 5 work was not touched. Build/check and focused desktop/mobile navigation, completion and layout checks passed; four existing eight-word paraphrase warnings remain in the archived augmentation essay. Changes are local, uncommitted and unpublished. Earlier review reports remain historical evidence.
+
+## Loader detail made optional (2026-09-16, author's decision)
+
+The section "The GPU waits on the JPEG decoder" stays in place with its motivation paragraph plus a two-sentence
+takeaway (idle accelerator → more loading processes, `DataLoader(num_workers=…)`; measure both sides before buying).
+The step formula, the worked table and the `DataLoader` settings are in a collapsed "Optional" block. Exercise title
+now "…then score the release"; Part 6 marked optional. No code, number or expected output changed; exercise not rerun.
+Chapters 1 and 4 left structurally unchanged, as decided. Phone-width check: block renders closed and open, table
+scrolls, no page overflow.
