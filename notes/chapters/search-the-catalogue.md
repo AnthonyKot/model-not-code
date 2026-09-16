@@ -42,3 +42,10 @@
   output projection sentence (and ch 3's "chapter 1's attention layer has four" fixed), q − cos×d explained,
   approximate nearest-neighbour sentence (stc-36), no anthropomorphism in the gradient sentence, ch 2 tense.
 - Gemini second round (proposal2.md, 2026-09-14): no proposals survived; it confirmed the codex fixes.
+
+
+## Small learning-design fixes — 2026-09-16
+
+Labelled English top-1 as fit on the six training query–title pairs, with Spanish excluded from those pairs. Kept the pipeline SVG at 720px inside a focusable horizontal scroll region and raised smaller labels to 12px. At 390px, the region is 358px wide, the SVG stays 720px, keyboard ArrowRight scrolls it, the hint is visible and the page itself has no horizontal overflow. Desktop keeps the full diagram without the hint. Visually inspected both ends of the mobile diagram.
+
+Authorized targeted fixes only. No independent task added and no optional-section restructuring. Chapter 5 work was not touched. Build/check and focused desktop/mobile navigation, completion and layout checks passed; four existing eight-word paraphrase warnings remain in the archived augmentation essay. Changes are local, uncommitted and unpublished. Earlier review reports remain historical evidence.

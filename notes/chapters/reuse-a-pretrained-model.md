@@ -31,3 +31,10 @@ change the printed labels; (8) running_mean[0] is a post-Linear feature; (9) Ada
 coupling kept and dated in the catalog caution; (12) runtime kept, measured and logged (5.97 s → "about six seconds").
 Also from the chapter 1 review: "Which W? A real attention layer has four" (chapter 1 builds three).
 - Gemini second round (proposal2.md): 1 proposal, applied — the exercise docstring no longer says chapter 1's block had four projections (docstring only; output unchanged).
+
+
+## Small learning-design fixes — 2026-09-16
+
+Labelled writer losses as fit/interference on the adaptation and pretraining strings, distinguishing them from the photo validation examples. No executable code or numeric output changed.
+
+Authorized targeted fixes only. No independent task added and no optional-section restructuring. Chapter 5 work was not touched. Build/check and focused desktop/mobile navigation, completion and layout checks passed; four existing eight-word paraphrase warnings remain in the archived augmentation essay. Changes are local, uncommitted and unpublished. Earlier review reports remain historical evidence.

@@ -229,6 +229,13 @@ button { font: inherit; }
 .prose .mission h3 { color: var(--white); }
 .prose .mission blockquote { color: var(--amber-pale); }
 .prose .mission table th, .prose .mission table td { border-color: rgba(255,255,255,.3); }
+.pipeline-scroll { max-width: 100%; overflow-x: auto; }
+.pipeline-scroll > svg { display: block; min-width: 720px; }
+.pipeline-scroll:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.pipeline-scroll-hint { display: none; }
+@media (max-width: 760px) {
+  .prose .pipeline-scroll-hint { display: block; font-size: .85rem; color: var(--muted); }
+}
 .table-scroll { max-width: 100%; overflow-x: auto; }
 .prose .table-scroll table { min-width: 620px; }
 .table-scroll:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }

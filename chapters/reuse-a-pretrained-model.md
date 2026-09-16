@@ -414,7 +414,7 @@ What each part does in real fine-tuning code:
 - **Unplugging and merging** put the original `nn.Linear` layers back and compare every tensor with the pretrained state, then fold (α/r)·B·A into each W and compare outputs with the adapter version.
 - **The full fine-tune** gives the optimiser every parameter, for comparison.
 
-**Expected result.** PyTorch 2.14 on a CPU; the output is in the chapter's corpus and is identical between runs.
+**Expected result.** PyTorch 2.14 on a CPU; the output is in the chapter's corpus and is identical between runs. The writer's `shop-format loss` and `own-text loss` are measured on the same strings used for adaptation and pretraining, respectively: fit and interference on those strings, not performance on held-out prompts. The photo accuracies use separate validation examples.
 
 ```text
 pretrained: old-task accuracy 0.981

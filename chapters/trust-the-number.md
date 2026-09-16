@@ -311,12 +311,34 @@ if __name__ == "__main__":
     best = min(grid, key=cost)
     print("validation cost by blade threshold:", {t: round(cost(t), 2) for t in grid}, "-> chosen", best)
 
-    # 4. One look at the test set, with every choice fixed.
+    # 4. The shop decides per listing: average its four photos, then choose on validation.
+    def per_listing(p, labels):
+        # photos() keeps each product's four photos together, including after the product split.
+        return p.reshape(-1, 4, 4).mean(1), labels.reshape(-1, 4)[:, 0]
+
+    listing_val, listing_y_val = per_listing(p_val, y_val)
+    def listing_cost(t):
+        flagged = listing_val[:, 3] >= t
+        blade = listing_y_val == 3
+        return FLAG_COST * (flagged & ~blade).sum().item() + MISS_COST * (~flagged & blade).sum().item()
+    listing_best = min(grid, key=listing_cost)
+    print("validation cost by LISTING threshold:", {t: listing_cost(t) for t in grid}, "-> chosen", listing_best)
+
+    # 5. Score test data only after both thresholds are fixed. Photo rows are guided comparisons.
     report("TEST: split by photo, argmax", probs(by_photo, x_test), y_test)
     report("TEST: split by product, argmax", probs(by_product, x_test), y_test)
-    report(f"TEST: shipped, blade threshold {best}", probs(by_product, x_test), y_test, blade_threshold=best)
+    report(f"TEST: per-photo, threshold {best}", probs(by_product, x_test), y_test, blade_threshold=best)
 
-    # 5. The input pipeline: L = 32 x 2 ms per batch, C = 20 ms per step.
+    listing_test, listing_y_test = per_listing(probs(by_product, x_test), y_test)
+    report("LISTING TEST: argmax", listing_test, listing_y_test)
+    report(f"LISTING TEST: shipped, t={listing_best}", listing_test, listing_y_test, blade_threshold=listing_best)
+    listing_accuracy = (listing_test.argmax(1) == listing_y_test).float().mean().item()
+    se = (listing_accuracy * (1 - listing_accuracy) / len(listing_y_test)) ** 0.5
+    blades = listing_y_test == 3
+    caught = ((listing_test[:, 3] >= listing_best) & blades).sum().item()
+    print(f"release: {len(listing_y_test)} listings, accuracy SE {se:.3f}, blades caught {caught} of {blades.sum().item()}")
+
+    # 6. The input pipeline: L = 32 x 2 ms per batch, C = 20 ms per step.
     ds = JpegFolder(x, y)
     for workers in (0, 1, 2, 4):
         loader = DataLoader(ds, batch_size=32, shuffle=True, num_workers=workers)
@@ -332,10 +354,11 @@ What each part does in real evaluation code:
 - **Part 1** holds out 2,000 photos at random, then 500 whole products (`product < 500`), and compares the two held-out accuracies. `torch.isin` counts how many random held-out photos have a sibling in training.
 - **Part 2** computes inverse-frequency weights from the training labels only, trains a weighted model, and prints both models' blade recall on validation. `report` separates the two decisions: the category shown is the argmax; the flag is either the argmax being "blade" or the blade score clearing a threshold.
 - **Part 3** is the cost sweep: for each candidate threshold, count false flags and missed blades on validation, price them, and keep the cheapest. Nothing in this part touches the test photos.
-- **Part 4** scores the test photos after the choices are fixed. The shipped row is the release number; the two argmax rows are printed only so you can see what the alternatives would have measured. In a real release you would print the shipped row alone.
-- **Part 5** is a real `DataLoader` over a `Dataset` whose `__getitem__` sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. `ms_per_step` discards four warm-up steps, then averages twelve. The `if __name__ == "__main__":` guard is required where worker processes start by importing the script.
+- **Part 4** averages the four softmax vectors per listing and chooses a separate threshold on validation listings. This synthetic generator keeps each product's four photos together, so reshaping is sufficient; real data must be grouped by product ID.
+- **Part 5** scores the test data after both thresholds are fixed. The photo rows and listing argmax row are guided comparisons; the `LISTING TEST: shipped` row is the release result. The final line gives the listing count, accuracy standard error and caught/total blades. In a real release report only the chosen listing pipeline, without using the comparison rows to retune.
+- **Part 6** is a real `DataLoader` over a `Dataset` whose `__getitem__` sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. `ms_per_step` discards four warm-up steps, then averages twelve. The `if __name__ == "__main__":` guard is required where worker processes start by importing the script.
 
-**Expected result.** PyTorch 2.14 on a CPU; the output is in the chapter's corpus. Every number except the four timing lines is deterministic; the measured timings vary by a few milliseconds between runs.
+**Expected result.** PyTorch 2.14 on a CPU; the output is in the chapter's corpus. The recorded run used eight CPU threads. Training results can vary with the thread count or environment; the four measured timing lines also vary between runs.
 
 ```text
 held-out photos whose product has a photo in training: 0.994
@@ -346,17 +369,21 @@ class weights: [2.0, 3.24, 7.17, 19.23]
 unweighted, argmax                 category accuracy 0.878  blade recall 0.266  false flags  25  missed blades 91  cost  1870.0
 weighted, argmax                   category accuracy 0.865  blade recall 0.395  false flags  49  missed blades 75  cost  1598.0
 validation cost by blade threshold: {0.5: 2062.0, 0.2: 1574.0, 0.1: 1426.0, 0.05: 1294.0, 0.02: 1266.0, 0.01: 1304.0, 0.005: 1432.0, 0.002: 1692.0, 0.001: 1936.0} -> chosen 0.02
+validation cost by LISTING threshold: {0.5: 564.0, 0.2: 326.0, 0.1: 238.0, 0.05: 214.0, 0.02: 256.0, 0.01: 328.0, 0.005: 438.0, 0.002: 560.0, 0.001: 638.0} -> chosen 0.05
 TEST: split by photo, argmax       category accuracy 0.873  blade recall 0.211  false flags  26  missed blades 60  cost  1252.0
 TEST: split by product, argmax     category accuracy 0.886  blade recall 0.224  false flags  28  missed blades 59  cost  1236.0
-TEST: shipped, blade threshold 0.02 category accuracy 0.886  blade recall 0.711  false flags 337  missed blades 22  cost  1114.0
-num_workers=0: forecast  84.0 ms/step, measured  89.3
-num_workers=1: forecast  64.0 ms/step, measured  68.8
-num_workers=2: forecast  32.0 ms/step, measured  34.2
-num_workers=4: forecast  20.0 ms/step, measured  21.8
+TEST: per-photo, threshold 0.02    category accuracy 0.886  blade recall 0.711  false flags 337  missed blades 22  cost  1114.0
+LISTING TEST: argmax               category accuracy 0.946  blade recall 0.211  false flags   5  missed blades 15  cost   310.0
+LISTING TEST: shipped, t=0.05      category accuracy 0.946  blade recall 0.684  false flags  69  missed blades  6  cost   258.0
+release: 500 listings, accuracy SE 0.010, blades caught 13 of 19
+num_workers=0: forecast  84.0 ms/step, measured  87.2
+num_workers=1: forecast  64.0 ms/step, measured  67.8
+num_workers=2: forecast  32.0 ms/step, measured  33.9
+num_workers=4: forecast  20.0 ms/step, measured  22.2
 ```
 
-Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The loader's measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.
+Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The listing step averages four photo scores before applying its separately chosen threshold of 0.05: it reports 0.946 accuracy, catches 13 of 19 blades and costs 258 against 310 for the listing argmax. The loader's measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.
 
-Two things to try. First, add a random horizontal flip to the training loop, `xb = x[idx].clone(); flip = torch.rand(len(idx)) < 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])`, and train on `xb`: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change `MISS_COST` to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the shipped row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.
+Two things to try. First, add a random horizontal flip to the training loop, `xb = x[idx].clone(); flip = torch.rand(len(idx)) < 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])`, and train on `xb`: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change `MISS_COST` to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the per-photo row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.
 
 *Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9, 3.11, 4.3, 6.2, 6.3, 6.4, 7.4, 8.5, 11.4, 11.5 and 15.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 4.4 and 7.20; all paraphrased as study material. Chip Huyen, Designing Machine Learning Systems, early release, pp. 116, 120–133, 163–166 and 223 (physical); Daniel Vaughan, Data Science: The Hard Parts, pp. 139–143 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367 and 468–469 (physical); Yuan Tang, Distributed Machine Learning Patterns, pp. 29 and 59–60; the PyTorch 2.14 documentation and source for CrossEntropyLoss and DataLoader.*

@@ -43,3 +43,10 @@ request ("let's apply improvements"):
 - Gemini second round (`checks/reviews/trust-the-number/proposal2.md`, 2 proposals), both applied: the unlogged third
   "thing to try" (workers past free cores) removed; release-record column renamed "Measured value, synthetic" because it
   now mixes the exercise's photo numbers with the per-listing variation.
+
+
+## Small learning-design fixes — 2026-09-16
+
+Added the listing-level stage to the existing mission and matching workspace script. Average four softmax vectors per listing; choose threshold on validation listings before test scoring; print listing accuracy, recall, false flags, missed blades, cost, standard error and caught/total blades. Fresh run with PyTorch 2.14.0+cpu and default eight CPU threads reproduced the prior photo results and listing release record: threshold 0.05, accuracy 0.946, recall 0.684 (13/19), 69 false flags, 6 misses, cost 258 vs 310, SE 0.010. Updated expected output from that run and clarified the per-photo comparison row. The prior canonical log is preserved as corpus/trust-the-number/run-before-listing-step-2026-09-16.log. A one-thread sandbox attempt produced slightly different photo counts and then blocked on DataLoader sockets; the complete approved run used the original default eight-thread configuration. The expected-output note now acknowledges environment/thread effects.
+
+Authorized targeted fixes only. No independent task added and no optional-section restructuring. Chapter 5 work was not touched. Build/check and focused desktop/mobile navigation, completion and layout checks passed; four existing eight-word paraphrase warnings remain in the archived augmentation essay. Changes are local, uncommitted and unpublished. Earlier review reports remain historical evidence.

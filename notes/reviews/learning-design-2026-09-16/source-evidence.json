@@ -1,0 +1,38 @@
+{
+  "reuse-a-pretrained-model": {
+    "sha256": "502fe6d31c0d890cbbe68fa8e4b50ea0a34bc6c4c01a4a54e94cced783b9063f",
+    "mission_python_lines": 178,
+    "expected_output_in_stored_log": true,
+    "workspace_script_exact_match": true,
+    "h2_count": 10,
+    "mission_code_in_generated_html": true,
+    "expected_output_in_generated_html": true
+  },
+  "search-the-catalogue": {
+    "sha256": "49ff516f543485142b0a733eff119f643b9bbff13331403def3d059b3a212acc",
+    "mission_python_lines": 115,
+    "expected_output_in_stored_log": true,
+    "workspace_script_exact_match": true,
+    "h2_count": 7,
+    "mission_code_in_generated_html": true,
+    "expected_output_in_generated_html": true
+  },
+  "train-from-reward": {
+    "sha256": "f663398718356ba268303b6494b3d8eae2747dc7d6e93fe4095d3b3e72599e78",
+    "mission_python_lines": 226,
+    "expected_output_in_stored_log": true,
+    "workspace_script_exact_match": true,
+    "h2_count": 10,
+    "mission_code_in_generated_html": true,
+    "expected_output_in_generated_html": true
+  },
+  "trust-the-number": {
+    "sha256": "8021e94d92d9c4bfa95275c11fc5a45d1706a67cbdf842166bbb4ad1d5b427a4",
+    "mission_python_lines": 132,
+    "expected_output_in_stored_log": true,
+    "workspace_script_exact_match": true,
+    "h2_count": 9,
+    "mission_code_in_generated_html": true,
+    "expected_output_in_generated_html": true
+  }
+}

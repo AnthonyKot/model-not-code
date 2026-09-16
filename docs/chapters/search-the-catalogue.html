@@ -81,6 +81,7 @@
     <article class="prose"><p>A customer of an online shop types <strong>cheap keyboard for laptop</strong>. The product that should come first is listed as <em>Slim wireless keyboard</em>. Its title says neither &quot;cheap&quot; nor &quot;laptop&quot;. A keyword index ranks <em>Laptop stand</em> above it, because that title shares a word with the query. The shop wants two things. First, a search box that puts the keyboard on top. Second, a one-paragraph answer written from the products the search found, the kind a shop assistant would give.</p>
 <p>This chapter builds both as two models made from the same parts, each trained separately. Text becomes integers, the integers become vectors, the vectors look at each other through attention, and then the road forks. For search, the vectors of a text are averaged into one vector and compared with every product&#39;s vector. For the answer, a second model built from the same kind of blocks runs with one extra rule, the causal mask, and produces one token at a time. The figure is the map for the whole chapter; each section builds one box.</p>
 <figure class="diagram">
+<div class="pipeline-scroll" role="region" aria-label="Search and answer pipeline; scroll horizontally to follow all stages" tabindex="0">
 <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="Pipeline. Top row, the parts both models are built from: query text, tokenizer, token IDs, embedding rows plus positions, attention blocks. Search row: no mask and mean pool, unit vector, cosine against every catalogue vector, top titles. Answer row: prompt of question plus top titles, the generator's own blocks with a causal mask, scores divided by temperature then softmax, pick a token, which is appended and fed back." style="max-width:720px;font-family:inherit;font-size:12px">
   <defs>
     <marker id="stc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
@@ -117,25 +118,27 @@
   </g>
   <g fill="currentColor" text-anchor="middle">
     <text x="70" y="48">query text</text>
-    <text x="210" y="41">tokenizer</text><text x="210" y="57" font-size="10">§ 2</text>
+    <text x="210" y="41">tokenizer</text><text x="210" y="57" font-size="12">§ 2</text>
     <text x="350" y="48">token IDs</text>
     <text x="495" y="40">embedding rows</text><text x="495" y="56">+ positions</text>
-    <text x="645" y="41">attention blocks</text><text x="645" y="57" font-size="10">§ 3</text>
+    <text x="645" y="41">attention blocks</text><text x="645" y="57" font-size="12">§ 3</text>
     <text x="645" y="160">no mask,</text><text x="645" y="176">mean pool</text>
-    <text x="495" y="160">one unit vector</text><text x="495" y="176" font-size="10">§ 4</text>
+    <text x="495" y="160">one unit vector</text><text x="495" y="176" font-size="12">§ 4</text>
     <text x="350" y="160">cosine with</text><text x="350" y="176">every title</text>
     <text x="210" y="168">top titles</text>
     <text x="210" y="270">question</text><text x="210" y="286">+ top titles</text>
     <text x="350" y="270">generator blocks,</text><text x="350" y="286">causal mask</text>
     <text x="495" y="270">scores ÷ temperature,</text><text x="495" y="286">softmax · § 5</text>
     <text x="645" y="278">pick a token</text>
-    <text x="500" y="330" font-size="11">append the token and run again</text>
+    <text x="500" y="330" font-size="12">append the token and run again</text>
   </g>
-  <g fill="currentColor" font-size="11" text-anchor="start">
+  <g fill="currentColor" font-size="12" text-anchor="start">
     <text x="10" y="160">search</text>
     <text x="10" y="270">answer</text>
   </g>
 </svg>
+</div>
+<p class="pipeline-scroll-hint">Scroll the diagram sideways to follow all stages.</p>
 <figcaption>The chapter's pipeline. The top row lists the parts both models are built from; each model has its own trained weights. Search averages its blocks' output into one vector; the answer runs the generator's blocks, with a mask, once per generated token.</figcaption>
 </figure>
 
@@ -665,7 +668,7 @@ with torch.no_grad():
 <li><strong><code>answer</code></strong> is the chapter&#39;s pipeline at toy size: search picks the top title with the Part 1 encoder, and that title becomes the generator&#39;s prompt.</li>
 <li><strong>The last block</strong> appends one token and measures the largest change in the first four positions, with the mask and without it.</li>
 </ul>
-<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus.</p>
+<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus. English top-1 measures fit on the same six query–title pairs used for training, not accuracy on held-out queries. The Spanish queries were not training pairs.</p>
 <pre><code class="language-text">step   0  loss 7.9249  english top-1 1/6
 step 100  loss 0.0008  english top-1 6/6
 step 300  loss 0.0002  english top-1 6/6

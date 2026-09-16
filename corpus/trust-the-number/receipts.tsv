@@ -23,7 +23,7 @@ ttn-21	Precision at TPR 0.8, FPR 0.1: 0.296 when 5% are blades, 0.889 when half 
 ttn-22	Augmentation is applied to the training set only; a too-wide rotation range produced images unlike validation and lowered accuracy; add transforms one at a time	inferred	course-4735368	11-04	
 ttn-23	Each transform has its own probability; choose transforms by what the dataset allows; always look at augmented outputs	inferred	course-4735368	08-05	
 ttn-24	Horizontal flip is generally fine except for text and other asymmetrical objects; augmentation normally training-only	inferred	geron-pytorch	pp. 468–469	physical pages
-ttn-25	Flip variation: random horizontal flip leaves category accuracy at 0.878 but cuts blade recall 0.266 -> 0.056 and raises blades shown as lamps 26 -> 88	observed	course-4735368	08-05	the book's own run; run-variations.log
+ttn-25	Flip variation: random horizontal flip leaves category accuracy at 0.878 but cuts blade recall 0.266 -> 0.056 and raises blades shown as lamps 26 -> 88	observed	course-4735368	08-05	the book's own run; run-variations.log; reproduced by the main exercise in run.log, 2026-09-16
 ttn-26	Validation photos with blade score in [0.02, 0.0909): 209, of which 12.0% are blades; [0, 0.02): 2.1%; [0.0909, 0.5): 32.3%; [0.5, 1]: 52.3%	observed	geron-pytorch	pp. 146–151	the book's own run; run-variations.log
 ttn-27	Prefetch lets the next batch load while the current one trains; parallel map calls	inferred	course-4735368	03-11	
 ttn-28	DataLoader num_workers pre-fetches on CPU while the accelerator works; prefetch_factor per worker; pin_memory; worker start-up cost; persistent_workers	inferred	geron-pytorch	p. 367	physical page

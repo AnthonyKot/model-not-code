@@ -39,3 +39,10 @@ ratio, no replay memory; (3) the clip removes incentive, no hard bound (three se
 arbitrary-origin score replaced by the four numbers; (8) timing kept, now logged (10.7 s) and repeatability re-verified;
 (9) source narration removed ("documented pipeline", "its authors").
 - Gemini second round (proposal2.md, 2026-09-14): no proposals; it re-verified every run.log number and the codex fixes.
+
+
+## Small learning-design fixes — 2026-09-16
+
+Replaced the ambiguous human/model “learner” wording with the writer being tuned and the policy optimization. Clarified that held-out pairs are sampled answers to the same three products, not new prompts, and answers can recur. No executable code or numeric output changed.
+
+Authorized targeted fixes only. No independent task added and no optional-section restructuring. Chapter 5 work was not touched. Build/check and focused desktop/mobile navigation, completion and layout checks passed; four existing eight-word paraphrase warnings remain in the archived augmentation essay. Changes are local, uncommitted and unpublished. Earlier review reports remain historical evidence.

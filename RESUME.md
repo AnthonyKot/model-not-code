@@ -2,6 +2,22 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
+## Local targeted fixes — 2026-09-16
+
+The author authorized small fixes from the learning-design reports. Chapter 2 now includes the listing-level release step in its mission, rerun with the expected release values; chapter 1 labels training-pair fit and has a readable, scrollable mobile pipeline; chapter 3 labels writer training-string losses; chapter 4 clarifies the policy and the same-product held-out pairs. Details and verification are appended to each chapter note. These changes are local and not published; the status table below describes the earlier published baseline. The author reports chapter 5 work proceeding separately; the old 5–8 row predates that work.
+
+Next discussion: whether the chapter 2 loader, chapter 4 Q-learning/replay material and chapter 1 cosine-gradient derivation should be optional. The author explicitly asked to discuss before restructuring; all sections remain in place.
+
+## Guidance update — 2026-09-16
+
+Author requested improving Markdown prompts and guidance from Book21's review findings.
+`notes/chapters/REVIEW-GUIDE.md` now defines the shared method; the chapter checklist and
+Codex/Gemini actionable prompt include focus, independent judgment, combined disclosure and
+assessment fairness. `review.md` remains editorial leads, not completed revisions. The archived
+essay checklist also points to the applicable principles. No chapter content, review history or
+publication state changed, and no external review was run for this documentation update.
+For the next authorized chapter revision, read the guide and verify its chapter-specific leads first.
+
 ## Where the book is
 
 Eight project chapters on one online shop, written from scratch (plan: `notes/chapters/CHAPTER-PLAN.md`,

@@ -107,6 +107,20 @@ Added for this book:
   receipts say where they came from. Where a source and a primary disagree, the essay states the
   correct version and does not stage the disagreement.
 
+## 4b. Review and practice guidance (2026-09-16)
+
+The author requested improving guidance and prompts using Book21's review findings. Apply
+`notes/chapters/REVIEW-GUIDE.md` alongside the technical checklist. `review.md` holds
+chapter-specific editorial leads, to verify before acting. Review explanatory focus, the decision
+left to the reader, combined answer disclosure and fairness of feedback. Keep the connected shop
+chapters, recomputable examples and executed CPU demonstration with exactly one mission marker.
+A bounded independent decision may sit within that mission; do not replace the demonstration or
+import Book21's lab format, word targets or weekly budget.
+
+Treat guided execution, model solvability and observed human learning as distinct evidence. Preserve
+necessary limitations; do not interpret shorter prose or a larger exercise as improvement by itself.
+This update adopts review criteria, not chapter revisions or evidence of learner progress.
+
 ## 5. Sourcing standard
 
 Two source classes, three receipt forms, all in `site/catalog.mjs` `sources[]` and per essay in

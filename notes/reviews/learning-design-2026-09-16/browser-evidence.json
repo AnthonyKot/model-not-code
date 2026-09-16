@@ -1,0 +1,202 @@
+[
+  {
+    "title": "Search the Catalogue, Then Answer From It",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 720,
+        "viewbox": "0 0 720 340"
+      }
+    ],
+    "slug": "search-the-catalogue",
+    "width": 1440,
+    "route": "/chapters/search-the-catalogue.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Trust the Number Before You Ship the Classifier",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 640,
+        "viewbox": "0 0 640 210"
+      }
+    ],
+    "slug": "trust-the-number",
+    "width": 1440,
+    "route": "/chapters/trust-the-number.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Reuse a Pretrained Model",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 620,
+        "viewbox": "0 0 620 230"
+      }
+    ],
+    "slug": "reuse-a-pretrained-model",
+    "width": 1440,
+    "route": "/chapters/reuse-a-pretrained-model.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Train From Reward",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 660,
+        "viewbox": "0 0 660 150"
+      },
+      {
+        "width": 720,
+        "viewbox": "0 0 720 330"
+      }
+    ],
+    "slug": "train-from-reward",
+    "width": 1440,
+    "route": "/chapters/train-from-reward.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Search the Catalogue, Then Answer From It",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 358,
+        "viewbox": "0 0 720 340"
+      }
+    ],
+    "slug": "search-the-catalogue",
+    "width": 390,
+    "route": "/chapters/search-the-catalogue.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Trust the Number Before You Ship the Classifier",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 358,
+        "viewbox": "0 0 640 210"
+      }
+    ],
+    "slug": "trust-the-number",
+    "width": 390,
+    "route": "/chapters/trust-the-number.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Reuse a Pretrained Model",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 358,
+        "viewbox": "0 0 620 230"
+      }
+    ],
+    "slug": "reuse-a-pretrained-model",
+    "width": 390,
+    "route": "/chapters/reuse-a-pretrained-model.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  },
+  {
+    "title": "Train From Reward",
+    "missionCount": 1,
+    "disclosures": [
+      {
+        "summary": "Sources and limits",
+        "containsMission": false
+      }
+    ],
+    "pageOverflow": 0,
+    "missionAction": "Check your understanding.\nRun the exercise and compare your output with the expected result.\nMark exercise complete",
+    "diagrams": [
+      {
+        "width": 358,
+        "viewbox": "0 0 660 150"
+      },
+      {
+        "width": 358,
+        "viewbox": "0 0 720 330"
+      }
+    ],
+    "slug": "train-from-reward",
+    "width": 390,
+    "route": "/chapters/train-from-reward.html",
+    "completedWithoutSubmission": "true",
+    "persistedOnReload": "true",
+    "shelfStatus": "EXERCISE DONE"
+  }
+]

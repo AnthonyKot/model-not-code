@@ -4,6 +4,11 @@ You draft ONE essay of *The Program Is Now a Model* in `/home/diablo/book20`. Yo
 slug and the picked pitch letter. This brief carries everything the author has taught the book so
 far; where it is stricter than `CONTEXT.md`, this brief wins (it records the author's latest rules).
 
+For current project chapters, also apply `notes/chapters/REVIEW-GUIDE.md` and verify the
+chapter-specific leads in `review.md`. The archived essay procedure below does not override the
+current chapter plan or authorize parallel drafting. Guided output remains required; independent
+judgment, where appropriate, can be a bounded part of the same mission with answers after the attempt.
+
 ## Read first, in this order
 
 1. `CONTEXT.md` §1, §3, §4, §5, §5b and the §6 register entry for `lora-is-a-low-rank-diff` (its

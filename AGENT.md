@@ -3,6 +3,16 @@
 Read `CONTEXT.md` first, then `notes/BRIEF.md`, then the essay's pitch. This file is the rules of
 engagement; it does not repeat them.
 
+## Current chapter review guidance (2026-09-16)
+
+The current book uses project chapters; the essay pitch and ownership rules below describe the
+archived essay workflow. For chapter work read `RESUME.md`, `CONTEXT.md`, the chapter plan and
+`notes/chapters/REVIEW-GUIDE.md`. Use `review.md` as chapter-specific leads to verify. Preserve
+correctness checks while assessing explanatory focus, independent judgment, combined answer
+disclosure and fair feedback. Guidance changes do not imply chapters have been revised or reviewed.
+Current user instructions take precedence; do not infer permission to launch reviewers or publish
+from the reusable guide.
+
 ## Priority stack
 
 1. **Never false.** No numbers from memory. A claim about a lecture or a page has a receipt a

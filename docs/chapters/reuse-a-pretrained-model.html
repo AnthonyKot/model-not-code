@@ -568,7 +568,7 @@ print(f&quot;full fine-tune: trainable {sum(p.numel() for p in writer.parameters
 <li><strong>Unplugging and merging</strong> put the original <code>nn.Linear</code> layers back and compare every tensor with the pretrained state, then fold (α/r)·B·A into each W and compare outputs with the adapter version.</li>
 <li><strong>The full fine-tune</strong> gives the optimiser every parameter, for comparison.</li>
 </ul>
-<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus and is identical between runs.</p>
+<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus and is identical between runs. The writer&#39;s <code>shop-format loss</code> and <code>own-text loss</code> are measured on the same strings used for adaptation and pretraining, respectively: fit and interference on those strings, not performance on held-out prompts. The photo accuracies use separate validation examples.</p>
 <pre><code class="language-text">pretrained: old-task accuracy 0.981
 A requires_grad=False only   weights moved 0.0e+00  running_mean[0] -0.044  old task 0.952  new task 0.765
 B + BatchNorm in eval()      weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.824
