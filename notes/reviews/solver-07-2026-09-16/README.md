@@ -10,3 +10,5 @@ measurements named. Batching correctly set aside as throughput, not latency. Hin
 section 4's rule ("low utilisation and a small batch → memory-bound") as disclosure; that is the taught mechanism
 applied to a changed case, which the guide expects, not the answer to the case. No task change. Solvability
 observation only, not evidence of human learning.
+
+Note: the packet contained a prediction pause that restated the case's numbers (found by the Gemini review, since replaced), so this solve is weaker evidence of independence than the chapter 5 and 6 solves.

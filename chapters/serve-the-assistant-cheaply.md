@@ -35,7 +35,7 @@ The cache is memory too, and it grows with every token in every request being se
 
 <p class="formula">cache bytes = 2 · L · H<sub>kv</sub> · d<sub>head</sub> · b · T</p>
 
-The 2 is for keys and values; L the number of layers; H<sub>kv</sub> the number of key/value heads; d<sub>head</sub> the width of each; b the bytes per number; T the tokens in the sequence. For an invented model with 24 layers, 8 key/value heads of width 128 and 2-byte numbers, one token costs 96 KB of cache: 0.09 GB at 1,000 tokens, 0.73 GB at 8,000, 2.93 GB at 32,000, per request. Two ways to shrink it follow from the formula. **Grouped-query attention** lets several query heads share one key/value head, cutting H<sub>kv</sub>: with 32 key/value heads instead of 8 the same 8,000-token request would take 2.93 GB. A **sliding window** caps how many past positions a layer attends to, capping T for that layer: a window of 4,096 holds the cache at 0.38 GB however long the conversation runs, at the cost of tokens beyond the window being reachable only through what later positions carried forward.
+The 2 is for keys and values; L the number of layers; H<sub>kv</sub> the number of key/value heads; d<sub>head</sub> the width of each; b the bytes per number; T the tokens in the sequence. For an invented model with 24 layers, 8 key/value heads of width 128 and 2-byte numbers, one token costs 96 KB of cache: 0.09 GB at 1,000 tokens, 0.73 GB at 8,000, 2.93 GB at 32,000, per request. Two ways to shrink it follow from the formula. **Grouped-query attention** lets several query heads share one key/value head, cutting H<sub>kv</sub>: without it, a model with 32 key/value heads would need 2.93 GB for the same 8,000-token request. A **sliding window** caps how many past positions a layer attends to, capping T for that layer: a window of 4,096 holds the cache at 0.38 GB however long the conversation runs, at the cost of tokens beyond the window being reachable only through what later positions carried forward.
 
 ## Four bits per weight
 
@@ -89,7 +89,7 @@ A serving dashboard shows utilisation of the arithmetic units, memory in use, ti
 
 The reading order is fixed by the opening's number. If utilisation is low and the batch is small, decode is memory-bound: bytes per step and batch size are the levers, and a card with more arithmetic buys nothing that the dashboard is waiting on. If utilisation is high at a full batch, the arithmetic units are the limit and the faster card is the honest lever.
 
-**Before reading on:** the dashboard shows 19% utilisation, two requests decoding at once, and customers waiting four seconds per answer. Say which lever you would pull first, and which number on the dashboard you would look at to check that you were right.
+**Before reading on:** a different shop's dashboard shows 93% utilisation with forty requests decoding at once, memory nearly full, and a queue that grows every evening. Say which lever you would pull first, and which number you would look at to check that you were right. The next paragraph is the check.
 
 ## What a real project adds
 
@@ -272,7 +272,7 @@ Two things to try. First, change `bits=4` to `bits=2` in `quantise`: the hand bl
 
 ### Your call: the week 37 serving report
 
-The shop runs the assistant's generator on one GPU. Here is the week's report and the platform team's proposal. The report's last three lines are what a purchase decision costs and what it claims; the rest is what the dashboard shows.
+The shop runs the assistant's generator on one GPU. Here is the week's report and the platform team's proposal. The report's last two lines are what a purchase decision costs and what it claims; the rest is what the dashboard shows.
 
 ```
 SERVING REPORT, week 37 (one GPU, the assistant's generator)
@@ -310,7 +310,7 @@ Two requests at once and 19% utilisation say what the arithmetic units are doing
 
 **Memory-bound.** Two requests decoding at once and 19% utilisation: the arithmetic units are idle most of the time, and the step is waiting on the weights. Each step reads 7 GB; at 28 steps per second that is about 196 GB/s of weight traffic, which is the card's bandwidth being spent almost entirely on weights. Time to first token is short, 180 ms for a 600-token prefill, so the compute-bound phase is not where the four seconds go.
 
-**The proposal.** Twice the arithmetic changes nothing a memory-bound decode is waiting on. 1.4 times the bandwidth is the part that would help, and it caps the gain at about 1.4 times: 28 tokens per second becomes at most 39, an answer of 4.3 seconds becomes about 3.1, for 830 more a month. The 48 GB is headroom the report does not need: caches use 0.7 GB of 16.3 GB free. Rejecting it is well supported by the 19% line; buying it anyway is defensible only if the shop wants 3 seconds and will not accept a re-evaluated model, which the report cannot say.
+**The proposal.** Twice the arithmetic changes nothing a memory-bound decode is waiting on. 1.4 times the bandwidth is the part that would help, and it caps the gain at about 1.4 times: 28 tokens per second becomes at most 39, an answer of 4.3 seconds becomes about 3.1, for 830 more a month. The 48 GB is headroom the report does not need: caches use 0.7 GB, leaving 16.3 GB free. Rejecting it is well supported by the 19% line; buying it anyway is defensible only if the shop wants 3 seconds and will not accept a re-evaluated model, which the report cannot say.
 
 **Four-bit weights.** Bytes per step fall from 7 GB to about 1.75 GB. If the step stays bandwidth-bound, that is up to four times the decode speed, 28 to about 112 tokens per second, on the same card and the same bill. The cost is chapter 2's: the quantised generator's answers go through chapter 6's golden set and a release comparison before it serves anyone. This is the first lever for the four seconds.
 
