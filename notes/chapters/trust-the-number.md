@@ -35,7 +35,7 @@ request ("let's apply improvements"):
 - (1) Unit of decision: NOT a full rebuild of the exercise per listing. The photo-level walkthrough stays with its unit
   named ("73 photos", "52 blade photos"); a new paragraph measures per-listing scoring (mean of four softmax vectors,
   threshold on validation listings: 0.946, 13/19 blades, cost 258 vs 310; `listing_check.py`, run-variations.log), and
-  the release record now reports listings. Open: the author may still want the whole exercise per listing.
+  the release record now reports listings. Closed 2026-09-17: the listing step was added to the exercise (2026-09-16) and the per-photo rows stay as the guided contrast; no full per-listing rebuild.
 - (2) Winner's curse: exact binomial numbers (0.0932, 0.6909, 0.9031) and the independence caveat; table 69.6% → 69.1%.
 - (3) Class-count table. (4) "one-loading-process". (5) Rotation advice conditional on real uploads.
 - (6) Chapter 1's forward link to chapter 2 fixed (both sentences). (7) Balanced malaria dataset sentence (04-03, ttn-38).
