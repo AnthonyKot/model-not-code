@@ -4,15 +4,15 @@ SERVING REPORT, week 37 (one GPU, the assistant's generator)
   answer tokens per request               120
   time to first token                     180 ms
   decode speed per request                28 tokens/s  (an answer takes 4.3 s)
-  requests decoding at once, average      2.0
+  requests decoding at once, average      3.4
   generated tokens per second, all users  96
   GPU utilisation (arithmetic units busy) 19%
-  GPU memory: weights 7.0 GB + caches 0.7 GB of 24.0 GB
+  GPU memory: weights 7.0 GB + caches 1.2 GB of 24.0 GB
   monthly cost, this GPU                  620
 PROPOSAL from the platform team: move to the next card up: twice the arithmetic, 1.4 times the memory bandwidth, 48 GB, 1450 a month, 'to bring latency down'.
 
 DISCUSSION NUMBERS
-  memory headroom for caches: 16.3 GB = 48 requests at 0.35 GB each
-  a step at batch 2 reads the weights once for 2 tokens; at batch 16, once for 16: about 8x the tokens per second if the step time holds
-  the next card: 1.4x bandwidth -> at most 1.4x decode speed if memory-bound; 2x arithmetic helps prefill (TTFT) and a full batch, not batch 2
-  4-bit weights: 7.0 GB -> 1.75 GB read per step; up to ~4x decode speed at batch 2 if memory-bound, at the cost of a chapter 2 evaluation
+  memory headroom for caches: 15.8 GB = 48 requests at 0.35 GB each
+  a step at batch 3.4 reads the weights once for 3.4 tokens; at batch 16, once for 16: about 4.7x the tokens per second if the step time holds
+  the next card: 1.4x bandwidth -> at most 1.4x decode speed if memory-bound; 2x arithmetic helps prefill (TTFT) and a full batch, not batch 3.4
+  4-bit weights: 7.0 GB -> 1.75 GB read per step; up to ~4x decode speed at batch 3.4 if memory-bound, at the cost of a chapter 2 evaluation

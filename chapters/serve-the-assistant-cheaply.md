@@ -281,10 +281,10 @@ SERVING REPORT, week 37 (one GPU, the assistant's generator)
   answer tokens per request               120
   time to first token                     180 ms
   decode speed per request                28 tokens/s  (an answer takes 4.3 s)
-  requests decoding at once, average      2.0
+  requests decoding at once, average      3.4
   generated tokens per second, all users  96
   GPU utilisation (arithmetic units busy) 19%
-  GPU memory: weights 7.0 GB + caches 0.7 GB of 24.0 GB
+  GPU memory: weights 7.0 GB + caches 1.2 GB of 24.0 GB
   monthly cost, this GPU                  620
 PROPOSAL from the platform team: move to the next card up: twice the arithmetic, 1.4 times the memory bandwidth, 48 GB, 1450 a month, 'to bring latency down'.
 ```
@@ -301,20 +301,20 @@ A lever chosen for a reason the report's numbers do not support is not a pass, e
 <details>
 <summary>Hints, if you are stuck</summary>
 
-Two requests at once and 19% utilisation say what the arithmetic units are doing. Each decode step reads the 7 GB of weights; at 28 steps a second, that is a bandwidth. Ask what each proposal changes about bytes per step and about the arithmetic, and which of the two the step is waiting on. Batching raises tokens per second for all users; ask whether it changes the seconds one customer waits.
+About three and a half requests at once and 19% utilisation say what the arithmetic units are doing. Each decode step reads the 7 GB of weights; at 28 steps a second, that is a bandwidth. Ask what each proposal changes about bytes per step and about the arithmetic, and which of the two the step is waiting on. Batching raises tokens per second for all users; ask whether it changes the seconds one customer waits.
 
 </details>
 
 <details>
 <summary>Discussion — open after writing your decision</summary>
 
-**Memory-bound.** Two requests decoding at once and 19% utilisation: the arithmetic units are idle most of the time, and the step is waiting on the weights. Each step reads 7 GB; at 28 steps per second that is about 196 GB/s of weight traffic, which is the card's bandwidth being spent almost entirely on weights. Time to first token is short, 180 ms for a 600-token prefill, so the compute-bound phase is not where the four seconds go.
+**Memory-bound.** About three and a half requests decoding at once and 19% utilisation: the arithmetic units are idle most of the time, and the step is waiting on the weights. Each step reads 7 GB; at 28 steps per second that is about 196 GB/s of weight traffic, which is the card's bandwidth being spent almost entirely on weights. Time to first token is short, 180 ms for a 600-token prefill, so the compute-bound phase is not where the four seconds go.
 
-**The proposal.** Twice the arithmetic changes nothing a memory-bound decode is waiting on. 1.4 times the bandwidth is the part that would help, and it caps the gain at about 1.4 times: 28 tokens per second becomes at most 39, an answer of 4.3 seconds becomes about 3.1, for 830 more a month. The 48 GB is headroom the report does not need: caches use 0.7 GB, leaving 16.3 GB free. Rejecting it is well supported by the 19% line; buying it anyway is defensible only if the shop wants 3 seconds and will not accept a re-evaluated model, which the report cannot say.
+**The proposal.** Twice the arithmetic changes nothing a memory-bound decode is waiting on. 1.4 times the bandwidth is the part that would help, and it caps the gain at about 1.4 times: 28 tokens per second becomes at most 39, an answer of 4.3 seconds becomes about 3.1, for 830 more a month. The 48 GB is headroom the report does not need: caches use 1.2 GB, leaving 15.8 GB free. Rejecting it is well supported by the 19% line; buying it anyway is defensible only if the shop wants 3 seconds and will not accept a re-evaluated model, which the report cannot say.
 
 **Four-bit weights.** Bytes per step fall from 7 GB to about 1.75 GB. If the step stays bandwidth-bound, that is up to four times the decode speed, 28 to about 112 tokens per second, on the same card and the same bill. The cost is chapter 2's: the quantised generator's answers go through chapter 6's golden set and a release comparison before it serves anyone. This is the first lever for the four seconds.
 
-**Batching.** With 0.8 requests a second and 4.3 seconds an answer, about two requests overlap, and a batch of two reads the weights once for two tokens. Admitting more requests per step would raise the tokens per second for all users, about eightfold at batch 16 if the step time holds, and there is memory for 48 requests' caches. It does not shorten one customer's wait: the step time is what a customer waits for, and batching leaves it where it is. Batching is the right lever for a bill or a queue, and the wrong one for this complaint, which is latency at low load.
+**Batching.** With 0.8 requests a second and 4.3 seconds an answer, about 3.4 requests overlap, and a step at that batch reads the weights once for 3.4 tokens. Admitting more requests per step would raise the tokens per second for all users, about 4.7 times at batch 16 if the step time holds, and there is memory for 48 requests' caches. It does not shorten one customer's wait: the step time is what a customer waits for, and batching leaves it where it is. Batching is the right lever for a bill or a queue, and the wrong one for this complaint, which is latency at low load.
 
 **What to measure first.** Step time against batch size on this card, as the exercise does, to find where the machine's own crossover is; and the quantised model's golden-set scores against the current one, with the standard error, before anyone touches the proposal.
 

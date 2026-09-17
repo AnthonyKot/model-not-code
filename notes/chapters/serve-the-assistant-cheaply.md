@@ -43,3 +43,10 @@ different scenario (93% utilisation, forty in flight, compute-bound) with the ne
 than deleted; (2) GQA sentence read as if it raised the head count; reworded; (3) "0.7 GB of 16.3 GB free" → "0.7 GB,
 leaving 16.3 GB free"; (4) "last three lines" → "last two". The blind Haiku solve was on the packet with the leaking
 pause; its result is therefore weaker evidence than chapters 5–6's, noted in the solver README.
+
+## Correction after publication (2026-09-17)
+
+The author found the serving report internally inconsistent: 0.8 requests/s and 4.3 s per answer imply about 3.4
+requests decoding at once (96 tokens/s ÷ 28 agrees), but the report said 2.0. `reader_case.py` now derives the figure
+(3.4); the report block, cache memory (1.2 GB, 15.8 GB free), the hints, the discussion's batching arithmetic (4.7x at
+batch 16, not 8x) and receipt sac-48 were updated. The decision and its reasons are unchanged. Republished.
