@@ -46,3 +46,14 @@ InstructGPT's ± has no stated n on p. 3; ts-foundation's "50%" is 0.517 and 0.5
 ## Owed
 
 - Gemini review; blind Haiku solve; the author's read; publish on the author's say; RESUME/CONTEXT at publish time.
+
+## Review decisions (2026-09-17)
+
+Blind Haiku solve first (`notes/reviews/solver-08-2026-09-17/`): correct decision; found the flip-point arithmetic
+wrong and the stated-vs-drawn dodge rate unclear; both fixed before the Gemini report arrived.
+Gemini actionable review (first round), `checks/reviews/did-the-shop-need-a-model/proposal1-gemini.md`, 7 proposals:
+(1) "1.6 standard errors of the larger one" → of the difference, with the pooled SE shown: applied; (2) flip points:
+already fixed from the solver, Gemini's independent recomputation (44%, 72%) matches; (3)–(7) source narration ("the
+course", "the lecturer", "the paper", "a forecasting book", "the text reads"): applied with the book as the voice,
+keeping every figure and its single-run caveat; the credit line still names the sources. Gemini verified the ledger,
+break-even, K-choose-2 and interval arithmetic against the logs and found no disclosure in the reader case.
