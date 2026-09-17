@@ -1,0 +1,10 @@
+K-choose-2: {4: 6, 9: 36}
+random pricer: 95% half-width 37 -> SE 18.9; per-item SD 267
+0.85 ± 0.03 as 95% interval: n ≈ 544
+0.85 ± 0.03 as one SE: n ≈ 142
+0.71 ± 0.04 as 95% interval: n ≈ 494
+0.71 ± 0.04 as one SE: n ≈ 129
+ts-foundation table 2.2: 1.34/2.59 = 0.517 ; 4.87/8.69 = 0.56
+if per-item error SD were 40: SE of a 200-item mean 2.8, of a 50-item mean 5.7
+if per-item error SD were 60: SE of a 200-item mean 4.2, of a 50-item mean 8.5
+if per-item error SD were 80: SE of a 200-item mean 5.7, of a 50-item mean 11.3

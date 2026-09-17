@@ -1,0 +1,48 @@
+**Drafted by:** Claude Fable 5.1 (main session), 2026-09-17, from scratch, from the approved outline (`did-the-shop-need-a-model-outline.md`; author's picks: the full eleven-rung ladder; the reader's ledger revisits chapter 2's classifier)
+
+# Chapter 8 — Did the Shop Need a Model?
+
+- Question: which of the shop's models earned their cost, and how would you have known before building? The ledger
+  and its break-even inequality; baselines (zero-rule, heuristic, human); the rule and the encoder on chapter 6's
+  golden set (rule wins on shared-word questions, encoder alone reads the six click-log paraphrases); read the table
+  first (the course's ladder with the ±37 interval turned into standard errors; InstructGPT's 85 ± 3, K-choose-2 and
+  labeller agreement; the forecasting book's two twelve-point tables); where the book's models sit; the ending, nothing
+  sold. Reader case: chapter 2's classifier against a seller-declared rule on chapter 2's 500 test listings, priced at
+  20,000 listings a month, where the classifier's 69 false flags per 500 are the cost that decides, and "the rule, and
+  buy an audit for it" is the sound answer.
+- Length: prose without code ≈ 19.4k (≈ 12.6k before the exercise). No figure (two ledgers and a ladder are tables).
+- Checks (scratch copy, status published): build (8 of 8 chapters) and site check green; receipts 42 passed, 0 failed;
+  paraphrase 0/0.
+
+## Evidence
+
+- `workspace/did-the-shop-need-a-model/exercise.py` → `corpus/.../run.log` (≈2 s, two identical runs); `variations.py`
+  logic inline → `run-variations.log` (margin 1.0; share 0.05); `worked.py` → `run-worked.log` (K-choose-2, ±37 → SE,
+  implied n for 85 ± 3, ts-foundation ratios, SE by per-item spread); `reader_case.py` → `reader-case.log` (chapter 2's
+  test listings via `workspace/trust-the-number/exercise.py`; seller behaviour invented: 25% dodge, 2% false declaration).
+- Sources: `sources.md` and `receipts-draft.tsv` by a research subagent that hit the session rate limit after writing
+  both files; every ladder figure carries its lecture and lines. Corrections carried in: "800,000" is 06-27/06-13, not
+  07-24; the "linear model wins when the truth is a weighted sum" clause is 06-14, not 06-07; ts-foundation printed
+  pages are physical minus 20.
+
+## What the runs changed from the outline (reported, not hidden)
+
+- The first paraphrase set shared words with the chunks and the rule scored them; replaced by six click-log queries
+  with no shared word, added to the encoder's training pairs as chapter 1 did with its clicks, and the prose says the
+  encoder's score there is fit on its training pairs.
+- A zero-match query fell to the first chunk by tie-break and counted as a rule hit; the rule now returns nothing.
+- The ledger hard-coded top-1 counts; it now uses the scored ones (the two tie at 6/12 on the golden set).
+- First draft claimed the rule wins below a 3% paraphrase share; the run shows the ledger (top-1 only) favours the
+  encoder at any share above zero and does not price MRR, where the rule wins; the prose now says so.
+- The reader case's rule wins by about 9,400 a month because of the classifier's review queue, not its accuracy; the
+  discussion computes the dodge rate and the miss price at which that flips.
+
+## Source traps (kept out of the prose)
+
+Model names drift in the captions (Opus 4.5 / "4.7" / "4.5 sonnet"); the SFT run scored 67.75 in an earlier run of
+the same setup; the random forest saw a subset; 06-21's Gemini run is 50 items; Huyen's 70% and 30% are illustrations;
+InstructGPT's ± has no stated n on p. 3; ts-foundation's "50%" is 0.517 and 0.560 recomputed.
+
+## Owed
+
+- Gemini review; blind Haiku solve; the author's read; publish on the author's say; RESUME/CONTEXT at publish time.

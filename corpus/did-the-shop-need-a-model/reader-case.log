@@ -1,0 +1,12 @@
+500 test listings, 19 blades (chapter 2's test set)
+classifier at 0.05           blades caught 13/19 recall 0.684 ± 0.107  false flags 69  missed 6  chapter-2 cost 258
+rule: seller declared blade  blades caught 17/19 recall 0.895 ± 0.070  false flags 8  missed 2  chapter-2 cost 56
+both: model OR rule          blades caught 19/19 recall 1.000 ± 0.000  false flags 75  missed 0  chapter-2 cost 150
+
+LEDGER (per month; invented prices, labelled)
+  classifier: review queue 2760 false flags (5520), missed blades 240 (4800)
+  rule      : review queue 320 false flags (640), missed blades 80 (1600)
+  both      : review queue 3000 false flags (6000), missed blades 0 (0)
+  classifier fixed and running: labelling 10,000 photos once 2,500; the golden test set 300; serving 40 a month; chapter 5's audit 270 a week = 1,170 a month; a retrain every quarter 400
+  rule fixed and running: one field check in the listing form; 0 a month; no audit exists for it unless the shop pays for one
+  standard error on 19 blades: a recall difference under about 0.15 is inside one SE
