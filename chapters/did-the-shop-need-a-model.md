@@ -38,14 +38,25 @@ Chapter 6's twelve golden questions over its six product sheets, scored two ways
 
 Every golden question shares a word with the chunk that answers it, because that is how golden questions get written, and on such questions a rule that counts shared words is hard to beat. The rule's cost per query is 173 word comparisons per query word; the encoder's is a sixteen-wide pass and twelve dot products, and the assistant's adds three writer calls at chapter 7's price per token.
 
-What the rule cannot reach is the row the golden set hides. Add six queries from the click log that share no word with any chunk, *hot drink maker*, *brighten the room*, *slice vegetables*, *pack for class*, *wrist clock*, *type while travelling*, each of which customers typed and then clicked a product. The encoder is trained on those pairs, as chapter 1's was on its clicks. The rule has no way to learn from a click log at all:
+What the rule cannot reach is the row the golden set hides. Add six queries from the click log that share no word with the chunks of the product they lead to, *hot drink maker*, *brighten the room*, *slice vegetables*, *pack for class*, *wrist clock*, *type while travelling*, each of which customers typed and then clicked a product. The encoder is trained on those pairs, as chapter 1's was on its clicks. The rule cannot learn from a click log, but the click log can be used without a model: keep it as a table, send a query typed before to the product clicked before, and fall back to the rule for anything else. That lookup is the fair comparator, and on the six known queries it beats the encoder:
 
-| Six paraphrased queries | Top-1 | MRR | Recall@3 |
+| Six paraphrased queries from the click log | Top-1 | MRR | Recall@3 |
 |---|---|---|---|
 | Keyword rule | 0/6 | 0.000 | 0.000 |
+| Click-log lookup, then the rule | 6/6 | 1.000 | 1.000 |
 | Encoder | 4/6 | 0.833 | 1.000 |
 
-The encoder's score here is fit on its own training pairs, as chapter 1's top-1 was; a held-out paraphrase would need words it has seen. The point stands with that caveat: the encoder's value is exactly the share of queries that look like the second table, and that share has to be measured, not assumed. The exercise's ledger prices it. With an invented margin of 4 per sale, an encoder that costs 0.0002 a query against the rule's 0.00001, a golden set at 300, a build at 1,200 and 150 a month to keep right, and 15% of queries paraphrased, the encoder gains 0.40 per query net and pays for itself after 3,752 queries, then 375 a month; at 30% paraphrased, after 1,875. The ledger counts top-1 hits, on which the two tie for the golden set, so any paraphrased share above zero favours the encoder here; it does not price MRR, where the rule wins, because a second-ranked result was not given a value. The number that decides is the share of queries the rule cannot reach, and it is in the shop's logs, not in anyone's opinion.
+The encoder's 4/6 is fit on its own training pairs, as chapter 1's top-1 was, and the lookup's 6/6 is the same pairs read back. Neither says anything about a paraphrase nobody has typed yet, which is the only kind the encoder is for. So the exercise holds out six more, *maker of hot drink*, *room to brighten*, *vegetables to slice*, *pack class*, *clock for the wrist*, *travelling type*, built from the click log's content words joined by ordinary connectors, none of them ever used as a training query:
+
+| Six held-out paraphrases | Top-1 | MRR | Recall@3 |
+|---|---|---|---|
+| Keyword rule | 0/6 | 0.083 | 0.167 |
+| Click-log lookup, then the rule | 0/6 | 0.083 | 0.167 |
+| Encoder | 5/6 | 0.854 | 0.833 |
+
+The rule's 0.083 is one lucky stopword: *the* in *clock for the wrist* matches the watch's own chunk, *tell the time*, at rank 2, behind the lamp's chunk, which also contains *the*. The lookup has nothing to look up. The encoder places five of six, and misses *travelling type*, which it sends to the watch. That is the measurement the ledger should rest on, and it is six questions, so the interval around it is wide; it is a measured rate on unseen queries, not a fit. The encoder's value is exactly the share of queries that look like the third table, and that share has to be measured, not assumed.
+
+The exercise's ledger prices it as a scenario: it assumes the held-out rates, 0 in 6 for the lookup and 5 in 6 for the encoder, hold on the shop's new paraphrases. With an invented margin of 4 per sale, an encoder that costs 0.0002 a query against the rule's 0.00001, a golden set at 300, a build at 1,200 and 150 a month to keep right, and 15% of queries being new paraphrases, the encoder gains 0.50 per query net and pays for itself after 3,001 queries, then 300 a month; at 30%, after 1,500. The ledger counts top-1 hits, on which the two tie for the golden set, so any new-paraphrase share above zero favours the encoder here; it does not price MRR, where the rule wins, because a second-ranked result was not given a value. Two numbers decide, and both are in the shop's logs, not in anyone's opinion: the share of queries that are new paraphrases, and the encoder's hit rate on a held-out sample of them larger than six.
 
 ## Read the table first
 
@@ -133,7 +144,11 @@ GOLD = [("boil water fast", "steel kettle", "boils water fast"), ("kettle weight
 PARAPHRASED = [("hot drink maker", "steel kettle", "steel kettle"), ("brighten the room", "desk lamp", "desk lamp"),
                ("slice vegetables", "chef knife", "chef knife"), ("pack for class", "canvas backpack", "canvas backpack"),
                ("wrist clock", "leather watch", "leather watch"), ("type while travelling", "slim wireless keyboard", "slim wireless keyboard")]
-# the click log: customers who typed each paraphrase clicked that product; the encoder trains on it, the rule cannot use it
+HELD_OUT = [("maker of hot drink", "steel kettle", "steel kettle"), ("room to brighten", "desk lamp", "desk lamp"),
+            ("vegetables to slice", "chef knife", "chef knife"), ("pack class", "canvas backpack", "canvas backpack"),
+            ("clock for the wrist", "leather watch", "leather watch"), ("travelling type", "slim wireless keyboard", "slim wireless keyboard")]
+# the click log: customers who typed each PARAPHRASED query clicked that product; the encoder trains on those pairs.
+# HELD_OUT are paraphrases nobody has typed yet: click-log content words with ordinary connectors; the encoder never trains on them.
 
 def chunk(lines, size=4):
     return [" ".join(([lines[0]] if i else []) + lines[i:i + size]) for i in range(0, len(lines), size)]
@@ -189,6 +204,13 @@ def encoder_order(q):
     with torch.no_grad():
         return (embed(enc, [q]) @ embed(enc, chunks).T).argsort(1, descending=True)[0].tolist()
 
+CLICKS = {q: p for q, p, _ in PARAPHRASED}
+def lookup_order(q):
+    """The rule plus the click log as a table: a query typed before goes to the product clicked before; anything else, the rule."""
+    if q in CLICKS:
+        return [j for j in range(len(chunks)) if owner[j] == CLICKS[q]] + [j for j in rule_order(q) if owner[j] != CLICKS[q]]
+    return rule_order(q)
+
 def score(name, order_fn, questions):
     rr, top1, hits = [], 0, 0
     for q, prod, line in questions:
@@ -201,8 +223,10 @@ def score(name, order_fn, questions):
 
 print("twelve golden questions that share words with the catalogue:")
 r_gold = score("keyword rule", rule_order, GOLD); e_gold = score("encoder", encoder_order, GOLD)
-print("six paraphrased queries from the click log, no word shared with any chunk (the encoder trained on these pairs; the rule cannot):")
-r_para = score("keyword rule", rule_order, PARAPHRASED); e_para = score("encoder", encoder_order, PARAPHRASED)
+print("six paraphrased queries from the click log, no word shared with the answering product's chunks (the encoder trained on these pairs):")
+r_para = score("keyword rule", rule_order, PARAPHRASED); l_para = score("lookup+rule", lookup_order, PARAPHRASED); e_para = score("encoder", encoder_order, PARAPHRASED)
+print("six held-out paraphrases nobody typed before, click-log content words with connectors (no method has seen these queries):")
+r_new = score("keyword rule", rule_order, HELD_OUT); l_new = score("lookup+rule", lookup_order, HELD_OUT); e_new = score("encoder", encoder_order, HELD_OUT)
 words_in_chunks = sum(len(c.split()) for c in chunks)
 print(f"cost per query: rule {words_in_chunks} word comparisons per query word; encoder one 16-wide pass over the query plus {len(chunks)} dot products; the assistant adds three writer calls")
 
@@ -210,10 +234,12 @@ print(f"cost per query: rule {words_in_chunks} word comparisons per query word; 
 # invented prices, labelled as such: a missed search costs a lost sale's margin; a query costs compute
 MARGIN, RULE_COST, ENCODER_COST, ASSISTANT_COST = 4.0, 0.00001, 0.0002, 0.006   # per lost sale; per query
 GOLDEN_SET, MODEL_BUILD, RETRAIN_PER_MONTH = 300.0, 1200.0, 150.0                # fixed: the golden set; the encoder; keeping it right
-share_paraphrased = 0.15                                                          # queries the rule cannot reach (invented)
-rule_hit = (r_gold / 12) * (1 - share_paraphrased) + (r_para / 6) * share_paraphrased
-enc_hit = (e_gold / 12) * (1 - share_paraphrased) + (e_para / 6) * share_paraphrased
-print(f"top-1 hit rate over the query mix: rule {rule_hit:.3f}, encoder {enc_hit:.3f} (share of paraphrased queries {share_paraphrased})")
+share_paraphrased = 0.15                                                          # new paraphrases, not yet in the click log (invented)
+# the comparator is the rule with the click log as a lookup; both sides are scored on the held-out paraphrases, the
+# only measurement that is not fit on its own training pairs. The ledger is a scenario conditioned on that rate.
+rule_hit = (r_gold / 12) * (1 - share_paraphrased) + (l_new / 6) * share_paraphrased
+enc_hit = (e_gold / 12) * (1 - share_paraphrased) + (e_new / 6) * share_paraphrased
+print(f"top-1 hit rate over the query mix: lookup+rule {rule_hit:.3f}, encoder {enc_hit:.3f} (share of new paraphrases {share_paraphrased}, held-out rates {l_new}/6 and {e_new}/6)")
 gain = (enc_hit - rule_hit) * MARGIN - (ENCODER_COST - RULE_COST)                # per query, may be negative
 print(f"per query: the encoder gains {(enc_hit - rule_hit) * MARGIN:+.4f} in sales and costs {ENCODER_COST - RULE_COST:.5f} more to run: net {gain:+.4f}")
 if gain > 0:
@@ -221,17 +247,17 @@ if gain > 0:
 else:
     print("the encoder never pays at this query mix: the rule answers the shared-word queries better, and the paraphrased share is too small")
 for share in (0.3, 0.5):
-    rh = (r_gold / 12) * (1 - share) + (r_para / 6) * share; eh = (e_gold / 12) * (1 - share) + (e_para / 6) * share
+    rh = (r_gold / 12) * (1 - share) + (l_new / 6) * share; eh = (e_gold / 12) * (1 - share) + (e_new / 6) * share
     g = (eh - rh) * MARGIN - (ENCODER_COST - RULE_COST)
-    print(f"  paraphrased share {share}: rule {rh:.3f}, encoder {eh:.3f}, net per query {g:+.4f}" + (f", monthly break-even {RETRAIN_PER_MONTH / g:,.0f} queries after {(GOLDEN_SET + MODEL_BUILD) / g:,.0f}" if g > 0 else ", the rule still wins"))
+    print(f"  new-paraphrase share {share}: lookup+rule {rh:.3f}, encoder {eh:.3f}, net per query {g:+.4f}" + (f", monthly break-even {RETRAIN_PER_MONTH / g:,.0f} queries after {(GOLDEN_SET + MODEL_BUILD) / g:,.0f}" if g > 0 else ", the rule still wins"))
 ```
 
 What each part does:
 
-- **`SPECS`, `GOLD` and `PARAPHRASED`** are chapter 6's catalogue and golden set plus six click-log pairs whose queries share no word with any chunk. The paraphrases join the encoder's training pairs, as chapter 1's clicks did; the rule never sees them.
-- **`rule_order`** ranks chunks by the count of query words they contain and returns nothing for a query with no shared word. **`encoder_order`** is chapter 6's retrieval.
+- **`SPECS`, `GOLD`, `PARAPHRASED` and `HELD_OUT`** are chapter 6's catalogue and golden set, six click-log pairs whose queries share no word with the answering product's chunks, and six held-out paraphrases that reuse the click log's content words with ordinary connectors and that no method trains on. The click-log paraphrases join the encoder's training pairs, as chapter 1's clicks did.
+- **`rule_order`** ranks chunks by the count of query words they contain and returns nothing for a query with no shared word. **`lookup_order`** answers a query seen in the click log with the product clicked then, and otherwise falls back to the rule. **`encoder_order`** is chapter 6's retrieval.
 - **`score`** prints top-1, MRR and recall@3 with its standard error, and returns the top-1 count for the ledger.
-- **Part 2** prices the ledger with invented numbers named in the code: margin per sale, cost per query for each method, the golden set, the build, the monthly upkeep, and the share of paraphrased queries. It solves the break-even volume, and repeats at two other shares.
+- **Part 2** prices the ledger with invented numbers named in the code: margin per sale, cost per query for each method, the golden set, the build, the monthly upkeep, and the share of queries that are new paraphrases. The comparator is the lookup with the rule behind it, and both sides are scored on the held-out paraphrases, so the ledger is a scenario conditioned on that rate. It solves the break-even volume, and repeats at two other shares.
 
 **Expected result**, deterministic on a CPU:
 
@@ -239,20 +265,25 @@ What each part does:
 twelve golden questions that share words with the catalogue:
   keyword rule top-1  6/12  MRR 0.750  recall@3 1.000 ± 0.000
   encoder      top-1  6/12  MRR 0.615  recall@3 0.583 ± 0.142
-six paraphrased queries from the click log, no word shared with any chunk (the encoder trained on these pairs; the rule cannot):
+six paraphrased queries from the click log, no word shared with the answering product's chunks (the encoder trained on these pairs):
   keyword rule top-1  0/6  MRR 0.000  recall@3 0.000 ± 0.000
+  lookup+rule  top-1  6/6  MRR 1.000  recall@3 1.000 ± 0.000
   encoder      top-1  4/6  MRR 0.833  recall@3 1.000 ± 0.000
+six held-out paraphrases nobody typed before, click-log content words with connectors (no method has seen these queries):
+  keyword rule top-1  0/6  MRR 0.083  recall@3 0.167 ± 0.152
+  lookup+rule  top-1  0/6  MRR 0.083  recall@3 0.167 ± 0.152
+  encoder      top-1  5/6  MRR 0.854  recall@3 0.833 ± 0.152
 cost per query: rule 173 word comparisons per query word; encoder one 16-wide pass over the query plus 12 dot products; the assistant adds three writer calls
-top-1 hit rate over the query mix: rule 0.425, encoder 0.525 (share of paraphrased queries 0.15)
-per query: the encoder gains +0.4000 in sales and costs 0.00019 more to run: net +0.3998
-break-even volume: (300.0 + 1200.0 + 150.0 a month) / 0.3998 = 3,752 queries once, then 375 a month
-  paraphrased share 0.3: rule 0.350, encoder 0.550, net per query +0.7998, monthly break-even 188 queries after 1,875
-  paraphrased share 0.5: rule 0.250, encoder 0.583, net per query +1.3331, monthly break-even 113 queries after 1,125
+top-1 hit rate over the query mix: lookup+rule 0.425, encoder 0.550 (share of new paraphrases 0.15, held-out rates 0/6 and 5/6)
+per query: the encoder gains +0.5000 in sales and costs 0.00019 more to run: net +0.4998
+break-even volume: (300.0 + 1200.0 + 150.0 a month) / 0.4998 = 3,001 queries once, then 300 a month
+  new-paraphrase share 0.3: lookup+rule 0.350, encoder 0.600, net per query +0.9998, monthly break-even 150 queries after 1,500
+  new-paraphrase share 0.5: lookup+rule 0.250, encoder 0.667, net per query +1.6665, monthly break-even 90 queries after 900
 ```
 
-Read it against the chapter. The rule wins the golden set on MRR and recall; the encoder wins the paraphrases the rule cannot read at all; the ledger's answer is a volume, and the volume depends on a share the shop can measure.
+Read it against the chapter. The rule wins the golden set on MRR and recall; the lookup wins the click-log paraphrases outright, because it is those pairs; on the held-out paraphrases neither the rule nor the lookup places anything and the encoder places five of six; the ledger's answer is a volume conditioned on that held-out rate, and the volume depends on a share the shop can measure.
 
-Two things to try. First, set `MARGIN` to `1.0`: the encoder's net gain per query at 15% paraphrased falls to about 0.10 and the break-even volume quadruples. Second, set `share_paraphrased` to `0.05`: the net gain per query falls to 0.13 and the break-even climbs to 11,266 queries, then 1,127 a month.
+Two things to try. First, set `MARGIN` to `1.0`: the encoder's net gain per query at 15% new paraphrases falls to 0.12 and the break-even volume quadruples, to 12,018 queries and then 1,202 a month. Second, set `share_paraphrased` to `0.05`: the net gain per query falls to 0.17 and the break-even climbs to 9,010 queries, then 901 a month.
 
 ### Your call: chapter 2's classifier on the ledger
 

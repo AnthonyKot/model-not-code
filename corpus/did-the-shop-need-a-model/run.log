@@ -1,12 +1,17 @@
 twelve golden questions that share words with the catalogue:
   keyword rule top-1  6/12  MRR 0.750  recall@3 1.000 ± 0.000
   encoder      top-1  6/12  MRR 0.615  recall@3 0.583 ± 0.142
-six paraphrased queries from the click log, no word shared with any chunk (the encoder trained on these pairs; the rule cannot):
+six paraphrased queries from the click log, no word shared with the answering product's chunks (the encoder trained on these pairs):
   keyword rule top-1  0/6  MRR 0.000  recall@3 0.000 ± 0.000
+  lookup+rule  top-1  6/6  MRR 1.000  recall@3 1.000 ± 0.000
   encoder      top-1  4/6  MRR 0.833  recall@3 1.000 ± 0.000
+six held-out paraphrases nobody typed before, click-log content words with connectors (no method has seen these queries):
+  keyword rule top-1  0/6  MRR 0.083  recall@3 0.167 ± 0.152
+  lookup+rule  top-1  0/6  MRR 0.083  recall@3 0.167 ± 0.152
+  encoder      top-1  5/6  MRR 0.854  recall@3 0.833 ± 0.152
 cost per query: rule 173 word comparisons per query word; encoder one 16-wide pass over the query plus 12 dot products; the assistant adds three writer calls
-top-1 hit rate over the query mix: rule 0.425, encoder 0.525 (share of paraphrased queries 0.15)
-per query: the encoder gains +0.4000 in sales and costs 0.00019 more to run: net +0.3998
-break-even volume: (300.0 + 1200.0 + 150.0 a month) / 0.3998 = 3,752 queries once, then 375 a month
-  paraphrased share 0.3: rule 0.350, encoder 0.550, net per query +0.7998, monthly break-even 188 queries after 1,875
-  paraphrased share 0.5: rule 0.250, encoder 0.583, net per query +1.3331, monthly break-even 113 queries after 1,125
+top-1 hit rate over the query mix: lookup+rule 0.425, encoder 0.550 (share of new paraphrases 0.15, held-out rates 0/6 and 5/6)
+per query: the encoder gains +0.5000 in sales and costs 0.00019 more to run: net +0.4998
+break-even volume: (300.0 + 1200.0 + 150.0 a month) / 0.4998 = 3,001 queries once, then 300 a month
+  new-paraphrase share 0.3: lookup+rule 0.350, encoder 0.600, net per query +0.9998, monthly break-even 150 queries after 1,500
+  new-paraphrase share 0.5: lookup+rule 0.250, encoder 0.667, net per query +1.6665, monthly break-even 90 queries after 900

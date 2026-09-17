@@ -4,6 +4,10 @@ Read this first in any new session, then only the files it names. Updated 2026-0
 
 ## The book is complete — 2026-09-17
 
+**Rework applied, 2026-09-17 (Claude main session, Codex out of tokens):** chapter 6's case B now retrieves the edited chunk for the customer's question (top-3 search, a scripted reading rule, a clean control), and its T1 discussion accepts retrieval plus an unsupported attribution; chapter 8 adds six held-out paraphrases and a click-log lookup comparator and conditions the ledger on the held-out rates (break-even 3,001 then 300 a month at 15%). Independent AGY review: chapter 6 pass, chapter 8 three text fixes applied; `checks/reviews/rework-2026-09-17/report.md`. Decisions in both chapter notes; exercises re-run on PyTorch 2.14.0+cpu (scratch venv; the earlier interpreter no longer exists). The tabular chapter stays deferred. The author's read of chapters 5–8 remains outstanding.
+
+**Agent editorial read, 2026-09-17:** at the author's request, Codex read chapters 5–8 in full before reassessing a proposed tabular-ML addition. Recommendation: defer expansion; repair chapter 6's injection demonstration and diagnostic feedback first, then tighten chapter 8's training-pair comparison. Evidence and bounded follow-up: `notes/reviews/chapters-05-08-read-2026-09-17.md`. This was an agent read, not the author's read or a fresh exercise run; chapter content is unchanged.
+
 All eight chapters are published. Owed: the author's read of chapters 5–8 (each has a bounded reader decision; the
 author's own attempt is the only human evidence about them). Ideas still in the pool for chapters 1–4: a prediction pause
 per chapter, a preview of chapter 3's choice table, reader decisions modelled on chapters 5–8, chapter 1's cosine
