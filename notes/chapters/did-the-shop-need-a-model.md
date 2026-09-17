@@ -45,7 +45,7 @@ InstructGPT's ± has no stated n on p. 3; ts-foundation's "50%" is 0.517 and 0.5
 
 ## Owed
 
-- Gemini review; blind Haiku solve; the author's read; publish on the author's say; RESUME/CONTEXT at publish time.
+- The author's read. Published 2026-09-17.
 
 ## Review decisions (2026-09-17)
 

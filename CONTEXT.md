@@ -409,6 +409,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   ≈19.4k characters of prose; 36 receipts (12 EPUB sections unpaged). Chapter 8 outlined and approved (full ladder;
   ledger revisits chapter 2's classifier); its research and exercise prototype are done.
 
+- **2026-09-17 (later)** — Chapter 8, *Did the Shop Need a Model?*, written from the approved outline, blind-solved
+  (two arithmetic errors found and fixed), Gemini-reviewed (7 applied), revised on the author's three ending notes
+  (closing table; shorter research examples; the audit charged to rule and model alike) and published. The book's
+  eight chapters are complete; the author's read of chapters 5–8 is owed.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this

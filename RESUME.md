@@ -2,6 +2,19 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
+## The book is complete — 2026-09-17
+
+All eight chapters are published. Owed: the author's read of chapters 5–8 (each has a bounded reader decision; the
+author's own attempt is the only human evidence about them). Ideas still in the pool for chapters 1–4: a prediction pause
+per chapter, a preview of chapter 3's choice table, reader decisions modelled on chapters 5–8, chapter 1's cosine
+derivation folded if it interrupted the author. Solver records: `notes/reviews/solver-0{5,6,7,8}-*`.
+
+## Chapter 8 published — 2026-09-17
+
+`did-the-shop-need-a-model`: the ledger and its break-even; a rule and the encoder on chapter 6's golden set; the
+course's ladder read with intervals; a closing table of what the shop keeps, questions and would need to see; the
+reader's ledger on chapter 2's classifier. Evidence and decisions: `notes/chapters/did-the-shop-need-a-model.md`.
+
 ## Chapter 7 published — 2026-09-17
 
 `serve-the-assistant-cheaply`: KV cache (42 vs 9 key/value rows), four-bit blocks by hand with the outlier, batching
@@ -55,7 +68,7 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 | 5 | `keep-it-right-after-launch` | published 2026-09-16 from an approved outline (author's three decisions in `notes/chapters/keep-it-right-after-launch-outline.md`); Gemini first-round review: 2 proposals applied; first chapter with a bounded reader decision (hints and discussion collapsed); author's read owed |
 | 6 | `build-the-assistant` | published 2026-09-16 from an approved outline; Gemini first round: 3 applied; blind Haiku solve clean; author's read owed |
 | 7 | `serve-the-assistant-cheaply` | published 2026-09-17; Gemini first round: 4 applied (one was a leaking prediction pause); blind Haiku solve on the pre-review packet; author's read owed |
-| 8 | `did-the-shop-need-a-model` | outline approved 2026-09-16 (full ladder; the reader's ledger revisits chapter 2's classifier); research done, exercise prototyped, prose next |
+| 8 | `did-the-shop-need-a-model` | published 2026-09-17; Gemini first round: 7 applied; blind Haiku solve found two arithmetic errors, fixed; author's three ending notes applied; author's read owed |
 
 Live: https://anthonykot.github.io/model-not-code/ (chapters) · `/old/` (archive).
 
