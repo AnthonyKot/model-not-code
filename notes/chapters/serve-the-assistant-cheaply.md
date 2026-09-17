@@ -33,7 +33,7 @@
 
 ## Owed
 
-- Receipts from the research pass; Gemini review; blind Haiku solve; the author's read; publish on the author's say.
+- The author's read. Published 2026-09-17.
 
 ## Review decisions (2026-09-16)
 

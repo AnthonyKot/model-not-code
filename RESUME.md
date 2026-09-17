@@ -2,6 +2,13 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
+## Chapter 7 published — 2026-09-17
+
+`serve-the-assistant-cheaply`: KV cache (42 vs 9 key/value rows), four-bit blocks by hand with the outlier, batching
+as arithmetic intensity with the CPU's own crossover, a lever table, and a reader case on a serving report where the
+proposed bigger card is capped at 1.4x and four-bit weights are the first lever. Evidence and decisions:
+`notes/chapters/serve-the-assistant-cheaply.md`.
+
 ## Chapter 6 published — 2026-09-16
 
 `build-the-assistant`: golden-set retrieval metrics, chunk boundary, tool loop with dispatch table and confirmation
@@ -47,8 +54,8 @@ revision 2, approved). The twelve earlier essays are an archive at `/old/` on th
 | 4 | `train-from-reward` | published 2026-09-14; codex review applied (48 demonstrations, corridor label, clip wording); Gemini round 2: 0 proposals |
 | 5 | `keep-it-right-after-launch` | published 2026-09-16 from an approved outline (author's three decisions in `notes/chapters/keep-it-right-after-launch-outline.md`); Gemini first-round review: 2 proposals applied; first chapter with a bounded reader decision (hints and discussion collapsed); author's read owed |
 | 6 | `build-the-assistant` | published 2026-09-16 from an approved outline; Gemini first round: 3 applied; blind Haiku solve clean; author's read owed |
-| 7 | `serve-the-assistant-cheaply` | outline approved 2026-09-16 (plain scale-and-zero-point quantisation; timings printed with a variability note); research and prototype next |
-| 8 | `did-the-shop-need-a-model` | not started; the fine-tuning ladder is banked in `notes/chapters/did-the-shop-need-a-model-material.md` |
+| 7 | `serve-the-assistant-cheaply` | published 2026-09-17; Gemini first round: 4 applied (one was a leaking prediction pause); blind Haiku solve on the pre-review packet; author's read owed |
+| 8 | `did-the-shop-need-a-model` | outline approved 2026-09-16 (full ladder; the reader's ledger revisits chapter 2's classifier); research done, exercise prototyped, prose next |
 
 Live: https://anthonykot.github.io/model-not-code/ (chapters) · `/old/` (archive).
 

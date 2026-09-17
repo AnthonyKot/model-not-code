@@ -262,7 +262,7 @@ export const chapters = [
     [],
     [C("6538601", "03-05", "03-06", "03-07", "04-01"), C("6100015", "03-15", "07-03", "08-05"),
      B("inference-eng", "pp. 64–65, 122–130, 188–191"), B("llm-serving", "ch. 3, 5, 6"), B("quant-ru", "pp. 12–14"), B("llm-deep-dive", "p. 188")],
-    { status: "planned",
+    { status: "published",
       caution: "Chapter 1's toy generator, an invented machine and an invented serving report; the CPU timings are measured on one machine and vary. Hardware ratios and engine feature names are as of the sources' dates." }),
   CH(8, "did-the-shop-need-a-model", "Did the Shop Need a Model?",
     "A keyword rule, the search encoder and the assistant compared on the quality and cost measured in this book.",

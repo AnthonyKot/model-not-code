@@ -23,13 +23,13 @@
     </a>
     <div class="header-actions">
       <a href="about.html">About</a>
-      <span class="progress-summary" data-progress-summary>0 of 6 exercises</span>
+      <span class="progress-summary" data-progress-summary>0 of 7 exercises</span>
       <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
     </div>
   </header>
   <div class="page-shell">
     <aside class="book-nav" id="book-navigation" data-book-nav>
-      <div class="book-nav__intro"><a href="index.html">The chapters</a><p>One shop, eight chapters. 6 of 8 written. <a href="old/index.html">Archived essays →</a></p></div>
+      <div class="book-nav__intro"><a href="index.html">The chapters</a><p>One shop, eight chapters. 7 of 8 written. <a href="old/index.html">Archived essays →</a></p></div>
       <nav aria-label="Book contents">
     <a class="book-nav__item" href="chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
       <span class="book-nav__number">01</span>
@@ -61,11 +61,11 @@
       <span>Build the Assistant</span>
       <span class="book-nav__check" aria-label="Exercise completed">✓</span>
     </a>
-    <span class="book-nav__item book-nav__item--planned">
+    <a class="book-nav__item" href="chapters/serve-the-assistant-cheaply.html" data-mission-link="serve-the-assistant-cheaply">
       <span class="book-nav__number">07</span>
-      <span>Serve the Assistant Cheaply<small class="book-nav__planned">in writing</small></span>
-      <span></span>
-    </span>
+      <span>Serve the Assistant Cheaply</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
     <span class="book-nav__item book-nav__item--planned">
       <span class="book-nav__number">08</span>
       <span>Did the Shop Need a Model?<small class="book-nav__planned">in writing</small></span>
@@ -81,7 +81,7 @@
         <a class="button button--primary" href="chapters/search-the-catalogue.html">Start with chapter 1</a>
         <a class="button button--quiet" href="old/index.html">Archived essays</a>
       </div>
-      <div class="home-proof"><span><strong>6</strong> of 8 chapters written</span></div>
+      <div class="home-proof"><span><strong>7</strong> of 8 chapters written</span></div>
     </section>
     <section class="shelf-section" id="the-chapters">
       <div class="section-heading"><div><span class="section-label">The chapters</span><h2>Reading order</h2></div><p>Read in order: each chapter builds on the shop the previous one left.</p></div>
@@ -115,11 +115,11 @@
     <h3><a href="chapters/build-the-assistant.html">Build the Assistant</a></h3>
     <p>The assistant answered wrongly: score retrieval on a golden set, see what a chunk boundary cuts off, trace the loop that runs the tools, refuse an instruction that arrived inside a listing, and tell which stage failed.</p>
     <a class="shelf-card__action" href="chapters/build-the-assistant.html">Read the chapter <span>→</span></a>
-  </article><article class="shelf-card shelf-card--planned">
-    <div class="shelf-card__top"><span>Chapter 7</span><span class="shelf-card__status">In writing</span></div>
-    <h3>Serve the Assistant Cheaply</h3>
-    <p>What the generator costs per token and where it goes down: the KV cache, four bits per weight, batching.</p>
-    
+  </article><article class="shelf-card shelf-card--recommended" data-mission-card="serve-the-assistant-cheaply">
+    <div class="shelf-card__top"><span>Chapter 7</span><span class="shelf-card__status">Unread</span></div>
+    <h3><a href="chapters/serve-the-assistant-cheaply.html">Serve the Assistant Cheaply</a></h3>
+    <p>Where a generated token's cost goes and which lever moves it: keep the keys and values, read four bits per weight, batch the tokens, and read a serving report before buying a bigger card.</p>
+    <a class="shelf-card__action" href="chapters/serve-the-assistant-cheaply.html">Read the chapter <span>→</span></a>
   </article><article class="shelf-card shelf-card--planned">
     <div class="shelf-card__top"><span>Chapter 8</span><span class="shelf-card__status">In writing</span></div>
     <h3>Did the Shop Need a Model?</h3>

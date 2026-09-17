@@ -404,6 +404,11 @@ Review log (accepted / rejected, by essay) accumulates below as essays are revie
   blind-solved clean and published. ≈20.7k characters of prose; 37 receipts. Chapter 7 outline approved with the
   author's two picks. Chapter 2's loader detail made optional.
 
+- **2026-09-17** — Chapter 7, *Serve the Assistant Cheaply*, written from the approved outline, Gemini-reviewed (4
+  applied, including a prediction pause that restated the reader case and was replaced), blind-solved and published.
+  ≈19.4k characters of prose; 36 receipts (12 EPUB sections unpaged). Chapter 8 outlined and approved (full ladder;
+  ledger revisits chapter 2's classifier); its research and exercise prototype are done.
+
 ## 10. Open questions
 
 - Whether Part VI's four essays, sourced mostly from books rather than courses, belong in this
