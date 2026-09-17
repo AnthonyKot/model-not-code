@@ -17,8 +17,8 @@ The ledger has two columns and the same rows in each:
 | Building | a test, a code review | labelling, training, a golden set, the build |
 | Per decision | a few comparisons | a model pass, sometimes several |
 | Being wrong | the rule's misses and false flags, priced | the model's, priced on the same set |
-| Knowing it is still right | the test | chapter 5's audit, every week |
-| When the world changes | edit the rule | retrain, re-evaluate, re-gate |
+| Knowing it is still right | the same audit: a rule's inputs change too, and sellers learn rules | chapter 5's audit, every week |
+| When the world changes | edit the rule, re-run its test | retrain, re-evaluate, re-gate |
 | What it cannot reach | everything the rule does not name | what the training data did not show |
 
 The break-even condition is the ledger solved for volume:
@@ -72,15 +72,25 @@ The claim is the last row: a small open model with adapters beat every frontier 
 
 The re-derived number is the interval. The only rung with one is the random pricer: ± 37 at 95% on 200 items, so its standard error is about 18.9 and the spread of a single item's error about 267. That spread does not transfer to the better rungs, whose errors are smaller, but the shape of the arithmetic does: a 200-item mean of errors near 60 has a standard error of a few dollars for any plausible spread, 2.8 if the per-item spread is 40, 5.7 if it is 80, and the 50-item run's is twice that. So 62.51 against 63.97 is a gap of 1.46 on a standard error of a few, not a ranking; 57.62 against 58.68 is the same; and the fine-tune's 75.91 against its own 62.51 is a real loss only if its distribution is narrower than its earlier reruns suggest. A ladder read without intervals is a ranking of products; read with them, it is three or four groups, and the model names inside a group are as-of the recording and interchangeable.
 
-Two more tables, from the evaluation that introduced the method behind chapter 4, show what "held fixed" means. The claim: a 175-billion-parameter model tuned on human preferences was preferred to the untuned model 85 ± 3% of the time, and 71 ± 4% against the same model given a few examples in its prompt. The table's baseline was fixed, a supervised model of the same size, and so was the prompt distribution, the service's own users' prompts, on which an instruction-following model is at an acknowledged advantage. The ± does not say what it is: read as a 95% interval, 85 ± 3 implies about 544 comparisons; read as one standard error, about 142. The method section gives the number to re-derive: labellers ranked K = 4 to 9 answers per prompt, giving K-choose-2 comparisons, 6 at K = 4 and 36 at K = 9, and because the 36 share an answer they are correlated, so shuffling them into one dataset made a single pass overfit; the fix was to keep one prompt's comparisons together. And the labellers agreed among themselves 72.6 ± 1.5% of the time, which caps how much of the 85 is the model.
+The same reading applies to the table behind chapter 4's method: a 175-billion-parameter model tuned on human preferences was preferred to the untuned model 85 ± 3% of the time, against a fixed baseline on the service's own users' prompts, where an instruction-following model has an acknowledged advantage. The ± does not say what it is: as a 95% interval it implies about 544 comparisons, as one standard error about 142. The number to re-derive is in the method: labellers ranked K = 4 to 9 answers per prompt, K-choose-2 comparisons each, 6 at K = 4 and 36 at K = 9, correlated because they share answers, which is why shuffling them overfit in one pass. And the labellers agreed among themselves 72.6 ± 1.5% of the time, which caps how much of the 85 is the model.
 
-A smaller table shows the other failure. A forecasting example compares a pretrained model with no fine-tuning, a fine-tuned one and one trained from scratch on twelve monthly test points of one series: errors 1.59, 1.99 and 1.90, and reads the first as the power of pretrained models. The fine-tune ran ten steps, the from-scratch model a hundred. A second evaluation then has the same pretrained model losing to a from-scratch model on twelve daily points, 2.59 against 1.34, called a 50% improvement (1.34 / 2.59 = 0.517), and concludes that data frequency breaks pretrained forecasters. Between the two tables the frequency changed, and so did the domain, the training budget (500 steps this time), and the twelve points. Neither table has an interval. What changed besides frequency is the whole question, and the table cannot answer it.
+The opposite failure is a table too small to carry its conclusion: a forecasting example scores three models on twelve test points of one series, 1.59, 1.99 and 1.90, and reads the first as the power of pretrained models; a second table on twelve daily points reverses it, 2.59 against 1.34, and concludes that frequency breaks them. Between the tables the frequency changed, and so did the domain, the training budget and the twelve points, with no interval on either. What changed besides frequency is the whole question.
 
 **Before reading on:** a vendor's table shows their model at 0.91 and the open model you run at 0.88 on the vendor's benchmark. Write down the three things you would need to know before that gap means anything.
 
-## Where the book's models sit
+## What the shop keeps, questions, and would need to see
 
-Chapter 1's encoder beat a keyword rule only on the queries the rule cannot read, and the exercise's ledger says at what share of such queries it pays. Chapter 2's classifier is the reader case below. Chapter 4's tuning bought a measured preference from a hidden scorer on synthetic answers, at the cost of a reward model, a labelling process and the guard against reward hacking; whether people prefer the tuned writer is the release test the chapter deferred to people. Chapter 5's audit is the model's running cost that a rule never had, and the one that made the model's failure visible. Chapter 6's assistant costs three writer calls per answer and chapter 7 priced them; the same twelve questions were answered by a rule at 173 comparisons each. On every row the model's advantage is a measured gap on a specific slice of inputs, and the ledger is the slice's share times the gap, minus the cost of keeping the model right.
+Seven chapters, one ledger each. "Not established" is a finding, not a gap in the book: it names the evidence the shop has not bought yet.
+
+| Component | What the book demonstrated | What is not established | The shop's next decision, and the evidence that would settle it |
+|---|---|---|---|
+| Search encoder (ch. 1, 8) | reads click-log paraphrases a keyword rule cannot; ties the rule on shared-word questions | the share of paraphrased queries in the real logs; MRR is unpriced | keep the rule as the fallback; measure the paraphrase share for a month, then read the break-even |
+| Answer writer (ch. 1, 3, 4) | learns a format from a few hundred examples; a tuned version pleases a hidden scorer more than the reference | that people prefer the tuned writer; the cost of the labelling that a real reward model needs | do not ship tuning on the reward model's score; run the preference comparison with people on fresh prompts |
+| Photo classifier (ch. 2, 5) | 0.684 blade recall at a priced threshold; an audit that separates fewer blades from more misses | that it beats the seller-declared rule on cost at the shop's volume; the seller dodge rate | the reader case below; the audit is the purchase either way |
+| Assistant loop (ch. 6) | refuses an injected write; three failure stages separable by their evidence | answer accuracy on a golden set larger than twelve; the judge's agreement with people | grow the golden set from real questions; measure the judge against a labelled sample before trusting its scores |
+| Serving (ch. 7) | four-bit weights are the first lever for latency at low load; a bigger card is capped by its bandwidth ratio | that the quantised generator's answers survive; the machine's own crossover | the golden set again, with its standard error; step time against batch size on the shop's card |
+
+What the shop keeps without further evidence is the audit, the golden set and the ledger itself: they are the instruments, and every row's next decision is a measurement one of them makes. What it questions is every model whose advantage is a measured gap on a slice of inputs whose share nobody has counted. What would change any row is on that row.
 
 ## What a real project adds
 
@@ -88,7 +98,7 @@ The prices are the business's: what a missed blade costs, what an hour of review
 
 Volume is a forecast, and the ledger is a bet on it. Write down the volume at which the decision flips and check it quarterly.
 
-Drift turns the ledger into a time series. A rule's misses are constant until someone edits it; a model's drift is chapter 5's whole subject, and its audit is a line item forever.
+Drift turns the ledger into a time series for both columns. A model drifts when its inputs do, which is chapter 5's whole subject; a rule drifts when the people it reads learn it, which is the reader case below. The audit that measures either is a line item forever, and a ledger that charges it to the model alone is wrong by that line.
 
 The rule's gap is real and usually the reason the model was proposed. Price it, measure its share in the logs, and put it on the ledger's last row where it can be seen instead of assumed.
 

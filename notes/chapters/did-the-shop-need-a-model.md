@@ -57,3 +57,11 @@ already fixed from the solver, Gemini's independent recomputation (44%, 72%) mat
 course", "the lecturer", "the paper", "a forecasting book", "the text reads"): applied with the book as the voice,
 keeping every figure and its single-run caveat; the credit line still names the sources. Gemini verified the ledger,
 break-even, K-choose-2 and interval arithmetic against the logs and found no disclosure in the reader case.
+
+## Author's read notes applied (2026-09-17)
+
+(1) "Where the book's models sit" replaced by a closing table (component, demonstrated, not established, next
+decision and its evidence) plus what the shop keeps without further evidence: the audit, the golden set, the ledger.
+(2) The two research examples shortened so the ladder is the one long example and the chapter returns to the shop
+sooner. (3) The rule/model asymmetry corrected: the ledger's "knowing it is still right" row and the real-project drift
+paragraph now charge the audit to both columns, since sellers learn rules (the reader case's own point).
