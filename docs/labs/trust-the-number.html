@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The lab for chapter 2, Trust the Number Before You Ship the Classifier: split, weight, threshold, then score the release.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Lab: split, weight, threshold, then score the release">
+  <meta property="og:description" content="The lab for chapter 2, Trust the Number Before You Ship the Classifier: split, weight, threshold, then score the release.">
+  <meta property="og:type" content="website">
+  <title>Lab: split, weight, threshold, then score the release · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script defer src="../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="trust-the-number">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 8 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 8 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <nav aria-label="Book contents">
+    <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
+      <span class="book-nav__number">01</span>
+      <span>Search the Catalogue, Then Answer From It</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
+      <span class="book-nav__number">02</span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
+      <span class="book-nav__number">03</span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
+      <span class="book-nav__number">04</span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/keep-it-right-after-launch.html" data-mission-link="keep-it-right-after-launch">
+      <span class="book-nav__number">05</span>
+      <span>Keep It Right After Launch</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/build-the-assistant.html" data-mission-link="build-the-assistant">
+      <span class="book-nav__number">06</span>
+      <span>Build the Assistant</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/serve-the-assistant-cheaply.html" data-mission-link="serve-the-assistant-cheaply">
+      <span class="book-nav__number">07</span>
+      <span>Serve the Assistant Cheaply</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/did-the-shop-need-a-model.html" data-mission-link="did-the-shop-need-a-model">
+      <span class="book-nav__number">08</span>
+      <span>Did the Shop Need a Model?</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page lab-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>02</span>Lab · <a href="../chapters/trust-the-number.html">Chapter 2, Trust the Number Before You Ship the Classifier</a></div>
+      <h1 class="essay-title">split, weight, threshold, then score the release</h1>
+      <p class="essay-payoff">Runs on a laptop CPU. The expected output is printed below the code; mark the exercise complete when yours matches.</p>
+    </header>
+    <article class="prose"><p>The lab for chapter 2, <a href="../chapters/trust-the-number.html">Trust the Number Before You Ship the Classifier</a>. It builds the synthetic catalogue, trains the same small network under both splits and with a class weight, chooses the blade threshold on validation, scores the release per listing, and measures the input pipeline the setup section below describes.</p>
+<h2 id="before-you-run-it-the-gpu-waits-on-the-jpeg-decoder">Before you run it: the GPU waits on the JPEG decoder</h2>
+<p>Every section so far ends in &quot;train again and compare&quot;, so how fast one training run goes decides how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.</p>
+<p>When that CPU work is slower than the training step, the accelerator sits idle between batches, and the fix is more loading processes, <code>DataLoader(num_workers=…)</code> in PyTorch, until loading stops being the slower side. Measure the two sides before buying a faster accelerator: if loading is the bottleneck, the new accelerator waits just as long.</p>
+<details>
+<summary>Optional: forecast the step time and tune the loader</summary>
+
+<p>Split one training step in two. The <strong>load</strong> time L builds one batch on the CPU; the <strong>compute</strong> time C runs the forward pass, the loss, the backward pass and the optimiser step. A plain loop does them in turn, so a step takes L + C. With a separate loading process and a queue between the two, the next batch is built while the current one trains, and in steady state batches pass at the rate of the slower side:</p>
+<p class="formula">step = max(L / W, C)</p>
+
+<p>W is the number of loading processes, each building whole batches, and L/W their combined time per batch, as long as each has a free CPU core. C is the training step. The maximum is whichever side is slower, so speeding up the faster side changes nothing.</p>
+<p>Say one photo takes 5 ms to decode and augment on one core, a batch is 64 photos, so L = 320 ms, and the training step takes C = 100 ms. An epoch of 100,000 photos is 1,563 steps.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Step</th>
+<th>Accelerator busy, C ÷ step</th>
+<th>Epoch</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Load, then train, in one process</td>
+<td>320 + 100 = 420 ms</td>
+<td>23.8%</td>
+<td>656 s</td>
+</tr>
+<tr>
+<td>One loading process</td>
+<td>max(320, 100) = 320 ms</td>
+<td>31.2%</td>
+<td>500 s</td>
+</tr>
+<tr>
+<td>Two</td>
+<td>max(160, 100) = 160 ms</td>
+<td>62.5%</td>
+<td>250 s</td>
+</tr>
+<tr>
+<td>Three</td>
+<td>max(106.7, 100) = 106.7 ms</td>
+<td>93.8%</td>
+<td>167 s</td>
+</tr>
+<tr>
+<td>Four</td>
+<td>max(80, 100) = 100 ms</td>
+<td>100%</td>
+<td>156 s</td>
+</tr>
+<tr>
+<td>Eight</td>
+<td>max(40, 100) = 100 ms</td>
+<td>100%</td>
+<td>156 s</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The fourth process is the last one that helps. A faster accelerator that halves C leaves the one-loading-process pipeline at 320 ms a step, now busy 15.6% of the time. Measure before buying: in the plain loop, time the call that fetches a batch (L) and the training step (C), stopping the step&#39;s timer only after the accelerator has finished its queued work.</p>
+<p>In PyTorch the loading side is <code>DataLoader</code>. <code>num_workers</code> is W; with the default 0, batches are built in the training process itself, which is the L + C row. <code>prefetch_factor</code> is how many batches each worker keeps ready, a buffer against slow batches rather than a speed setting. <code>pin_memory=True</code> puts finished batches in page-locked memory so the copy to the accelerator is faster, and <code>persistent_workers=True</code> keeps the workers alive between epochs instead of starting them again. The exercise&#39;s optional last part measures a real <code>DataLoader</code> against the forecast.</p>
+</details>
+
+<section class="mission" data-mission="trust-the-number"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-split-weight-threshold-then-score-the-release">Exercise: split, weight, threshold, then score the release</h2>
+<p>The script builds a synthetic catalogue, trains the same small network several ways and prints every number the release record above uses. It needs PyTorch on a CPU and runs in about 10 seconds.</p>
+<pre><code class="language-python">import time
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+
+S = 12                                                   # photos are 12 x 12 pixels, one channel
+CATS = [&quot;cable&quot;, &quot;kettle&quot;, &quot;lamp&quot;, &quot;blade&quot;]
+FLAG_COST, MISS_COST = 2.0, 20.0                          # a reviewer&#39;s check; a blade sold without an age check
+SHARE = torch.tensor([0.50, 0.30, 0.15, 0.05])           # blades are the rare category
+SHAPES = torch.tensor([[[0, 0, 0], [1, 1, 1], [0, 0, 0]],   # cable
+                       [[0, 1, 0], [0, 1, 0], [0, 1, 0]],   # kettle
+                       [[0, 0, 1], [0, 1, 0], [1, 0, 0]],   # lamp
+                       [[1, 0, 0], [0, 1, 0], [0, 0, 1]]]).float()  # blade
+
+def make_products(n, gen):
+    cat = torch.multinomial(SHARE, n, replacement=True, generator=gen)
+    look = 1.5 * torch.randn(n, S, S, generator=gen)     # background and packaging: one per product
+    look[:, 2:-2, 2:-2] = 0                              # ...around the border of every photo
+    return cat, look
+
+def photos(cat, look, gen, per_product=4):
+    n = len(cat) * per_product
+    x = look.repeat_interleave(per_product, 0) + 0.5 * torch.randn(n, S, S, generator=gen)
+    y = cat.repeat_interleave(per_product)
+    for i in range(n):                                   # the category&#39;s shape, somewhere in the middle
+        r, c = torch.randint(2, S - 4, (2,), generator=gen).tolist()
+        x[i, r:r + 3, c:c + 3] += 1.8 * SHAPES[y[i]]
+    product = torch.arange(len(cat)).repeat_interleave(per_product)
+    return x[:, None], y, product
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = nn.Conv2d(1, 16, 3, padding=1)
+        self.shape = nn.Linear(16, 4)                    # strongest response anywhere in the photo
+        self.layout = nn.Linear(16 * S * S, 4)           # the whole map, border included
+    def forward(self, x):
+        h = F.relu(self.conv(x))
+        return self.shape(h.amax(dim=(2, 3))) + self.layout(h.flatten(1))
+
+def train(x, y, weight=None, epochs=8):
+    torch.manual_seed(1)
+    model = Net()
+    opt = torch.optim.Adam(model.parameters(), lr=3e-3)
+    loss_fn = nn.CrossEntropyLoss(weight=weight)
+    for _ in range(epochs):
+        for idx in torch.randperm(len(x)).split(64):
+            opt.zero_grad()
+            loss_fn(model(x[idx]), y[idx]).backward()
+            opt.step()
+    return model
+
+def probs(model, x):
+    with torch.no_grad():
+        return F.softmax(model(x), dim=1)
+
+def report(name, p, y, blade_threshold=None):
+    &quot;&quot;&quot;Two decisions: the category shown (argmax) and the age-check flag (blade score &gt;= threshold).&quot;&quot;&quot;
+    flagged = p.argmax(1) == 3 if blade_threshold is None else p[:, 3] &gt;= blade_threshold
+    blade = y == 3
+    fp, fn = (flagged &amp; ~blade).sum().item(), (~flagged &amp; blade).sum().item()
+    print(f&quot;{name:34s} category accuracy {(p.argmax(1) == y).float().mean():.3f}  blade recall {(flagged &amp; blade).sum() / blade.sum():.3f}&quot;
+          f&quot;  false flags {fp:3d}  missed blades {fn:2d}  cost {FLAG_COST * fp + MISS_COST * fn:7.1f}&quot;)
+
+class JpegFolder(Dataset):
+    &quot;&quot;&quot;Stands in for photos on disk: every item costs 2 ms of decoding.&quot;&quot;&quot;
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+    def __len__(self):
+        return len(self.x)
+    def __getitem__(self, i):
+        time.sleep(0.002)
+        return self.x[i], self.y[i]
+
+def ms_per_step(loader, steps=12):
+    it = iter(loader)
+    for _ in range(4):                                   # warm up: start the workers, fill the queue
+        next(it); time.sleep(0.020)
+    start = time.perf_counter()
+    for _ in range(steps):
+        next(it)
+        time.sleep(0.020)                                # stands in for forward + backward, C = 20 ms
+    return 1000 * (time.perf_counter() - start) / steps
+
+if __name__ == &quot;__main__&quot;:
+    gen = torch.Generator().manual_seed(0)
+    cat, look = make_products(2500, gen)                 # the labelled catalogue: 10,000 photos
+    x, y, product = photos(cat, look, gen)
+    new_cat, new_look = make_products(500, gen)          # products listed after the model ships
+    x_test, y_test, _ = photos(new_cat, new_look, gen)
+
+    # 1. Split by photo, then by product.
+    order = torch.randperm(len(x), generator=gen)
+    held, rest = order[:2000], order[2000:]
+    by_photo = train(x[rest], y[rest])
+    sibling = torch.isin(product[held], product[rest]).float().mean()
+    print(f&quot;held-out photos whose product has a photo in training: {sibling:.3f}&quot;)
+    val = product &lt; 500                                  # 500 whole products held out
+    by_product = train(x[~val], y[~val])
+    acc = lambda m, xs, ys: (probs(m, xs).argmax(1) == ys).float().mean().item()
+    print(f&quot;split by photo:   held-out accuracy {acc(by_photo, x[held], y[held]):.3f}&quot;)
+    print(f&quot;split by product: held-out accuracy {acc(by_product, x[val], y[val]):.3f}&quot;)
+
+    # 2. The rare category: accuracy, recall, and a class weight.
+    x_val, y_val = x[val], y[val]
+    print(f&quot;never flag a blade, on validation: {(y_val != 3).float().mean():.3f} of photos answered right&quot;)
+    counts = torch.bincount(y[~val], minlength=4).float()
+    weight = counts.sum() / counts                       # inverse frequency
+    print(&quot;class weights:&quot;, [round(w, 2) for w in weight.tolist()])
+    weighted = train(x[~val], y[~val], weight=weight)
+    report(&quot;unweighted, argmax&quot;, probs(by_product, x_val), y_val)
+    report(&quot;weighted, argmax&quot;, probs(weighted, x_val), y_val)
+
+    # 3. The threshold as a cost: FLAG_COST per false flag, MISS_COST per missed blade. Chosen on validation only.
+    p_val = probs(by_product, x_val)
+    grid = [0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001]
+    cost = lambda t: FLAG_COST * ((p_val[:, 3] &gt;= t) &amp; (y_val != 3)).sum().item() + MISS_COST * ((p_val[:, 3] &lt; t) &amp; (y_val == 3)).sum().item()
+    best = min(grid, key=cost)
+    print(&quot;validation cost by blade threshold:&quot;, {t: round(cost(t), 2) for t in grid}, &quot;-&gt; chosen&quot;, best)
+
+    # 4. The shop decides per listing: average its four photos, then choose on validation.
+    def per_listing(p, labels):
+        # photos() keeps each product&#39;s four photos together, including after the product split.
+        return p.reshape(-1, 4, 4).mean(1), labels.reshape(-1, 4)[:, 0]
+
+    listing_val, listing_y_val = per_listing(p_val, y_val)
+    def listing_cost(t):
+        flagged = listing_val[:, 3] &gt;= t
+        blade = listing_y_val == 3
+        return FLAG_COST * (flagged &amp; ~blade).sum().item() + MISS_COST * (~flagged &amp; blade).sum().item()
+    listing_best = min(grid, key=listing_cost)
+    print(&quot;validation cost by LISTING threshold:&quot;, {t: listing_cost(t) for t in grid}, &quot;-&gt; chosen&quot;, listing_best)
+
+    # 5. Score test data only after both thresholds are fixed. Photo rows are guided comparisons.
+    report(&quot;TEST: split by photo, argmax&quot;, probs(by_photo, x_test), y_test)
+    report(&quot;TEST: split by product, argmax&quot;, probs(by_product, x_test), y_test)
+    report(f&quot;TEST: per-photo, threshold {best}&quot;, probs(by_product, x_test), y_test, blade_threshold=best)
+
+    listing_test, listing_y_test = per_listing(probs(by_product, x_test), y_test)
+    report(&quot;LISTING TEST: argmax&quot;, listing_test, listing_y_test)
+    report(f&quot;LISTING TEST: shipped, t={listing_best}&quot;, listing_test, listing_y_test, blade_threshold=listing_best)
+    listing_accuracy = (listing_test.argmax(1) == listing_y_test).float().mean().item()
+    se = (listing_accuracy * (1 - listing_accuracy) / len(listing_y_test)) ** 0.5
+    blades = listing_y_test == 3
+    caught = ((listing_test[:, 3] &gt;= listing_best) &amp; blades).sum().item()
+    print(f&quot;release: {len(listing_y_test)} listings, accuracy SE {se:.3f}, blades caught {caught} of {blades.sum().item()}&quot;)
+
+    # 6. The input pipeline: L = 32 x 2 ms per batch, C = 20 ms per step.
+    ds = JpegFolder(x, y)
+    for workers in (0, 1, 2, 4):
+        loader = DataLoader(ds, batch_size=32, shuffle=True, num_workers=workers)
+        forecast = 64 + 20 if workers == 0 else max(64 / workers, 20)
+        print(f&quot;num_workers={workers}: forecast {forecast:5.1f} ms/step, measured {ms_per_step(loader):5.1f}&quot;)
+</code></pre>
+<p>What each part does in real evaluation code:</p>
+<ul>
+<li><strong><code>make_products</code> and <code>photos</code></strong> are the synthetic catalogue. Each product gets one random border, its &quot;look&quot;, shared by its four photos; each photo gets its category&#39;s 3 × 3 shape at a random place in the middle plus fresh noise. The border carries no information about the category, which is what makes it a trap: a model can use it only by remembering products.</li>
+<li><strong><code>Net</code></strong> is a one-layer convolutional network with two heads that are added together. <code>amax</code> keeps each filter&#39;s strongest response anywhere in the photo, which finds the shape wherever it sits; the <code>layout</code> head sees the whole feature map, border included, so it can also memorise a product&#39;s look. Real networks do not expose these routes as two labelled heads; the split here makes the shape route and the product-look route visible.</li>
+<li><strong><code>train</code></strong> is the ordinary loop from chapter 1 with minibatches of 64. <code>nn.CrossEntropyLoss(weight=weight)</code> is the class weight; everything else is identical between runs, including the seed.</li>
+<li><strong>Part 1</strong> holds out 2,000 photos at random, then 500 whole products (<code>product &lt; 500</code>), and compares the two held-out accuracies. <code>torch.isin</code> counts how many random held-out photos have a sibling in training.</li>
+<li><strong>Part 2</strong> computes inverse-frequency weights from the training labels only, trains a weighted model, and prints both models&#39; blade recall on validation. <code>report</code> separates the two decisions: the category shown is the argmax; the flag is either the argmax being &quot;blade&quot; or the blade score clearing a threshold.</li>
+<li><strong>Part 3</strong> is the cost sweep: for each candidate threshold, count false flags and missed blades on validation, price them, and keep the cheapest. Nothing in this part touches the test photos.</li>
+<li><strong>Part 4</strong> averages the four softmax vectors per listing and chooses a separate threshold on validation listings. This synthetic generator keeps each product&#39;s four photos together, so reshaping is sufficient; real data must be grouped by product ID.</li>
+<li><strong>Part 5</strong> scores the test data after both thresholds are fixed. The photo rows and listing argmax row are guided comparisons; the <code>LISTING TEST: shipped</code> row is the release result. The final line gives the listing count, accuracy standard error and caught/total blades. In a real release report only the chosen listing pipeline, without using the comparison rows to retune.</li>
+<li><strong>Part 6</strong> (optional; nothing above depends on it) is a real <code>DataLoader</code> over a <code>Dataset</code> whose <code>__getitem__</code> sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. <code>ms_per_step</code> discards four warm-up steps, then averages twelve. The <code>if __name__ == &quot;__main__&quot;:</code> guard is required where worker processes start by importing the script.</li>
+</ul>
+<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus. The recorded run used eight CPU threads. Training results can vary with the thread count or environment; the four measured timing lines also vary between runs.</p>
+<pre><code class="language-text">held-out photos whose product has a photo in training: 0.994
+split by photo:   held-out accuracy 0.924
+split by product: held-out accuracy 0.878
+never flag a blade, on validation: 0.938 of photos answered right
+class weights: [2.0, 3.24, 7.17, 19.23]
+unweighted, argmax                 category accuracy 0.878  blade recall 0.266  false flags  25  missed blades 91  cost  1870.0
+weighted, argmax                   category accuracy 0.865  blade recall 0.395  false flags  49  missed blades 75  cost  1598.0
+validation cost by blade threshold: {0.5: 2062.0, 0.2: 1574.0, 0.1: 1426.0, 0.05: 1294.0, 0.02: 1266.0, 0.01: 1304.0, 0.005: 1432.0, 0.002: 1692.0, 0.001: 1936.0} -&gt; chosen 0.02
+validation cost by LISTING threshold: {0.5: 564.0, 0.2: 326.0, 0.1: 238.0, 0.05: 214.0, 0.02: 256.0, 0.01: 328.0, 0.005: 438.0, 0.002: 560.0, 0.001: 638.0} -&gt; chosen 0.05
+TEST: split by photo, argmax       category accuracy 0.873  blade recall 0.211  false flags  26  missed blades 60  cost  1252.0
+TEST: split by product, argmax     category accuracy 0.886  blade recall 0.224  false flags  28  missed blades 59  cost  1236.0
+TEST: per-photo, threshold 0.02    category accuracy 0.886  blade recall 0.711  false flags 337  missed blades 22  cost  1114.0
+LISTING TEST: argmax               category accuracy 0.946  blade recall 0.211  false flags   5  missed blades 15  cost   310.0
+LISTING TEST: shipped, t=0.05      category accuracy 0.946  blade recall 0.684  false flags  69  missed blades  6  cost   258.0
+release: 500 listings, accuracy SE 0.010, blades caught 13 of 19
+num_workers=0: forecast  84.0 ms/step, measured  87.2
+num_workers=1: forecast  64.0 ms/step, measured  67.8
+num_workers=2: forecast  32.0 ms/step, measured  33.9
+num_workers=4: forecast  20.0 ms/step, measured  22.2
+</code></pre>
+<p>Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The listing step averages four photo scores before applying its separately chosen threshold of 0.05: it reports 0.946 accuracy, catches 13 of 19 blades and costs 258 against 310 for the listing argmax. The loader&#39;s measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.</p>
+<p>Two things to try. First, add a random horizontal flip to the training loop, <code>xb = x[idx].clone(); flip = torch.rand(len(idx)) &lt; 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])</code>, and train on <code>xb</code>: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change <code>MISS_COST</code> to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the per-photo row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.</p>
+</section></article>
+    <div class="mission-action" data-mission-action="trust-the-number">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="trust-the-number">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Back to the chapter">
+    <a href="../chapters/trust-the-number.html"><span>Back to chapter 2</span>Trust the Number Before You Ship the Classifier</a>
+    <a class="essay-pager__next" href="../chapters/reuse-a-pretrained-model.html"><span>Next</span>Reuse a Pretrained Model</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 3.9, 3.11, 4.3, 6.2–6.4, 7.4, 8.5, 11.4–11.5, 15.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 4.4, 7.20</li><li>Designing Machine Learning Systems, pp. 116, 120–133, 163–166, 223</li><li>Data Science: The Hard Parts, pp. 139–143</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367, 468–469</li><li>Distributed Machine Learning Patterns, pp. 29, 59–60</li><li>https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html</li><li>https://github.com/pytorch/pytorch/blob/v2.14.0/torch/utils/data/dataloader.py</li></ul><p>Every example is synthetic: 12 x 12 photos, invented prices for the two mistakes, sleeps standing in for decoding and training. PyTorch behaviour as of 2.14.</p></details>
+  </main>
+  </div>
+</body>
+</html>

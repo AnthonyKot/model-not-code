@@ -1,3 +1,4 @@
+# workspace/trust-the-number/worked.py; PyTorch 2.14.0 (CPU); rerun 2026-09-22 with section 4b (worked question 1) added, earlier sections unchanged
 == 1. standard error
  p 0.878 n 2000: SE 0.0073
  p 0.878 n 500: SE 0.0146
@@ -8,6 +9,8 @@
 == 4. best constant for the blade flag, 1,000 listings, 50 blades
  pulls at p = 0.05: 47.5 47.5  pos_weight 950/50 = 19.0  weighted pulls at 0.5: 475.0 475.0
  ln 19 = 2.9444
+== 4b. worked question 1 (2026-09-22): 1,000 listings, 20 blades
+ best constant 20/1000 = 0.02  pulls at p = 0.02: 19.6 19.6  pos_weight 980/20 = 49.0  weighted pulls at 0.5: 490.0 490.0
 == 5a. ten listings, costs 2 per false flag and 20 per missed blade
  t 0.5: flagged 2 false flags 1 missed 3 cost 62
  t 0.2: flagged 3 false flags 1 missed 2 cost 42

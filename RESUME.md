@@ -17,7 +17,8 @@ story-step beats, seven folds, two worked questions, bridge; reading path 2,698 
 moved verbatim to `labs/reuse-a-pretrained-model.md`; `site/build.mjs` now builds `docs/labs/<slug>.html` with the
 mission wrapper and completion button, and `check.mjs` / `paraphrase.mjs` cover labs. Exercise re-run identical.
 Decisions and counts: `notes/chapters/reuse-a-pretrained-model.md`. **Chapter 1 reworked the same way on the author's go-ahead (2026-09-22; reading path 2,696 words, 25% folded;
-lab moved; exercise re-run identical).** Owed: the author's read of chapters 3 and 1; then chapters 2 and 4. Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
+lab moved; exercise re-run identical).** Chapter 2 followed (reading path 2,431, 24.6% folded; the input-pipeline section is now the lab's setup
+section; exercise re-run identical apart from the timing lines). Owed: the author's read of chapters 3, 1 and 2; then chapter 4, then 5–8. Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
 `~/.gemini/antigravity-cli/scratch/myenv/bin/python`. Chapters 1, 2, 4–8 untouched; not pushed.
 
 ## The book is complete — 2026-09-17

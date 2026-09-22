@@ -78,18 +78,10 @@
       <h1 class="essay-title">Trust the Number Before You Ship the Classifier</h1>
       <p class="essay-payoff">The shop's product-photo classifier evaluated before release: the split, leakage, rare categories, the threshold as a cost, augmentation and the input pipeline.</p>
     </header>
-    <article class="prose"><p>Sellers list products on the shop from chapter 1 by uploading photos, usually four per product: front, side, box, label. A classifier looks at the photos and suggests the category, so a kettle lands under kettles without a person reading the listing. One category carries a rule: <strong>blades</strong> need an age check at checkout. A blade listed as a lamp is sold to anyone.</p>
-<p>The first training run prints 92.4% accuracy on held-out photos. This chapter is about what that number claims, and what it has to become before the shop ships the model. The evaluation changes six times along the way: the split, the count of how often you looked at the result, a row of its own for the rare category, prices for the two kinds of mistake, a check on augmentation, and a pipeline fast enough to run the whole evaluation more than once. None of those changes touches the model&#39;s architecture.</p>
-<p>Everything here runs on synthetic photos: 12 × 12 pixels, four categories, a shape in the middle that says the category and a border that stands in for a product&#39;s background and packaging. They are small enough to train in seconds and built so that each failure is visible. The last section lists what a release evaluation on real photos adds.</p>
-<h2 id="what-a-held-out-accuracy-claims">What a held-out accuracy claims</h2>
-<p><strong>Accuracy</strong> is the fraction of held-out photos whose predicted category is right. It is an estimate of a number you cannot compute: the fraction the model would get right on the photos the shop will actually receive. Like any estimate from a sample, it moves when the sample changes. For a true accuracy p measured on n independent items, the typical size of that movement is the <strong>standard error</strong>:</p>
-<p class="formula">SE = √( p · (1 − p) / n )</p>
-
-<p>p is the true accuracy and 1 − p the error rate; their product is the variance of one right-or-wrong outcome. Dividing by n gives the variance of an average of n such outcomes, and the square root returns to accuracy&#39;s units. At p = 0.878 on 2,000 photos, SE = √(0.878 × 0.122 / 2,000) = 0.0073.</p>
-<p>The formula assumes the 2,000 outcomes are independent, and here they are not. The 2,000 photos show 500 products, four photos each, and photos of one product share a background and a shape, so their outcomes rise and fall together. Counting products instead, SE = √(0.878 × 0.122 / 500) = 0.0146. The honest error bar lies between the two, and two models that differ by one percentage point on this set may be the same model.</p>
-<p>Three splits give the numbers different jobs. The <strong>training</strong> split fits the weights and anything else fitted from data, such as the mean and spread a normaliser subtracts and divides by; compute those on training rows only, or the evaluation rows shape the inputs. The <strong>validation</strong> split is where you compare settings, checkpoints and thresholds. The <strong>test</strong> split is scored once, after every choice is fixed, and gives the number you report.</p>
-<h2 id="split-by-product-not-by-photo">Split by product, not by photo</h2>
-<p>The 92.4% came from holding out 20% of the photos at random. A held-out photo&#39;s product has three other photos, and each landed in training with probability 0.8, so the chance that at least one sibling is in training is 1 − 0.2<sup>3</sup> = 0.992. The exercise measures 0.994. Nearly every &quot;unseen&quot; photo belongs to a product the model has already seen from another side.</p>
+    <article class="prose"><p>Sellers list products on the shop from chapter 1 by uploading photos, usually four per product: front, side, box, label. A classifier looks at the photos and suggests the category, so a kettle lands under kettles without a person reading the listing. One category carries a rule: <strong>blades</strong> need an age check at checkout, and a blade listed as a lamp is sold to anyone. The first training run prints 92.4% accuracy on held-out photos, and the shop is ready to ship it. That one number was lying three times over: about which photos were held out, about the one category the rule exists for, and about who was making the decision.</p>
+<p>This chapter takes the three lies in turn. The split first, because the held-out photos were not new; then the rare row, where a model that never flags a blade scores well and the optimiser finds exactly that model; then the decision, which belongs to the shop and not to the softmax. It closes with what the release evaluation reports instead of the 92.4%. Everything runs on synthetic photos, 12 × 12 pixels, four categories, a shape in the middle that says the category and a border that stands in for a product&#39;s background, small enough to train in seconds and built so that each failure is visible.</p>
+<h2 id="the-first-lie-the-held-out-photos-were-not-new">The first lie: the held-out photos were not new</h2>
+<p>The 92.4% came from holding out 20% of the photos at random. A held-out photo&#39;s product has three other photos, and each landed in training with probability 0.8, so the chance that at least one sibling is in training is 1 − 0.2<sup>3</sup> = 0.992; the lab measures 0.994. Nearly every &quot;unseen&quot; photo belongs to a product the model has already seen from another side.</p>
 <figure class="diagram">
 <svg viewBox="0 0 640 210" width="100%" role="img" aria-label="Two ways to split the same three products with four photos each. Split by photo: photos of every product are scattered across training and held out. Split by product: product C's four photos are all held out, products A and B are all in training." style="max-width:640px;font-family:inherit;font-size:13px">
   <g fill="currentColor" text-anchor="middle">
@@ -115,11 +107,17 @@
 <figcaption>The same twelve photos split two ways. On the left, every held-out photo has three siblings in training; on the right, the held-out product is new, which is what a live listing is.</figcaption>
 </figure>
 
-<p>A model can score well on such photos by recognising the product rather than its category: the background the seller always uses, the box, the lighting. That skill is worth nothing on the day a new product is listed, because the shop never asks the model about a product it was trained on. In the exercise the same model and data give 0.924 when split by photo and 0.878 when 500 whole products are held out. On 2,000 photos of products listed later, the photo-split model scores 0.873. The split by product predicted that; the split by photo promised 5 points that did not exist.</p>
-<p>The rule is to split by the unit the live system predicts for. Here that is a new product, so every photo of a product goes to the same side. When the catalogue changes over time, split by listing date as well: train on products listed before a cut-off and evaluate on products listed after it, because the shop&#39;s next month is never a random sample of its last year. Remove duplicates before splitting: the same stock photo uploaded by two sellers is one item, not two.</p>
-<p>The same failure has a second form, in the columns rather than the rows. Suppose you feed the model the listing&#39;s text fields alongside the photos, and the historical table has a field <code>age_check_required</code>. In that table it identifies blades almost perfectly. It is also filled in by a reviewer <em>after</em> the listing has been categorised, so at the moment a seller uploads photos it is empty. A model trained with it learns to read the answer from a column that will not exist when it has to answer. For every input, ask one question: does this value exist at the moment the prediction is made? Build training rows from values as they stood at that moment, and treat a test score much better than the first weeks in production as a sign that some input did not.</p>
-<h2 id="every-look-at-the-test-set-spends-it">Every look at the test set spends it</h2>
-<p>The split is fixed; now you tune. You try twelve settings of learning rate and epochs, score each on the same 500 validation photos, and keep the best. Suppose all twelve are equally good, with a true accuracy of 0.88. Each validation score is 0.88 plus sampling error, and taking the maximum picks the setting whose error happened to be most favourable. To size the effect, treat the twelve scores as independent. One setting&#39;s number of right answers X on 500 photos is then binomial, and a score of at least 0.90 needs X ≥ 450, which has probability 0.0932. None of twelve reaches it with probability (1 − 0.0932)<sup>12</sup> = 0.3091, so the best does with probability 0.6909.</p>
+<p>A model can score well on such photos by recognising the product rather than its category: the background the seller always uses, the box, the lighting. That skill is worth nothing on the day a new product is listed, because the shop never asks the model about a product it was trained on. In the lab the same model and data give 0.924 when split by photo and 0.878 when 500 whole products are held out. On 2,000 photos of products listed later, the photo-split model scores 0.873. The split by product predicted that; the split by photo promised 5 points that did not exist.</p>
+<p>The rule is to split by the unit the live system predicts for. Here that is a new product, so every photo of a product goes to the same side; when the catalogue changes over time, split by listing date as well, and remove duplicates first, because the same stock photo uploaded by two sellers is one item. The same lie has a form in the columns. A historical field such as <code>age_check_required</code> identifies blades almost perfectly and is filled in by a reviewer <em>after</em> the listing is categorised, so it is empty at the moment a seller uploads. For every input ask whether its value exists when the prediction is made, and treat a test score much better than the first weeks in production as a sign that some input did not.</p>
+<p>Three splits then give the numbers different jobs. The <strong>training</strong> split fits the weights, and anything else fitted from data such as a normaliser&#39;s mean and spread. The <strong>validation</strong> split is where settings, checkpoints and thresholds are compared. The <strong>test</strong> split is scored once, after every choice is fixed, and gives the number you report, because every comparison made on a set spends it.</p>
+<p>How much can the number it gives be trusted? Accuracy is an estimate of a number you cannot compute, the fraction the model would get right on the photos the shop will actually receive, and like any estimate from a sample it moves when the sample changes. For a true accuracy p measured on n independent items, the typical movement is the <strong>standard error</strong>:</p>
+<p class="formula">SE = √( p · (1 − p) / n )</p>
+
+<p>p is the true accuracy and 1 − p the error rate; their product is the variance of one right-or-wrong outcome, dividing by n gives the variance of an average of n outcomes, and the square root returns to accuracy&#39;s units. At p = 0.878 on 2,000 photos, SE = √(0.878 × 0.122 / 2,000) = 0.0073. But the 2,000 photos show 500 products, and photos of one product rise and fall together; counting products, SE = √(0.878 × 0.122 / 500) = 0.0146. The honest error bar lies between the two, and two models that differ by one point on this set may be the same model.</p>
+<details>
+<summary>Optional: every look at the validation set spends it, by the numbers</summary>
+
+<p>Try twelve settings of learning rate and epochs, score each on the same 500 validation photos, and keep the best. Suppose all twelve are equally good, with a true accuracy of 0.88: each score is 0.88 plus sampling error, and the maximum picks the most favourable error. Treating the twelve as independent, a score of at least 0.90 needs 450 right answers of 500, probability 0.0932, so the best of twelve reaches it with probability 1 − (1 − 0.0932)<sup>12</sup> = 0.6909.</p>
 <table>
 <thead>
 <tr>
@@ -144,16 +142,27 @@
 <td>0.880</td>
 </tr>
 </tbody></table>
-<p>The best of twelve reports 0.903 on average and is still 0.880 on photos it was not chosen on; with equal settings, the choice added nothing but a 2.3-point promise. Settings scored on the same photos share some of their errors, which shrinks the effect below this independent calculation without removing it. This is the <strong>winner&#39;s curse</strong>, and it grows with the number of candidates and shrinks with the size of the validation set, in units of the standard error from the first section. Settings of unequal quality do get sorted by the comparison; the winning score is inflated all the same. Keeping the checkpoint with the lowest validation loss, which save-best logic does automatically, is the same selection repeated every epoch.</p>
-<p>So the test set is scored once, at the end. If its number changes a decision (another setting, one more feature), it has become a second validation set, and an unbiased number needs photos no choice has touched.</p>
-<p>The same reasoning applies to numbers other people publish. The pretrained backbone chapter 3 will start from comes with a score on a public benchmark. That score was measured on one fixed, public test set that many teams have tuned against, and public test items can end up in the training data of later models. It is evidence about that test set. The number that decides whether the shop ships is the one measured on the shop&#39;s own products, split as above.</p>
-<h2 id="the-rare-category-right-95-of-the-time-by-never-flagging">The rare category: right 95% of the time by never flagging</h2>
-<p>Blades are 5% of listings. A flagger that never flags answers the question &quot;does this listing need an age check?&quot; correctly 95% of the time, and on the exercise&#39;s validation photos, where blades happen to be 6.2%, it scores 0.938. Overall accuracy averages away the one row the rule exists for. The imbalance comes from the shop&#39;s mix of products, not from the method: a public dataset of malaria cell images used to teach the same classification pipeline has equal numbers of infected and uninfected cells, and there a model that never says &quot;infected&quot; scores 50%. Report each category&#39;s <strong>recall</strong>: of the photos that truly are blades, the fraction the model called blades.</p>
-<p>The cause is in training as well as in the metric. The loss is a sum over rows, and 95 of every 100 rows are not blades. Take the blade question alone, 950 other listings and 50 blades, and a model that ignores the photo and gives every listing the same blade probability p. Its cross-entropy is:</p>
+<p>The best of twelve reports 0.903 on average and is still 0.880 on photos it was not chosen on: a 2.3-point promise from the choice alone. This is the <strong>winner&#39;s curse</strong>; it grows with the number of candidates and shrinks with the validation set, and keeping the checkpoint with the lowest validation loss is the same selection every epoch. If the test number changes a decision, it has become a second validation set; a public benchmark score is the same kind of claim about one test set many teams have tuned against.</p>
+</details>
+
+<h2 id="the-second-lie-right-94-of-the-time-by-never-flagging">The second lie: right 94% of the time by never flagging</h2>
+<p>The split is fixed and the number is honest about new products. It is still silent about the one row the rule exists for. Blades are 5% of listings, so a flagger that never flags answers &quot;does this listing need an age check?&quot; correctly 95% of the time, and on the lab&#39;s validation photos, where blades happen to be 6.2%, it scores 0.938. Overall accuracy averages away the rare category; report each category&#39;s <strong>recall</strong>, the fraction of true blades the model called blades. The imbalance comes from the shop&#39;s mix, not from the method: on a public dataset of cell images with equal numbers of infected and uninfected cells, a model that never says &quot;infected&quot; scores 50%.</p>
+<p><strong>The optimiser is given 950 non-blades and 50 blades and no class weight. What blade probability does it settle on, and what does that flag?</strong></p>
+<p>The cause is in training as well as in the metric. The loss is a sum over rows, and 95 of every 100 rows are not blades. Take the blade question alone and a model that ignores the photo and gives every listing the same blade probability p. Its cross-entropy is:</p>
 <p class="formula">L(p) = −[ 950 · ln(1 − p) + 50 · ln p ]</p>
 
-<p>950 and 50 are the counts. −ln(1 − p) is what each other listing pays for being given blade probability p, and −ln p is what each blade pays. Setting the derivative, 950/(1 − p) − 50/p, to zero gives p = 50/1,000 = 0.05. Check it with the gradient from chapter 1, p − y per row: the 950 others pull the score down with 950 × 0.05 = 47.5 and the 50 blades pull it up with 50 × 0.95 = 47.5. At 0.05 every listing is below 0.5, so nothing is flagged. The optimiser found the minimum of the loss it was given.</p>
-<p>A <strong>class weight</strong> multiplies every loss term of one class, so the rare class writes more of the sum. For a yes-or-no output PyTorch spells it <code>nn.BCEWithLogitsLoss(pos_weight=torch.tensor(19.0))</code>: each blade&#39;s term counts 950/50 = 19 times. The pulls at 0.5 are then 950 × 0.5 = 475 down and 19 × 50 × 0.5 = 475 up, so the best constant moves from 0.05 to 0.5. For the four-category model the equivalent is <code>nn.CrossEntropyLoss(weight=w)</code>, which multiplies each row&#39;s loss by the weight of its true category; the exercise uses total count ÷ category count over its 8,000 training photos:</p>
+<p>950 and 50 are the counts; −ln(1 − p) is what each other listing pays for being given blade probability p, and −ln p what each blade pays. The minimum is at p = 50/1,000 = 0.05, and chapter 1&#39;s gradient says why: p − y per row, so the 950 others pull the score down with 950 × 0.05 = 47.5 and the 50 blades pull it up with 50 × 0.95 = 47.5, in balance. At 0.05 every listing is below 0.5, so nothing is flagged. The optimiser found the minimum of the loss it was given.</p>
+<details>
+<summary>Optional: the derivative of L(p)</summary>
+
+<p>The derivative of L(p) is 950/(1 − p) − 50/p. Setting it to zero gives 950p = 50(1 − p), so 1,000p = 50 and p = 0.05. The same calculation with counts n<sub>0</sub> and n<sub>1</sub> gives p = n<sub>1</sub>/(n<sub>0</sub> + n<sub>1</sub>): the best constant is always the class frequency.</p>
+</details>
+
+<p>A <strong>class weight</strong> multiplies every loss term of one class, so the rare class writes more of the sum. For a yes-or-no output PyTorch spells it <code>nn.BCEWithLogitsLoss(pos_weight=torch.tensor(19.0))</code>: each blade&#39;s term counts 950/50 = 19 times, the pulls at 0.5 are 950 × 0.5 = 475 down and 19 × 50 × 0.5 = 475 up, and the best constant moves from 0.05 to 0.5. For the four-category model the equivalent is <code>nn.CrossEntropyLoss(weight=w)</code>, with total count ÷ category count as the weights. On the lab&#39;s validation photos the weight raises blade recall from 0.266 to 0.395 and lowers category accuracy from 0.878 to 0.865. It adds no information: 50 blades counted 19 times are still 50 examples, and a mislabelled blade counts 19 times too. And the weighted model&#39;s scores stop being frequencies, because it was trained for a world where blades are as common as everything else. More labelled blades are the remedy that adds information; the next lie hides a lever that turned out cheaper.</p>
+<details>
+<summary>Optional: the category weights the lab uses</summary>
+
+<p>Over the 8,000 training photos:</p>
 <table>
 <thead>
 <tr>
@@ -183,11 +192,21 @@
 <td>8,000 ÷ 416 = 19.23</td>
 </tr>
 </tbody></table>
-<p>Its mean divides by the sum of the weights in the batch, not by the number of rows, so weighted and unweighted loss values are not comparable in a log.</p>
-<p>On the exercise&#39;s validation photos the weight raises blade recall from 0.266 to 0.395 and lowers category accuracy from 0.878 to 0.865. It does not add information: 50 blades counted 19 times are still 50 examples, and a blade photo mislabelled as a lamp now counts 19 times too. And the weighted model&#39;s scores stop being frequencies: it was trained for a world where blades are as common as everything else, so its blade score overstates how often a listing is a blade. More labelled blades are the remedy that adds information. The next section shows a lever that turned out cheaper here.</p>
-<h2 id="the-model-outputs-a-score-the-shop-chooses-the-threshold">The model outputs a score; the shop chooses the threshold</h2>
-<p>The classifier&#39;s last layer produces a score per category, and a softmax turns them into four numbers that add up to one. &quot;Flag for an age check&quot; is a separate decision on one of them: flag when the blade score is at least a <strong>threshold</strong> t. Showing the most likely category is the default, and it flags a blade only when the blade score beats the other three, which on these photos means rarely.</p>
-<p>The two mistakes cost different amounts. A false flag sends a harmless listing to a reviewer, say 2 per check. A missed blade is a blade sold without an age check, say 20. Both prices are invented here; in a real shop somebody in operations or compliance has to name them, and until then the threshold is a guess. With them, the threshold becomes a calculation. Ten listings, sorted by blade score:</p>
+<p><code>CrossEntropyLoss</code> divides its mean by the sum of the weights in the batch, not by the number of rows, so weighted and unweighted loss values are not comparable in a log.</p>
+</details>
+
+<details>
+<summary>Optional: what a flipped photo claims about its label</summary>
+
+<p>With few photos per category, the usual next step is <strong>augmentation</strong>: during training each photo is sometimes replaced by a transformed copy, mirrored or tilted or brightened, under the same label:</p>
+<p class="formula">(x, y) → (T(x), y)</p>
+
+<p>x is the photo, T a transform and y the label, unchanged on both sides of the arrow. That is a statement the pipeline never checks: <em>the correct category of T(x) is y</em>. For a kettle or a cable a horizontal flip is true. For the lab&#39;s photos it is false in one place: the blade&#39;s shape is a diagonal and the lamp&#39;s the other diagonal, so a mirrored blade is, pixel for pixel, a lamp&#39;s shape labelled &quot;blade&quot;. Train with a random horizontal flip on half the photos and category accuracy stays at 0.878, because cables and kettles gain what blades and lamps lose; blade recall falls from 0.266 to 0.056, and blades shown as lamps rise from 26 to 88. Real photos have the same trap in smaller places, such as left- and right-handed scissors. Augment only training batches, add one transform at a time, keep it only if validation recall improves for every category you care about, and look at a batch of augmented photos first.</p>
+</details>
+
+<h2 id="the-third-lie-the-model-was-deciding-who-gets-checked">The third lie: the model was deciding who gets checked</h2>
+<p>The rare row now has a number of its own, and it is low. The third lie is about who chose it. The classifier&#39;s last layer produces a score per category, and a softmax turns them into four numbers that add up to one; showing the most likely category is the default, and it flags a blade only when the blade score beats the other three, which on these photos is rare. &quot;Flag for an age check&quot; is a separate decision on one of the four numbers: flag when the blade score is at least a <strong>threshold</strong> t, and the threshold is the shop&#39;s to choose.</p>
+<p>The two mistakes cost different amounts. A false flag sends a harmless listing to a reviewer, say 2 per check; a missed blade is a blade sold without an age check, say 20. Both prices are invented here, and in a real shop somebody in operations or compliance has to name them; until then the threshold is a guess. With them it is a calculation. Ten listings, sorted by blade score, four of them blades:</p>
 <div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
 <thead>
 <tr>
@@ -236,13 +255,6 @@
 <td>62</td>
 </tr>
 <tr>
-<td>0.2</td>
-<td>3</td>
-<td>1</td>
-<td>2</td>
-<td>42</td>
-</tr>
-<tr>
 <td>0.1</td>
 <td>5</td>
 <td>2</td>
@@ -264,118 +276,15 @@
 <td>12</td>
 </tr>
 </tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The cheapest threshold is 0.03, far from the 0.5 you get by default. If the scores were true probabilities, the break-even would follow from the prices alone: flagging a listing with blade probability p costs 2 × (1 − p) in expected false flags and saves 20 × p in expected misses, so flag when 20p &gt; 2(1 − p), that is p &gt; 2/22 = 0.091.</p>
-<p>Scores from a trained network need not be true probabilities, which is why the threshold is chosen on validation photos by computing the cost at each candidate, not by formula. In the exercise the validation sweep picks 0.02. The reason is measurable: of the 209 validation photos whose blade score lies between 0.02 and 0.091, 12.0% are blades, above the 9.1% at which flagging pays. The scores understate how often those listings are blades, and the cost sweep corrects for it without anyone having to know why.</p>
-<p>On the test photos, scored once, the choice holds up. Showing the most likely category flags blades with recall 0.224 and costs 1,236; the same model with the blade threshold at 0.02 reaches recall 0.711 and costs 1,114. The weight was not needed for that. On validation, the weighted model at its default decision cost 1,598, and the unweighted model with a chosen threshold cost 1,266. Here the threshold was the cheaper lever: it needs no retraining, and it leaves the scores as they were. The cost of that recall is also on the printout: 337 false flags among 2,000 test photos, a queue somebody has to staff, which is a cost the formula only counts if you price it.</p>
-<p>Every count so far treats each photo as a decision, but the shop flags listings, and a listing has four photos. So the evaluation needs one more rule and one more pass at that unit. Average each listing&#39;s four sets of category scores, then choose the blade threshold on the 500 validation listings with the same prices. On the 500 test listings, category accuracy is 0.946, the chosen threshold of 0.05 catches 13 of the 19 blades, recall 0.684, and the cost is 258 against 310 for showing the most likely category, with 69 false flags. Nineteen blades make that recall an estimate with a wide error bar, about ±0.11. Averaging is itself a choice, to be compared on validation with alternatives such as taking the highest blade score among the four photos. Report the release at the unit the shop decides on.</p>
-<p>Two numbers people report alongside a threshold behave differently when blades become rarer or more common. <strong>Recall</strong> (true positive rate) is computed among blades and <strong>false positive rate</strong> among everything else, so neither depends on how many blades there are. <strong>Precision</strong>, the fraction of flags that are blades, mixes the two groups:</p>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The cheapest threshold is 0.03, far from the 0.5 the default implies. If the scores were true probabilities the break-even would follow from the prices alone, flag when 20p &gt; 2(1 − p), that is p &gt; 2/22 = 0.091. Scores from a trained network need not be true probabilities, which is why the threshold is chosen on validation photos by computing the cost at each candidate. The lab&#39;s sweep picks 0.02, and the reason is measurable: of the 209 validation photos whose blade score lies between 0.02 and 0.091, 12.0% are blades, above the 9.1% at which flagging pays. The scores understate how often those listings are blades, and the cost sweep corrects for it without anyone having to know why.</p>
+<p>On the test photos, scored once, the choice holds. Showing the most likely category flags blades with recall 0.224 and costs 1,236; the same model with the threshold at 0.02 reaches recall 0.711 and costs 1,114. The weight was not needed for that: on validation, the weighted model at its default decision cost 1,598 and the unweighted model with a chosen threshold 1,266. The threshold needs no retraining and leaves the scores as they were. Its price is also on the printout, 337 false flags among 2,000 test photos, a queue somebody has to staff.</p>
+<p>Every count so far treats each photo as a decision, but the shop flags listings, and a listing has four photos. Average each listing&#39;s four sets of scores and choose the threshold again on the 500 validation listings with the same prices. On the 500 test listings, category accuracy is 0.946, the chosen threshold of 0.05 catches 13 of the 19 blades, recall 0.684, and the cost is 258 against 310 for the default, with 69 false flags. Nineteen blades make that recall an estimate with a wide error bar, about ±0.11. Report the release at the unit the shop acts on.</p>
+<p>Two numbers reported alongside a threshold behave differently when blades become rarer or more common. <strong>Recall</strong> (the true positive rate, TPR) is computed among blades and the <strong>false positive rate</strong> (FPR) among everything else, so neither depends on how many blades there are. <strong>Precision</strong>, the fraction of flags that are blades, mixes the two groups:</p>
 <p class="formula">precision = TPR · π / (TPR · π + FPR · (1 − π))</p>
 
-<p>TPR is recall, FPR the false positive rate, and π the share of listings that are blades. TPR · π is the share of all listings that are correctly flagged blades; FPR · (1 − π) the share that are wrongly flagged. At TPR 0.8 and FPR 0.1, precision is 0.889 on a test set that is half blades and 0.296 on a catalogue where they are 5%. The same model and threshold give both numbers, so an evaluation set balanced for convenience flatters precision. A <strong>ROC curve</strong> plots TPR against FPR and a <strong>precision–recall curve</strong> plots precision against recall, one point per threshold. When the positive class is rare, the precision–recall curve is the one that shows what the flags will look like.</p>
-<h2 id="augmentation-is-a-claim-about-your-labels">Augmentation is a claim about your labels</h2>
-<p>With few photos per category, the usual next step is <strong>augmentation</strong>: during training, each photo is sometimes replaced by a transformed copy, mirrored or tilted or brightened, under the same label:</p>
-<p class="formula">(x, y) → (T(x), y)</p>
-
-<p>x is the photo, T a transform, y the label, and the label is unchanged on both sides of the arrow. That is a statement the pipeline never checks: <em>the correct category of T(x) is y</em>. A horizontal flip declares that a mirrored product has the same category. For a kettle or a cable, true. For the exercise&#39;s photos it is false in one place: the blade&#39;s shape is a diagonal and the lamp&#39;s is the other diagonal, so a mirrored blade is, pixel for pixel, a lamp&#39;s shape labelled &quot;blade&quot;. Train with a random horizontal flip on half the photos and category accuracy stays at 0.878, because cables and kettles gain what blades and lamps lose. Blade recall falls from 0.266 to 0.056, and blades shown as lamps rise from 26 to 88. The overall number did not move; the rare row collapsed.</p>
-<p>Real product photos have the same trap in smaller places: scissors and guitars come in left- and right-handed versions that are mirror images of each other. A transform can also keep the label and still mislead: if the photos sellers upload are upright, a 180° rotation trains on photos unlike the ones the model will be asked about, and a mirrored box shows backwards print. Check a sample of real uploads before ruling a transform in or out. Whether a transform is honest depends on the label, not the photo:</p>
-<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
-<thead>
-<tr>
-<th>Transform</th>
-<th>Category</th>
-<th>Handedness attribute</th>
-<th>Colour attribute</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Horizontal flip</td>
-<td>keeps it, except shapes that mirror into another category</td>
-<td>changes it</td>
-<td>keeps it</td>
-</tr>
-<tr>
-<td>Upside down</td>
-<td>keeps it; check whether uploads ever look like this</td>
-<td>keeps it; same check</td>
-<td>keeps it; same check</td>
-</tr>
-<tr>
-<td>Tilt of a few degrees</td>
-<td>keeps it</td>
-<td>keeps it</td>
-<td>keeps it</td>
-</tr>
-<tr>
-<td>Hue shift</td>
-<td>keeps it</td>
-<td>keeps it</td>
-<td>changes it</td>
-</tr>
-</tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>Augment only training batches, with a fresh random draw each time a photo is presented; validation and test photos stay as uploaded, because they stand in for what sellers send. Add one transform at a time and keep it only if validation recall improves for every category you care about, not only overall accuracy. And look at a batch of augmented photos before training on them.</p>
-<h2 id="the-gpu-waits-on-the-jpeg-decoder">The GPU waits on the JPEG decoder</h2>
-<p>Every section so far ends in &quot;train again and compare&quot;, so how fast one training run goes decides how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.</p>
-<p>When that CPU work is slower than the training step, the accelerator sits idle between batches, and the fix is more loading processes, <code>DataLoader(num_workers=…)</code> in PyTorch, until loading stops being the slower side. Measure the two sides before buying a faster accelerator: if loading is the bottleneck, the new accelerator waits just as long.</p>
-<details>
-<summary>Optional: forecast the step time and tune the loader</summary>
-
-<p>Split one training step in two. The <strong>load</strong> time L builds one batch on the CPU; the <strong>compute</strong> time C runs the forward pass, the loss, the backward pass and the optimiser step. A plain loop does them in turn, so a step takes L + C. With a separate loading process and a queue between the two, the next batch is built while the current one trains, and in steady state batches pass at the rate of the slower side:</p>
-<p class="formula">step = max(L / W, C)</p>
-
-<p>W is the number of loading processes, each building whole batches, and L/W their combined time per batch, as long as each has a free CPU core. C is the training step. The maximum is whichever side is slower, so speeding up the faster side changes nothing.</p>
-<p>Say one photo takes 5 ms to decode and augment on one core, a batch is 64 photos, so L = 320 ms, and the training step takes C = 100 ms. An epoch of 100,000 photos is 1,563 steps.</p>
-<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
-<thead>
-<tr>
-<th>Configuration</th>
-<th>Step</th>
-<th>Accelerator busy, C ÷ step</th>
-<th>Epoch</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Load, then train, in one process</td>
-<td>320 + 100 = 420 ms</td>
-<td>23.8%</td>
-<td>656 s</td>
-</tr>
-<tr>
-<td>One loading process</td>
-<td>max(320, 100) = 320 ms</td>
-<td>31.2%</td>
-<td>500 s</td>
-</tr>
-<tr>
-<td>Two</td>
-<td>max(160, 100) = 160 ms</td>
-<td>62.5%</td>
-<td>250 s</td>
-</tr>
-<tr>
-<td>Three</td>
-<td>max(106.7, 100) = 106.7 ms</td>
-<td>93.8%</td>
-<td>167 s</td>
-</tr>
-<tr>
-<td>Four</td>
-<td>max(80, 100) = 100 ms</td>
-<td>100%</td>
-<td>156 s</td>
-</tr>
-<tr>
-<td>Eight</td>
-<td>max(40, 100) = 100 ms</td>
-<td>100%</td>
-<td>156 s</td>
-</tr>
-</tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The fourth process is the last one that helps. A faster accelerator that halves C leaves the one-loading-process pipeline at 320 ms a step, now busy 15.6% of the time. Measure before buying: in the plain loop, time the call that fetches a batch (L) and the training step (C), stopping the step&#39;s timer only after the accelerator has finished its queued work.</p>
-<p>In PyTorch the loading side is <code>DataLoader</code>. <code>num_workers</code> is W; with the default 0, batches are built in the training process itself, which is the L + C row. <code>prefetch_factor</code> is how many batches each worker keeps ready, a buffer against slow batches rather than a speed setting. <code>pin_memory=True</code> puts finished batches in page-locked memory so the copy to the accelerator is faster, and <code>persistent_workers=True</code> keeps the workers alive between epochs instead of starting them again. The exercise&#39;s optional last part measures a real <code>DataLoader</code> against the forecast.</p>
-</details>
-
+<p>π is the share of listings that are blades; TPR · π is the share of all listings that are correctly flagged blades and FPR · (1 − π) the share wrongly flagged. At TPR 0.8 and FPR 0.1, precision is 0.889 on a test set that is half blades and 0.296 on a catalogue where they are 5%, from the same model and threshold, so an evaluation set balanced for convenience flatters precision. A <strong>ROC curve</strong> plots TPR against FPR and a <strong>precision–recall curve</strong> precision against recall, one point per threshold; when the positive class is rare, the second shows what the flags will look like.</p>
 <h2 id="what-the-release-evaluation-reports">What the release evaluation reports</h2>
-<p>The number that started the chapter, 92.4% on random photos, is replaced by a record like this one, each line tied to a decision:</p>
+<p>The number that started the chapter is replaced by a record like this one, each line tied to a decision:</p>
 <table>
 <thead>
 <tr>
@@ -387,7 +296,7 @@
 <tbody><tr>
 <td>Category accuracy on new products</td>
 <td>Split by product (and by listing date on real data), scored per listing, test scored once</td>
-<td>0.946 on 500 test listings (0.886 per photo)</td>
+<td>0.946 on 500 test listings</td>
 </tr>
 <tr>
 <td>Its uncertainty</td>
@@ -396,8 +305,8 @@
 </tr>
 <tr>
 <td>The rare category</td>
-<td>Per-category recall, not overall accuracy</td>
-<td>blade recall 0.684, 13 of 19 blades, at the chosen threshold</td>
+<td>Per-category recall at the chosen threshold</td>
+<td>blade recall 0.684, 13 of 19</td>
 </tr>
 <tr>
 <td>The flag threshold</td>
@@ -420,205 +329,30 @@
 <td>photos only</td>
 </tr>
 </tbody></table>
-<p>Synthetic photos cannot tell you four things a real release needs. Real photos vary in ways no generator was told about: phone cameras, lighting, a seller&#39;s watermark. Real labels are noisy, because sellers miscategorise and reviewers disagree, so the test set&#39;s labels need their own check. The prices of the two mistakes are guesses until the people who pay them name them. And the mix of listings changes after launch, with new product lines, which is where chapter 5 picks the classifier up again.</p>
-<section class="mission" data-mission="trust-the-number"><div class="mission__label">Try the exercise</div>
-<h2 id="exercise-split-weight-threshold-then-score-the-release">Exercise: split, weight, threshold, then score the release</h2>
-<p>The script builds a synthetic catalogue, trains the same small network several ways and prints every number the release record above uses. It needs PyTorch on a CPU and runs in about 10 seconds.</p>
-<pre><code class="language-python">import time
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
+<p>Synthetic photos cannot tell you four things a real release needs. Real photos vary in ways no generator was told about: phone cameras, lighting, a seller&#39;s watermark. Real labels are noisy, because sellers miscategorise and reviewers disagree, so the test set&#39;s labels need their own check. The prices of the two mistakes are guesses until the people who pay them name them. And the mix of listings changes after launch, which is where chapter 5 picks the classifier up again.</p>
+<h2 id="two-questions-to-work">Two questions to work</h2>
+<p><strong>1. A rarer blade.</strong> A different shop lists 1,000 products a month of which 20 are blades. With no class weight, what constant blade probability minimises the loss, what does the model flag, and what <code>pos_weight</code> puts the two pulls in balance at 0.5?</p>
+<details>
+<summary>Worked answer</summary>
 
-S = 12                                                   # photos are 12 x 12 pixels, one channel
-CATS = [&quot;cable&quot;, &quot;kettle&quot;, &quot;lamp&quot;, &quot;blade&quot;]
-FLAG_COST, MISS_COST = 2.0, 20.0                          # a reviewer&#39;s check; a blade sold without an age check
-SHARE = torch.tensor([0.50, 0.30, 0.15, 0.05])           # blades are the rare category
-SHAPES = torch.tensor([[[0, 0, 0], [1, 1, 1], [0, 0, 0]],   # cable
-                       [[0, 1, 0], [0, 1, 0], [0, 1, 0]],   # kettle
-                       [[0, 0, 1], [0, 1, 0], [1, 0, 0]],   # lamp
-                       [[1, 0, 0], [0, 1, 0], [0, 0, 1]]]).float()  # blade
+<p>The best constant is the class frequency, 20/1,000 = 0.02: the 980 others pull down with 980 × 0.02 = 19.6 and the 20 blades pull up with 20 × 0.98 = 19.6. Every listing sits at 0.02, below 0.5, so nothing is flagged, and accuracy on the flag question is 98%. Balancing the pulls at 0.5 needs each blade to count 980/20 = 49 times: 980 × 0.5 = 490 down against 49 × 20 × 0.5 = 490 up, so <code>pos_weight=torch.tensor(49.0)</code>. The rarer the class, the larger the weight and the fewer real examples stand behind it; 20 blades counted 49 times are still 20 blades, and the threshold on the unweighted scores remains the cheaper lever to try first.</p>
+</details>
 
-def make_products(n, gen):
-    cat = torch.multinomial(SHARE, n, replacement=True, generator=gen)
-    look = 1.5 * torch.randn(n, S, S, generator=gen)     # background and packaging: one per product
-    look[:, 2:-2, 2:-2] = 0                              # ...around the border of every photo
-    return cat, look
+<p><strong>2. Checking the threshold once more.</strong> The threshold was chosen at 0.02 on the validation photos. A colleague, seeing the 337 false flags on test, proposes recomputing the cost sweep on the test photos and shipping whichever threshold is cheapest there. What is right in the instinct, and where is the wrong turn?</p>
+<details>
+<summary>Worked answer</summary>
 
-def photos(cat, look, gen, per_product=4):
-    n = len(cat) * per_product
-    x = look.repeat_interleave(per_product, 0) + 0.5 * torch.randn(n, S, S, generator=gen)
-    y = cat.repeat_interleave(per_product)
-    for i in range(n):                                   # the category&#39;s shape, somewhere in the middle
-        r, c = torch.randint(2, S - 4, (2,), generator=gen).tolist()
-        x[i, r:r + 3, c:c + 3] += 1.8 * SHAPES[y[i]]
-    product = torch.arange(len(cat)).repeat_interleave(per_product)
-    return x[:, None], y, product
+<p>The instinct is right that 337 false flags is a real cost and that a price of 2 may be wrong; if so, the fix is a better price, and the sweep is rerun on validation. The wrong turn is the test set. A threshold picked on test has been chosen on the photos that are supposed to report it, so its test cost is a validation cost with the winner&#39;s curse built in, and the shop has no unbiased number left. If test and validation disagree about the best threshold, the disagreement is what the error bar looks like on a few hundred blades, not a reason to move. Choose on validation, score test once, and if the test number must change a decision, hold out photos no choice has touched.</p>
+</details>
 
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv = nn.Conv2d(1, 16, 3, padding=1)
-        self.shape = nn.Linear(16, 4)                    # strongest response anywhere in the photo
-        self.layout = nn.Linear(16 * S * S, 4)           # the whole map, border included
-    def forward(self, x):
-        h = F.relu(self.conv(x))
-        return self.shape(h.amax(dim=(2, 3))) + self.layout(h.flatten(1))
-
-def train(x, y, weight=None, epochs=8):
-    torch.manual_seed(1)
-    model = Net()
-    opt = torch.optim.Adam(model.parameters(), lr=3e-3)
-    loss_fn = nn.CrossEntropyLoss(weight=weight)
-    for _ in range(epochs):
-        for idx in torch.randperm(len(x)).split(64):
-            opt.zero_grad()
-            loss_fn(model(x[idx]), y[idx]).backward()
-            opt.step()
-    return model
-
-def probs(model, x):
-    with torch.no_grad():
-        return F.softmax(model(x), dim=1)
-
-def report(name, p, y, blade_threshold=None):
-    &quot;&quot;&quot;Two decisions: the category shown (argmax) and the age-check flag (blade score &gt;= threshold).&quot;&quot;&quot;
-    flagged = p.argmax(1) == 3 if blade_threshold is None else p[:, 3] &gt;= blade_threshold
-    blade = y == 3
-    fp, fn = (flagged &amp; ~blade).sum().item(), (~flagged &amp; blade).sum().item()
-    print(f&quot;{name:34s} category accuracy {(p.argmax(1) == y).float().mean():.3f}  blade recall {(flagged &amp; blade).sum() / blade.sum():.3f}&quot;
-          f&quot;  false flags {fp:3d}  missed blades {fn:2d}  cost {FLAG_COST * fp + MISS_COST * fn:7.1f}&quot;)
-
-class JpegFolder(Dataset):
-    &quot;&quot;&quot;Stands in for photos on disk: every item costs 2 ms of decoding.&quot;&quot;&quot;
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-    def __len__(self):
-        return len(self.x)
-    def __getitem__(self, i):
-        time.sleep(0.002)
-        return self.x[i], self.y[i]
-
-def ms_per_step(loader, steps=12):
-    it = iter(loader)
-    for _ in range(4):                                   # warm up: start the workers, fill the queue
-        next(it); time.sleep(0.020)
-    start = time.perf_counter()
-    for _ in range(steps):
-        next(it)
-        time.sleep(0.020)                                # stands in for forward + backward, C = 20 ms
-    return 1000 * (time.perf_counter() - start) / steps
-
-if __name__ == &quot;__main__&quot;:
-    gen = torch.Generator().manual_seed(0)
-    cat, look = make_products(2500, gen)                 # the labelled catalogue: 10,000 photos
-    x, y, product = photos(cat, look, gen)
-    new_cat, new_look = make_products(500, gen)          # products listed after the model ships
-    x_test, y_test, _ = photos(new_cat, new_look, gen)
-
-    # 1. Split by photo, then by product.
-    order = torch.randperm(len(x), generator=gen)
-    held, rest = order[:2000], order[2000:]
-    by_photo = train(x[rest], y[rest])
-    sibling = torch.isin(product[held], product[rest]).float().mean()
-    print(f&quot;held-out photos whose product has a photo in training: {sibling:.3f}&quot;)
-    val = product &lt; 500                                  # 500 whole products held out
-    by_product = train(x[~val], y[~val])
-    acc = lambda m, xs, ys: (probs(m, xs).argmax(1) == ys).float().mean().item()
-    print(f&quot;split by photo:   held-out accuracy {acc(by_photo, x[held], y[held]):.3f}&quot;)
-    print(f&quot;split by product: held-out accuracy {acc(by_product, x[val], y[val]):.3f}&quot;)
-
-    # 2. The rare category: accuracy, recall, and a class weight.
-    x_val, y_val = x[val], y[val]
-    print(f&quot;never flag a blade, on validation: {(y_val != 3).float().mean():.3f} of photos answered right&quot;)
-    counts = torch.bincount(y[~val], minlength=4).float()
-    weight = counts.sum() / counts                       # inverse frequency
-    print(&quot;class weights:&quot;, [round(w, 2) for w in weight.tolist()])
-    weighted = train(x[~val], y[~val], weight=weight)
-    report(&quot;unweighted, argmax&quot;, probs(by_product, x_val), y_val)
-    report(&quot;weighted, argmax&quot;, probs(weighted, x_val), y_val)
-
-    # 3. The threshold as a cost: FLAG_COST per false flag, MISS_COST per missed blade. Chosen on validation only.
-    p_val = probs(by_product, x_val)
-    grid = [0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001]
-    cost = lambda t: FLAG_COST * ((p_val[:, 3] &gt;= t) &amp; (y_val != 3)).sum().item() + MISS_COST * ((p_val[:, 3] &lt; t) &amp; (y_val == 3)).sum().item()
-    best = min(grid, key=cost)
-    print(&quot;validation cost by blade threshold:&quot;, {t: round(cost(t), 2) for t in grid}, &quot;-&gt; chosen&quot;, best)
-
-    # 4. The shop decides per listing: average its four photos, then choose on validation.
-    def per_listing(p, labels):
-        # photos() keeps each product&#39;s four photos together, including after the product split.
-        return p.reshape(-1, 4, 4).mean(1), labels.reshape(-1, 4)[:, 0]
-
-    listing_val, listing_y_val = per_listing(p_val, y_val)
-    def listing_cost(t):
-        flagged = listing_val[:, 3] &gt;= t
-        blade = listing_y_val == 3
-        return FLAG_COST * (flagged &amp; ~blade).sum().item() + MISS_COST * (~flagged &amp; blade).sum().item()
-    listing_best = min(grid, key=listing_cost)
-    print(&quot;validation cost by LISTING threshold:&quot;, {t: listing_cost(t) for t in grid}, &quot;-&gt; chosen&quot;, listing_best)
-
-    # 5. Score test data only after both thresholds are fixed. Photo rows are guided comparisons.
-    report(&quot;TEST: split by photo, argmax&quot;, probs(by_photo, x_test), y_test)
-    report(&quot;TEST: split by product, argmax&quot;, probs(by_product, x_test), y_test)
-    report(f&quot;TEST: per-photo, threshold {best}&quot;, probs(by_product, x_test), y_test, blade_threshold=best)
-
-    listing_test, listing_y_test = per_listing(probs(by_product, x_test), y_test)
-    report(&quot;LISTING TEST: argmax&quot;, listing_test, listing_y_test)
-    report(f&quot;LISTING TEST: shipped, t={listing_best}&quot;, listing_test, listing_y_test, blade_threshold=listing_best)
-    listing_accuracy = (listing_test.argmax(1) == listing_y_test).float().mean().item()
-    se = (listing_accuracy * (1 - listing_accuracy) / len(listing_y_test)) ** 0.5
-    blades = listing_y_test == 3
-    caught = ((listing_test[:, 3] &gt;= listing_best) &amp; blades).sum().item()
-    print(f&quot;release: {len(listing_y_test)} listings, accuracy SE {se:.3f}, blades caught {caught} of {blades.sum().item()}&quot;)
-
-    # 6. The input pipeline: L = 32 x 2 ms per batch, C = 20 ms per step.
-    ds = JpegFolder(x, y)
-    for workers in (0, 1, 2, 4):
-        loader = DataLoader(ds, batch_size=32, shuffle=True, num_workers=workers)
-        forecast = 64 + 20 if workers == 0 else max(64 / workers, 20)
-        print(f&quot;num_workers={workers}: forecast {forecast:5.1f} ms/step, measured {ms_per_step(loader):5.1f}&quot;)
-</code></pre>
-<p>What each part does in real evaluation code:</p>
-<ul>
-<li><strong><code>make_products</code> and <code>photos</code></strong> are the synthetic catalogue. Each product gets one random border, its &quot;look&quot;, shared by its four photos; each photo gets its category&#39;s 3 × 3 shape at a random place in the middle plus fresh noise. The border carries no information about the category, which is what makes it a trap: a model can use it only by remembering products.</li>
-<li><strong><code>Net</code></strong> is a one-layer convolutional network with two heads that are added together. <code>amax</code> keeps each filter&#39;s strongest response anywhere in the photo, which finds the shape wherever it sits; the <code>layout</code> head sees the whole feature map, border included, so it can also memorise a product&#39;s look. Real networks do not expose these routes as two labelled heads; the split here makes the shape route and the product-look route visible.</li>
-<li><strong><code>train</code></strong> is the ordinary loop from chapter 1 with minibatches of 64. <code>nn.CrossEntropyLoss(weight=weight)</code> is the class weight; everything else is identical between runs, including the seed.</li>
-<li><strong>Part 1</strong> holds out 2,000 photos at random, then 500 whole products (<code>product &lt; 500</code>), and compares the two held-out accuracies. <code>torch.isin</code> counts how many random held-out photos have a sibling in training.</li>
-<li><strong>Part 2</strong> computes inverse-frequency weights from the training labels only, trains a weighted model, and prints both models&#39; blade recall on validation. <code>report</code> separates the two decisions: the category shown is the argmax; the flag is either the argmax being &quot;blade&quot; or the blade score clearing a threshold.</li>
-<li><strong>Part 3</strong> is the cost sweep: for each candidate threshold, count false flags and missed blades on validation, price them, and keep the cheapest. Nothing in this part touches the test photos.</li>
-<li><strong>Part 4</strong> averages the four softmax vectors per listing and chooses a separate threshold on validation listings. This synthetic generator keeps each product&#39;s four photos together, so reshaping is sufficient; real data must be grouped by product ID.</li>
-<li><strong>Part 5</strong> scores the test data after both thresholds are fixed. The photo rows and listing argmax row are guided comparisons; the <code>LISTING TEST: shipped</code> row is the release result. The final line gives the listing count, accuracy standard error and caught/total blades. In a real release report only the chosen listing pipeline, without using the comparison rows to retune.</li>
-<li><strong>Part 6</strong> (optional; nothing above depends on it) is a real <code>DataLoader</code> over a <code>Dataset</code> whose <code>__getitem__</code> sleeps 2 ms per photo, so L = 32 × 2 = 64 ms per batch, with a 20 ms sleep standing in for C. <code>ms_per_step</code> discards four warm-up steps, then averages twelve. The <code>if __name__ == &quot;__main__&quot;:</code> guard is required where worker processes start by importing the script.</li>
-</ul>
-<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus. The recorded run used eight CPU threads. Training results can vary with the thread count or environment; the four measured timing lines also vary between runs.</p>
-<pre><code class="language-text">held-out photos whose product has a photo in training: 0.994
-split by photo:   held-out accuracy 0.924
-split by product: held-out accuracy 0.878
-never flag a blade, on validation: 0.938 of photos answered right
-class weights: [2.0, 3.24, 7.17, 19.23]
-unweighted, argmax                 category accuracy 0.878  blade recall 0.266  false flags  25  missed blades 91  cost  1870.0
-weighted, argmax                   category accuracy 0.865  blade recall 0.395  false flags  49  missed blades 75  cost  1598.0
-validation cost by blade threshold: {0.5: 2062.0, 0.2: 1574.0, 0.1: 1426.0, 0.05: 1294.0, 0.02: 1266.0, 0.01: 1304.0, 0.005: 1432.0, 0.002: 1692.0, 0.001: 1936.0} -&gt; chosen 0.02
-validation cost by LISTING threshold: {0.5: 564.0, 0.2: 326.0, 0.1: 238.0, 0.05: 214.0, 0.02: 256.0, 0.01: 328.0, 0.005: 438.0, 0.002: 560.0, 0.001: 638.0} -&gt; chosen 0.05
-TEST: split by photo, argmax       category accuracy 0.873  blade recall 0.211  false flags  26  missed blades 60  cost  1252.0
-TEST: split by product, argmax     category accuracy 0.886  blade recall 0.224  false flags  28  missed blades 59  cost  1236.0
-TEST: per-photo, threshold 0.02    category accuracy 0.886  blade recall 0.711  false flags 337  missed blades 22  cost  1114.0
-LISTING TEST: argmax               category accuracy 0.946  blade recall 0.211  false flags   5  missed blades 15  cost   310.0
-LISTING TEST: shipped, t=0.05      category accuracy 0.946  blade recall 0.684  false flags  69  missed blades  6  cost   258.0
-release: 500 listings, accuracy SE 0.010, blades caught 13 of 19
-num_workers=0: forecast  84.0 ms/step, measured  87.2
-num_workers=1: forecast  64.0 ms/step, measured  67.8
-num_workers=2: forecast  32.0 ms/step, measured  33.9
-num_workers=4: forecast  20.0 ms/step, measured  22.2
-</code></pre>
-<p>Read it against the chapter. The photo split promises 0.924 and new products give that model 0.873; the product split promises 0.878 and delivers 0.886, within its error bar. The weight lifts blade recall at a cost in accuracy; the threshold, chosen on validation, lifts it much further at test time without retraining. The listing step averages four photo scores before applying its separately chosen threshold of 0.05: it reports 0.946 accuracy, catches 13 of 19 blades and costs 258 against 310 for the listing argmax. The loader&#39;s measured steps sit a few milliseconds above the forecast, which is the per-batch overhead the formula leaves out.</p>
-<p>Two things to try. First, add a random horizontal flip to the training loop, <code>xb = x[idx].clone(); flip = torch.rand(len(idx)) &lt; 0.5; xb[flip] = torch.flip(xb[flip], dims=[-1])</code>, and train on <code>xb</code>: category accuracy stays at 0.878, blade recall on validation falls from 0.266 to 0.056, and 88 blade photos are shown as lamps instead of 26. Second, change <code>MISS_COST</code> to 5.0: missed blades are now cheap, the validation sweep chooses 0.2, and the per-photo row flags 73 photos by mistake and misses 52 blade photos, at a cost of 406.</p>
+<h2 id="the-lab">The lab</h2>
+<p>The lab, <a href="../labs/trust-the-number.html">split, weight, threshold, then score the release</a>, opens with the input pipeline, why a training run waits on the JPEG decoder and how many loading processes it takes, then runs the chapter&#39;s numbers on the synthetic catalogue in about ten seconds. It should print 0.994 for held-out photos with a sibling in training, 0.924 against 0.878 for the two splits, 0.938 for never flagging, the sweep choosing 0.02 per photo and 0.05 per listing, and a release line of <code>blades caught 13 of 19</code>. Two variations follow: a horizontal flip, and a missed blade priced at 5.</p>
+<p>The shop&#39;s next classifier job arrives with a new supplier: a garden range, photographed under different lighting, with a few hundred labelled photos. Chapter 3 starts from a model somebody else trained, freezes it, trains a new head on top, and watches the frozen part change anyway.</p>
 <p><em>Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9, 3.11, 4.3, 6.2, 6.3, 6.4, 7.4, 8.5, 11.4, 11.5 and 15.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 4.4 and 7.20; all paraphrased as study material. Chip Huyen, Designing Machine Learning Systems, early release, pp. 116, 120–133, 163–166 and 223 (physical); Daniel Vaughan, Data Science: The Hard Parts, pp. 139–143 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367 and 468–469 (physical); Yuan Tang, Distributed Machine Learning Patterns, pp. 29 and 59–60; the PyTorch 2.14 documentation and source for CrossEntropyLoss and DataLoader.</em></p>
-</section></article>
-    <div class="mission-action" data-mission-action="trust-the-number">
-      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
-      <button type="button" data-complete-mission="trust-the-number">Mark exercise complete</button>
+</article>
+    <div class="mission-action lab-action">
+      <div><strong>The lab.</strong><span>split, weight, threshold, then score the release — the code, its expected output and the completion button are on the lab page.</span></div>
+      <a class="button-link" href="../labs/trust-the-number.html">Open the lab</a>
     </div>
     <nav class="essay-pager" aria-label="Adjacent chapters">
     <a href="search-the-catalogue.html"><span>Previous</span>Search the Catalogue, Then Answer From It</a>
