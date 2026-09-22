@@ -96,3 +96,5 @@ is still owed and is the evidence about human reading.
 **Exercise re-run.** `~/.gemini/antigravity-cli/scratch/myenv/bin/python` (PyTorch 2.14.0+cu130 on CPU) on the lab's code block, in a scratch directory for its `release.pt`: output byte-identical to `corpus/keep-it-right-after-launch/run.log`. Not re-run: the two variations and the reader case (their code did not move).
 
 **Not done.** The author's read and the author's own attempt at the reader case; chapters 6–8; the §6 site copy.
+
+**Cross-check of chapters 4–6 (2026-09-22, same session).** Two repairs in this chapter: the story paragraph said the banner's 0.742 against 0.763 was "on the same test" as chapter 2's 0.684, but those numbers come from the 20,000-listing check, and now say so; the bridge said "the writer refused an injected instruction", but in chapter 6 the loop refuses it and the writer's answer is still wrong, and now says so. Nothing else between chapters 4, 5 and 6, or in the chapters that cite them (2, 7, 8), needed a change.
