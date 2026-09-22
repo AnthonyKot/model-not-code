@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays, chapters } from "./catalog.mjs";
+import { essays, chapters, appendices } from "./catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.join(root, "docs");
@@ -22,7 +22,11 @@ const builtChapters = chapters.filter((chapter) =>
 );
 
 const hasLab = (chapter) => fs.existsSync(path.join(root, "labs", `${chapter.slug}.md`));
+const builtAppendices = appendices.filter((a) =>
+  (buildAll || a.status === "published") && fs.existsSync(path.join(root, "appendix", `${a.letter}.md`))
+);
 const pages = [
+  ...builtAppendices.map((a) => path.join(out, "appendix", `${a.letter}.html`)),
   path.join(out, "index.html"),
   path.join(out, "about.html"),
   path.join(out, "old", "index.html"),
@@ -80,6 +84,20 @@ for (const essay of documents) {
   }
 }
 
+// An appendix has one heading, its catalog title, no exercise section and a link to each chapter it serves.
+for (const appendix of builtAppendices) {
+  const html = fs.readFileSync(path.join(out, "appendix", `${appendix.letter}.html`), "utf8");
+  const source = fs.readFileSync(path.join(root, "appendix", `${appendix.letter}.md`), "utf8");
+  if (source.match(/^# (.+)$/m)?.[1] !== appendix.title) errors.push(`${appendix.slug}: catalog title disagrees with the appendix`);
+  if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1) errors.push(`${appendix.slug}: expected one main heading`);
+  if ((html.match(/class="mission"/g) || []).length !== 0) errors.push(`${appendix.slug} has an exercise section`);
+  if (html.includes(`data-mission-link="${appendix.slug}"`) || html.includes(`data-mission="${appendix.slug}"`)) errors.push(`${appendix.slug} is counted as an exercise`);
+  for (const n of appendix.chapters) {
+    const chapter = chapters.find((c) => c.number === n);
+    if (chapter && !html.includes(`href="../chapters/${chapter.slug}.html"`)) errors.push(`${appendix.slug} does not link to chapter ${n}`);
+  }
+}
+
 const publishedText = pages.map((page) => fs.readFileSync(page, "utf8")).join("\n");
 const leakPatterns = [
   "/mnt/c/Users/",
@@ -97,4 +115,4 @@ if (errors.length) {
   errors.forEach((error) => console.error(`- ${error}`));
   process.exit(1);
 }
-console.log(`Site validation passed: ${pages.length} HTML pages (${builtChapters.length} chapters, ${builtEssays.length} archived essays), ${documents.length} exercise sections, local links resolved, no private source paths.`);
+console.log(`Site validation passed: ${pages.length} HTML pages (${builtChapters.length} chapters, ${builtAppendices.length} appendices, ${builtEssays.length} archived essays), ${documents.length} exercise sections, local links resolved, no private source paths.`);

@@ -1,6 +1,6 @@
 # APPENDIX-PLAN — three tool appendices (planned 2026-09-22, not started)
 
-**Status: plan only, agreed with the author in chat on 2026-09-22.** Nothing is written. The rework's
+**Status (2026-09-22): A written and published locally (`appendix/a.md`, note `notes/chapters/appendix-a.md`); B and C not started.** The site support in "Site" below is built. The rework's
 own order comes first: chapter 8, then the §6 site copy in `STORY-MAP.md`, then the push. The
 appendices follow, A first. Up to three appendices of 2,000–4,000 words each; optional reading
 after chapter 8; the chapter rules in `CONTEXT.md` §4–§5 apply unchanged.

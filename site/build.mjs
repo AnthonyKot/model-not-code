@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
-import { meta, parts, courses, essays, skips, chapters } from "./catalog.mjs";
+import { meta, parts, courses, essays, skips, chapters, appendices } from "./catalog.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -27,11 +27,16 @@ const chapterFor = (essaySlug) => chapters.find((chapter) => chapter.builtFrom.i
 // Labs (since 2026-09-22): labs/<slug>.md holds a chapter's exercise and its <!--mission--> marker.
 // A chapter with a lab links forward to it; the completion button lives on the lab page.
 const labPath = (chapter) => path.join(root, "labs", `${chapter.slug}.md`);
+// Appendices: appendix/<letter>.md, built when published (or --all) and present on disk.
+const appendixPath = (appendix) => path.join(root, "appendix", `${appendix.letter}.md`);
+const builtAppendices = appendices.filter((appendix) =>
+  (buildAll || appendix.status === "published") && fs.existsSync(appendixPath(appendix))
+);
 const hasLab = (chapter) => fs.existsSync(labPath(chapter));
 const pad2 = (n) => String(n).padStart(2, "0");
 
 fs.rmSync(out, { recursive: true, force: true });
-for (const directory of [out, path.join(out, "essays"), path.join(out, "assets"), path.join(out, "chapters"), path.join(out, "labs"), path.join(out, "old", "essays")]) {
+for (const directory of [out, path.join(out, "essays"), path.join(out, "assets"), path.join(out, "chapters"), path.join(out, "labs"), path.join(out, "appendix"), path.join(out, "old", "essays")]) {
   fs.mkdirSync(directory, { recursive: true });
 }
 if (skips.length) fs.mkdirSync(path.join(out, "reviews"), { recursive: true });
@@ -130,7 +135,7 @@ renderer.heading = function ({ tokens, depth }) {
   return `<h${depth} id="${id}">${rendered}</h${depth}>\n`;
 };
 renderer.link = function ({ href, title, tokens }) {
-  const destination = /^(?:\.\.\/)?(?:essays|chapters|labs)\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
+  const destination = /^(?:\.\.\/)?(?:essays|chapters|labs|appendix)\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
   const external = /^https?:\/\//.test(destination);
   const attributes = `${title ? ` title="${escapeHtml(title)}"` : ""}${external ? ' target="_blank" rel="noreferrer"' : ""}`;
   return `<a href="${escapeHtml(destination)}"${attributes}>${this.parser.parseInline(tokens)}</a>`;
@@ -166,12 +171,23 @@ function chapterNavItems(prefix, activeSlug = "") {
     </span>`).join("");
 }
 
+// The appendices follow the chapters in the contents; no data-mission-link, so they do not count as exercises.
+function appendixNavItems(prefix, activeSlug = "") {
+  if (!builtAppendices.length) return "";
+  return `<div class="book-nav__group">Appendices</div>` + builtAppendices.map((appendix) => `
+    <a class="book-nav__item${appendix.slug === activeSlug ? " is-active" : ""}" href="${prefix}appendix/${appendix.letter}.html">
+      <span class="book-nav__number">${escapeHtml(appendix.letter.toUpperCase())}</span>
+      <span>${escapeHtml(appendix.title.replace(/^Appendix [A-Z]\.\s*/, ""))}</span>
+      <span></span>
+    </a>`).join("");
+}
+
 function shell({ title, description, prefix = "", activeSlug = "", body, pageClass = "", archive = false }) {
   const count = archive ? builtEssays.length : builtChapters.length;
   const intro = archive
     ? `<a href="${prefix}old/index.html">Archived essays</a><p>The twelve essays the chapters replaced, kept for reference. <a href="${prefix}index.html">Back to the chapters →</a></p>`
     : `<a href="${prefix}index.html">The chapters</a><p>One shop, eight chapters. ${builtChapters.length} of ${chapters.length} written. <a href="${prefix}old/index.html">Archived essays →</a></p>`;
-  const nav = archive ? essayNavItems(prefix, activeSlug) : chapterNavItems(prefix, activeSlug);
+  const nav = archive ? essayNavItems(prefix, activeSlug) : chapterNavItems(prefix, activeSlug) + appendixNavItems(prefix, activeSlug);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -421,9 +437,44 @@ function homePage() {
       <div class="section-heading"><div><span class="section-label">The chapters</span><h2>Reading order</h2></div><p>Read in order: each chapter builds on the shop the previous one left.</p></div>
       <div class="shelf-grid">${cards}</div>
     </section>
+    ${builtAppendices.length ? `<section class="shelf-section" id="the-appendices">
+      <div class="section-heading"><div><span class="section-label">Appendices</span><h2>The tools, after the mechanisms</h2></div><p>Optional reading after chapter 8: the serving engines and platforms the chapters keep out of the story. No exercise; nothing to mark complete.</p></div>
+      <div class="shelf-grid">${builtAppendices.map((appendix) => `<article class="shelf-card shelf-card--recommended">
+    <div class="shelf-card__top"><span>Appendix ${escapeHtml(appendix.letter.toUpperCase())}</span><span class="shelf-card__status">Optional</span></div>
+    <h3><a href="appendix/${appendix.letter}.html">${escapeHtml(appendix.title.replace(/^Appendix [A-Z]\.\s*/, ""))}</a></h3>
+    <p>${escapeHtml(appendix.payoff)}</p>
+    <a class="shelf-card__action" href="appendix/${appendix.letter}.html">Read the appendix <span>→</span></a>
+  </article>`).join("")}</div>
+    </section>` : ""}
     <footer class="home-footer"><div><strong>${escapeHtml(meta.title)}</strong><p>${escapeHtml(meta.subtitle)}</p></div><p><a href="${escapeHtml(meta.repo)}">Source on GitHub</a></p></footer>
   </main>`;
   return shell({ title: meta.title, description: meta.subtitle, body, pageClass: "home-view" });
+}
+
+function appendixPage(appendix) {
+  const source = fs.readFileSync(appendixPath(appendix), "utf8");
+  const article = renderMarkdown(source).replace(/^<h1[^>]*>.*?<\/h1>\s*/s, "");
+  const forChapters = appendix.chapters.map((n) => chapters.find((c) => c.number === n)).filter(Boolean);
+  const chapterLinks = forChapters.map((c) => `<a href="../chapters/${c.slug}.html">chapter ${c.number}, ${escapeHtml(c.title)}</a>`).join(" and ");
+  const index = builtAppendices.indexOf(appendix);
+  const previous = builtAppendices[index - 1];
+  const next = builtAppendices[index + 1];
+  const last = builtChapters[builtChapters.length - 1];
+  const pager = `<nav class="essay-pager" aria-label="Adjacent pages">
+    ${previous ? `<a href="${previous.letter}.html"><span>Previous</span>${escapeHtml(previous.title)}</a>` : last ? `<a href="../chapters/${last.slug}.html"><span>Previous</span>${escapeHtml(last.title)}</a>` : "<span></span>"}
+    ${next ? `<a class="essay-pager__next" href="${next.letter}.html"><span>Next</span>${escapeHtml(next.title)}</a>` : `<a class="essay-pager__next" href="../index.html"><span>Return</span>The chapters</a>`}
+  </nav>`;
+  const body = `<main id="main" class="essay-page appendix-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>${escapeHtml(appendix.letter.toUpperCase())}</span>Appendix · the tools behind ${chapterLinks}</div>
+      <h1 class="essay-title">${escapeHtml(appendix.title)}</h1>
+      <p class="essay-payoff">${escapeHtml(appendix.payoff)}</p>
+    </header>
+    <article class="prose">${article}</article>
+    ${pager}
+    ${sourceNotes(appendix)}
+  </main>`;
+  return shell({ title: appendix.title, description: appendix.payoff, prefix: "../", activeSlug: appendix.slug, body, pageClass: "article-view" });
 }
 
 function redirectPage(target, title) {
@@ -451,6 +502,7 @@ fs.writeFileSync(path.join(out, "about.html"), aboutPage());
 fs.writeFileSync(path.join(out, "old", "index.html"), archiveHomePage());
 builtChapters.forEach((chapter) => fs.writeFileSync(path.join(out, "chapters", `${chapter.slug}.html`), chapterPage(chapter)));
 builtChapters.filter(hasLab).forEach((chapter) => fs.writeFileSync(path.join(out, "labs", `${chapter.slug}.html`), labPage(chapter)));
+builtAppendices.forEach((appendix) => fs.writeFileSync(path.join(out, "appendix", `${appendix.letter}.html`), appendixPage(appendix)));
 builtEssays.forEach((essay, index) => {
   fs.writeFileSync(path.join(out, "old", "essays", `${essay.slug}.html`), essayPage(essay, index));
   fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), redirectPage(`../old/essays/${essay.slug}.html`, essay.title));

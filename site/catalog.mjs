@@ -205,6 +205,24 @@ export const skips = [];
 // kept as an archive, built under docs/old/. A chapter is built when status is "published" (or
 // --all) and chapters/<slug>.md exists; the rest are listed on the home page as planned.
 // builtFrom[] names the archived essays whose ground the chapter covers (for the archive banner).
+// Appendices (planned 2026-09-22, notes/chapters/APPENDIX-PLAN.md): optional tool walkthroughs after
+// chapter 8. Source appendix/<letter>.md, built to docs/appendix/<letter>.html with the chapter shell and
+// no mission, so the progress count stays "N of 8 exercises". Receipts live in corpus/appendix-<letter>/.
+const AP = (letter, title, payoff, chapters, sources, extra = {}) => ({
+  letter, slug: `appendix-${letter}`, title, payoff, chapters, sources, builtFrom: [],
+  status: "planned", caution: "",
+  ...extra,
+});
+
+export const appendices = [
+  AP("a", "Appendix A. Serving the Writer: vLLM, RunPod and Modal",
+    "Chapter 7's three levers as the settings of one serving engine, two ways to put it on a rented GPU, and what the week 37 report looks like from the engine's side.",
+    [7],
+    [C("6538601", "04-01"), C("6100015", "08-05"), B("inference-eng", "pp. 70, 131–134, 190–192"), B("llm-serving", "ch. 6")],
+    { status: "published",
+      caution: "A tool walkthrough, as of the two lectures' recordings and the books' editions; the lectures name no tool versions. The code is illustrative and was not executed: it needs a GPU, downloads and a paid account. Timings are one instructor's, on one machine." }),
+];
+
 const CH = (number, slug, title, payoff, builtFrom, sources, extra = {}) => ({
   number, slug, title, payoff, builtFrom, sources,
   status: "planned", caution: "", missionLabel: "",

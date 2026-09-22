@@ -43,6 +43,7 @@ button { font: inherit; }
 .book-nav__intro a { color: var(--forest); font-family: var(--serif); font-size: 1.25rem; font-weight: 700; text-decoration: none; }
 .book-nav__intro p { margin: .35rem 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 .book-nav nav { display: grid; }
+.book-nav__group { margin: 1.1rem .6rem .35rem; color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
 .book-nav__item { display: grid; grid-template-columns: 1.6rem 1fr 1rem; gap: .55rem; align-items: start; padding: .7rem .6rem; color: #4f5c57; font-family: var(--serif); font-size: .82rem; line-height: 1.25; text-decoration: none; border-radius: .4rem; }
 .book-nav__item:hover { background: rgba(255, 253, 248, .72); color: var(--forest); }
 .book-nav__item.is-active { background: var(--white); color: var(--forest); box-shadow: 0 5px 18px rgba(26, 42, 36, .06); }

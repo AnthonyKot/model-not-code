@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays, chapters } from "../site/catalog.mjs";
+import { essays, chapters, appendices } from "../site/catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const buildAll = process.argv.includes("--all") || process.env.BUILD_ALL === "1";
@@ -106,6 +106,11 @@ for (const chapter of chapters) {
   if (fs.existsSync(file)) targets.push({ essay: chapter, label: chapter.slug, file });
   const lab = path.join(root, "labs", `${chapter.slug}.md`);
   if (fs.existsSync(lab)) targets.push({ essay: chapter, label: `${chapter.slug} (lab)`, file: lab });
+}
+
+for (const appendix of appendices) {
+  const file = path.join(root, "appendix", `${appendix.letter}.md`);
+  if (fs.existsSync(file)) targets.push({ essay: appendix, label: appendix.slug, file });
 }
 
 for (const { essay: baseEssay, label, file: essayPath } of targets) {

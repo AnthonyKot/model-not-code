@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { essays, courses, chapters } from "../site/catalog.mjs";
+import { essays, courses, chapters, appendices } from "../site/catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -115,6 +115,7 @@ const summaryLines = [];
 const drafted = [
   ...essays.filter((e) => fs.existsSync(path.join(root, "essays", `${e.slug}.md`))),
   ...chapters.filter((c) => fs.existsSync(path.join(root, "chapters", `${c.slug}.md`))),
+  ...appendices.filter((a) => fs.existsSync(path.join(root, "appendix", `${a.letter}.md`))),
 ];
 for (const essay of drafted) {
   const { rows, structuralFailures } = checkReceiptsFile(essay.slug);
