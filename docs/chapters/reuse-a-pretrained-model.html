@@ -399,7 +399,7 @@ config = LoraConfig(r=32, lora_alpha=64,
 model = get_peft_model(base_model, config)    # wraps each named nn.Linear the way the lab does
 model.print_trainable_parameters()            # 18,350,080 for this model: 655,360 x 28
 </code></pre>
-<p><strong>QLoRA</strong> stores the frozen base&#39;s large linear layers in four bits per weight, while layers such as the embedding table keep their format: about 2.2 GB for the three-billion-weight base, plus about 70 MB of adapters at full precision. How four bits stand in for 32 is chapter 7&#39;s; only the frozen base is compressed, never the diff being trained.</p>
+<p><strong>QLoRA</strong> stores the frozen base&#39;s large linear layers in four bits per weight, while layers such as the embedding table keep their format: about 2.2 GB for the three-billion-weight base, plus about 70 MB of adapters at full precision. How four bits stand in for sixteen is chapter 7&#39;s; only the frozen base is compressed, never the diff being trained.</p>
 </details>
 
 <h2 id="where-it-stops">Where it stops</h2>

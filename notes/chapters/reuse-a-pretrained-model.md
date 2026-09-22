@@ -72,3 +72,5 @@ Authorized targeted fixes only. No independent task added and no optional-sectio
 ### Cross-read repairs — 2026-09-22 (pair reviews 2+3 and 3+4)
 
 Reviewers reported: the opening said chapter 2's classifier learned from 10,000 photos (chapter 2 says 8,000 training photos; 10,000 is the lab's catalogue with validation); "checkpoint" meant a snapshot to choose among in chapter 2 and the downloaded file here, unscoped; "head" was one layer here and two summed layers in chapter 2's lab; "the first of three answers" sat above a four-row table; 13 GB in prose against 12 GB in the fold's own table. Applied: 8,000; one sentence re-scoping checkpoint and head; "the first of the answers"; 12 GB. To keep the path at 2,700 after the added sentence: "Where it stops" lost its peak-memory sentence and the "gap between 0.8303 and 0.3883" clause (both numbers remain on the page above). Path 2701, folds 25.0%.
+
+**Round two (pair review 6+7):** "How four bits stand in for 32 is chapter 7's" → "for sixteen", which is what chapter 7 works. Path 2701.

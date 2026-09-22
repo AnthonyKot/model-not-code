@@ -213,7 +213,7 @@ model = get_peft_model(base_model, config)    # wraps each named nn.Linear the w
 model.print_trainable_parameters()            # 18,350,080 for this model: 655,360 x 28
 ```
 
-**QLoRA** stores the frozen base's large linear layers in four bits per weight, while layers such as the embedding table keep their format: about 2.2 GB for the three-billion-weight base, plus about 70 MB of adapters at full precision. How four bits stand in for 32 is chapter 7's; only the frozen base is compressed, never the diff being trained.
+**QLoRA** stores the frozen base's large linear layers in four bits per weight, while layers such as the embedding table keep their format: about 2.2 GB for the three-billion-weight base, plus about 70 MB of adapters at full precision. How four bits stand in for sixteen is chapter 7's; only the frozen base is compressed, never the diff being trained.
 
 </details>
 
