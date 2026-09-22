@@ -270,6 +270,6 @@ export const chapters = [
     [C("6100015", "06-07", "06-13", "06-14", "06-15", "06-16", "06-18", "06-19", "06-20", "06-21", "06-23", "06-24", "06-25", "06-26", "06-27", "07-23", "07-24"),
      B("huyen-dmls", "pp. 110–111, 115, 226, 235–236"), B("instructgpt", "pp. 3, 8"), B("ts-foundation", "pp. 48, 51")],
     { status: "published",
-      caution: "The ledger's prices, volume and seller behaviour are invented and labelled; the course's ladder is its own single runs on 200 test items (100 and 50 for two rungs), model names as of the recording; the encoder's paraphrase score is fit on its training pairs." }),
+      caution: "The ledger's prices, volume and seller behaviour are invented and labelled; the course's ladder is its own single runs on 200 test items (100 and 50 for two rungs), model names as of the recording; the encoder's click-log score is fit on its training pairs, and the ledger rests on six held-out paraphrases." }),
 ];
 

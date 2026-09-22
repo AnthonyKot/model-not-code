@@ -115,12 +115,12 @@ A forecasting example scores three models on twelve test points of one series, 1
 
 ## What the shop keeps, questions and would need to see
 
-The ledger, the same questions and the reading of other people's tables are the three instruments, and each of the shop's components has now been through them. "Not established" is a finding, not a gap in the book: it names the evidence the shop has not bought yet.
+Each of the shop's components has now been through the three instruments. "Not established" is a finding, not a gap in the book: it names the evidence the shop has not bought yet.
 
 | Component | What the book demonstrated | What is not established | The shop's next decision, and the evidence that would settle it |
 |---|---|---|---|
 | Search encoder (ch. 1, 8) | reads click-log paraphrases a keyword rule cannot; ties the rule on shared-word questions | the share of paraphrased queries in the real logs; MRR is unpriced | keep the rule as the fallback; measure the paraphrase share for a month, then read the break-even |
-| Answer writer (ch. 1, 3, 4) | learns a format from a few hundred examples; a tuned version pleases a hidden scorer more than the reference | that people prefer the tuned writer; the cost of the labelling that a real reward model needs | do not ship tuning on the reward model's score; run the preference comparison with people on fresh prompts |
+| Answer writer (ch. 1, 3, 4) | learns a format from four strings through an adapter; tuned against a scorer, it raises the scorer's mean from 0.34 to 6.12 while the preferences behind it fall from 0.33 to −0.20, until a reference guard holds it | that people prefer the tuned writer; the cost of the labelling that a real reward model needs | do not ship tuning on the reward model's score; run the preference comparison with people on fresh prompts |
 | Photo classifier (ch. 2, 5) | 0.684 blade recall at a priced threshold; an audit that separates fewer blades from more misses | that it beats the seller-declared rule on cost at the shop's volume; the seller dodge rate | the lab's reader case; the audit is the purchase either way |
 | Assistant loop (ch. 6) | refuses an injected write; three failure stages separable by their evidence | answer accuracy on a golden set larger than twelve; the judge's agreement with people | grow the golden set from real questions; measure the judge against a labelled sample before trusting its scores |
 | Serving (ch. 7) | four-bit weights are the first lever for latency at low load; a bigger card is capped by its bandwidth ratio | that the quantised generator's answers survive; the machine's own crossover | the golden set again, with its standard error; step time against batch size on the shop's card |

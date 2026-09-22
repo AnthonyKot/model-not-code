@@ -267,9 +267,10 @@ body 2,032: same situation as chapter 6.
 
 ### Chapter 8 — Did the Shop Need a Model?
 
-**Story.** On one ledger, a rule costs a test and a model costs data, evaluation and drift. The model
-breaks even at 3,001 questions a month — then at 300, once a 15% held-out rate is allowed for. What
-would the shop have to see to choose it?
+**Story.** On one ledger, a rule costs a test and a model costs data, evaluation and drift. At a 15% share
+of paraphrases the rule cannot reach, the model pays back its build after 3,001 queries and its upkeep
+with 300 a month (both numbers at that share; the wording before 2026-09-22 misread them). What would the
+shop have to see to choose it?
 
 **Beats.** (1) The ledger: what each side is charged for, monitoring on both. (2) The same catalogue,
 a rule and a model, on chapter 6's golden set, with intervals. (3) Read the table first: the flip
@@ -346,7 +347,7 @@ character target.
 **Done:** chapter 3 (pilot), then 1 and 2, in that order, by the main session; commits `1115505`,
 `8840699`, `eeb9442`, `fa86b08`. The author's provisional verdict on the three: OK, 7 of 10 (given as an
 assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). Chapters 4, 5, 6, 7 and 8 followed later the same day (their notes have the
-entries). **Next:** the cross-check of 8 against 1–7, then the §6 site copy, then push.
+entries). **Next:** the §6 site copy, then push.
 
 | Ch | Reading path | Folds | Page | Notes |
 |---|---|---|---|---|
