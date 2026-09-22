@@ -2,7 +2,7 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-22 (the rework section below is current; everything under it is history). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
-## Rework in progress — 2026-09-22: chapters, cross-check and site copy pushed; appendix A written; next B
+## Rework in progress — 2026-09-22: chapters, cross-check and site copy pushed; appendices A and B written; next C
 
 **Authority: `notes/chapters/STORY-MAP.md`** (its §7 has the status and the lessons from the first three).
 The author's read of the whole book: chapters are visible concatenations of the essays, and they go so
@@ -31,8 +31,10 @@ for print.
 
 **Next, in order.** Pushed 2026-09-22 (`e695b43`). Appendix A is written to `notes/chapters/APPENDIX-PLAN.md`
 (`appendix/a.md`, `corpus/appendix-a/receipts.tsv`, note `notes/chapters/appendix-a.md`; site support: `appendices[]`
-in `site/catalog.mjs`, `docs/appendix/<letter>.html`, no mission), not pushed. Next: appendix B (Ollama, Gradio,
-tool calling; its chapter 6 loop is run and logged if a small model runs on this CPU), then C. The author decided
+in `site/catalog.mjs`, `docs/appendix/<letter>.html`, no mission), not pushed. Appendix B is written the same way
+(`appendix/b.md`, `corpus/appendix-b/receipts.tsv`, note `notes/chapters/appendix-b.md`; illustrative throughout, since no
+local model runner is installed here). Next: appendix C (ONNX Runtime, FastAPI, TensorBoard, Gradio for evaluation;
+its ONNX export of chapter 2's classifier is run and logged under `corpus/appendix-c/`), then push. The author decided
 (2026-09-22) to keep the three tool appendices and not to add chapters; the tabular and bandit chapter ideas are
 not planned. The site copy is done: `about.md`, the home-page paragraph in `site/build.mjs`, `README.md` and
 `CONTEXT.md` §1 describe story, folds and labs, drop the 20,000–35,000 character target, and name the

@@ -221,6 +221,12 @@ export const appendices = [
     [C("6538601", "04-01"), C("6100015", "08-05"), B("inference-eng", "pp. 70, 131–134, 190–192"), B("llm-serving", "ch. 6")],
     { status: "published",
       caution: "A tool walkthrough, as of the two lectures' recordings and the books' editions; the lectures name no tool versions. The code is illustrative and was not executed: it needs a GPU, downloads and a paid account. Timings are one instructor's, on one machine." }),
+  AP("b", "Appendix B. The Assistant's Toolbox: Ollama, the Chat API, Gradio and Tool Calling",
+    "Real parts where chapter 6 had stand-ins: an open-weight writer behind the same chat endpoint, the loop as one interface callback, and the three checks unchanged against a provider's tool-calling format.",
+    [1, 6],
+    [C("6100015", "01-01", "01-16", "01-19", "02-04", "02-05", "02-07", "02-08", "02-09", "02-10", "02-11", "02-12", "02-13", "02-15", "02-16", "02-17", "02-18")],
+    { status: "published",
+      caution: "A tool walkthrough, as of the lectures' recordings; model names and sizes are as of then and the libraries are unversioned. The code is illustrative and was not executed: no local model runner is installed on the book's machine, and pulling one is a download. Sizes, costs and the two-coins result are one instructor's, one session." }),
 ];
 
 const CH = (number, slug, title, payoff, builtFrom, sources, extra = {}) => ({
