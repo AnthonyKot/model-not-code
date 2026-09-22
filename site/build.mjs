@@ -24,10 +24,14 @@ const builtChapters = chapters.filter((chapter) =>
   fs.existsSync(path.join(root, "chapters", `${chapter.slug}.md`))
 );
 const chapterFor = (essaySlug) => chapters.find((chapter) => chapter.builtFrom.includes(essaySlug));
+// Labs (since 2026-09-22): labs/<slug>.md holds a chapter's exercise and its <!--mission--> marker.
+// A chapter with a lab links forward to it; the completion button lives on the lab page.
+const labPath = (chapter) => path.join(root, "labs", `${chapter.slug}.md`);
+const hasLab = (chapter) => fs.existsSync(labPath(chapter));
 const pad2 = (n) => String(n).padStart(2, "0");
 
 fs.rmSync(out, { recursive: true, force: true });
-for (const directory of [out, path.join(out, "essays"), path.join(out, "assets"), path.join(out, "chapters"), path.join(out, "old", "essays")]) {
+for (const directory of [out, path.join(out, "essays"), path.join(out, "assets"), path.join(out, "chapters"), path.join(out, "labs"), path.join(out, "old", "essays")]) {
   fs.mkdirSync(directory, { recursive: true });
 }
 if (skips.length) fs.mkdirSync(path.join(out, "reviews"), { recursive: true });
@@ -126,7 +130,7 @@ renderer.heading = function ({ tokens, depth }) {
   return `<h${depth} id="${id}">${rendered}</h${depth}>\n`;
 };
 renderer.link = function ({ href, title, tokens }) {
-  const destination = /^(?:\.\.\/)?(?:essays|chapters)\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
+  const destination = /^(?:\.\.\/)?(?:essays|chapters|labs)\/.*\.md$/.test(href) ? href.replace(/\.md$/, ".html") : href;
   const external = /^https?:\/\//.test(destination);
   const attributes = `${title ? ` title="${escapeHtml(title)}"` : ""}${external ? ' target="_blank" rel="noreferrer"' : ""}`;
   return `<a href="${escapeHtml(destination)}"${attributes}>${this.parser.parseInline(tokens)}</a>`;
@@ -270,8 +274,9 @@ function essayPage(essay, index, variant = null) {
 function chapterPage(chapter) {
   const source = fs.readFileSync(path.join(root, "chapters", `${chapter.slug}.md`), "utf8");
   let article = renderMarkdown(source).replace(/^<h1[^>]*>.*?<\/h1>\s*/s, "");
+  const lab = hasLab(chapter);
   const missionOpen = `<section class="mission" data-mission="${chapter.slug}"><div class="mission__label">${escapeHtml(chapter.missionLabel || "Try the exercise")}</div>`;
-  if (article.includes("<!--mission-->")) article = article.replace("<!--mission-->", missionOpen) + "</section>";
+  if (!lab && article.includes("<!--mission-->")) article = article.replace("<!--mission-->", missionOpen) + "</section>";
   const index = builtChapters.indexOf(chapter);
   const previous = builtChapters[index - 1];
   const next = chapters.find((c) => c.number === chapter.number + 1);
@@ -293,15 +298,55 @@ function chapterPage(chapter) {
       <p class="essay-payoff">${escapeHtml(chapter.payoff)}</p>
     </header>
     <article class="prose">${article}</article>
+    ${lab ? `<div class="mission-action lab-action">
+      <div><strong>The lab.</strong><span>${escapeHtml(labTitle(chapter))} — the code, its expected output and the completion button are on the lab page.</span></div>
+      <a class="button-link" href="../labs/${chapter.slug}.html">Open the lab</a>
+    </div>` : `<div class="mission-action" data-mission-action="${chapter.slug}">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="${chapter.slug}">Mark exercise complete</button>
+    </div>`}
+    ${pager}
+    ${sourceNotes(chapter)}
+    ${archiveNote}
+  </main>`;
+  return shell({ title: chapter.title, description: chapter.payoff, prefix: "../", activeSlug: chapter.slug, body, pageClass: "article-view" });
+}
+
+// The lab's H1 ("Lab: …") is its title; the build strips it from the article as it does for chapters.
+function labTitle(chapter) {
+  const match = fs.readFileSync(labPath(chapter), "utf8").match(/^# (.+)$/m);
+  return match ? match[1].replace(/^Lab:\s*/i, "") : `Lab for chapter ${chapter.number}`;
+}
+
+function labPage(chapter) {
+  const source = fs.readFileSync(labPath(chapter), "utf8");
+  let article = renderMarkdown(source).replace(/^<h1[^>]*>.*?<\/h1>\s*/s, "");
+  const missionOpen = `<section class="mission" data-mission="${chapter.slug}"><div class="mission__label">${escapeHtml(chapter.missionLabel || "Try the exercise")}</div>`;
+  if (article.includes("<!--mission-->")) article = article.replace("<!--mission-->", missionOpen) + "</section>";
+  const next = chapters.find((c) => c.number === chapter.number + 1);
+  const nextLink = next && builtChapters.includes(next)
+    ? `<a class="essay-pager__next" href="../chapters/${next.slug}.html"><span>Next</span>${escapeHtml(next.title)}</a>`
+    : `<a class="essay-pager__next" href="../index.html"><span>${next ? `Chapter ${next.number} is in writing` : "Return"}</span>The chapters</a>`;
+  const pager = `<nav class="essay-pager" aria-label="Back to the chapter">
+    <a href="../chapters/${chapter.slug}.html"><span>Back to chapter ${chapter.number}</span>${escapeHtml(chapter.title)}</a>
+    ${nextLink}
+  </nav>`;
+  const description = `The lab for chapter ${chapter.number}, ${chapter.title}: ${labTitle(chapter)}.`;
+  const body = `<main id="main" class="essay-page lab-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>${pad2(chapter.number)}</span>Lab · <a href="../chapters/${chapter.slug}.html">Chapter ${chapter.number}, ${escapeHtml(chapter.title)}</a></div>
+      <h1 class="essay-title">${escapeHtml(labTitle(chapter))}</h1>
+      <p class="essay-payoff">Runs on a laptop CPU. The expected output is printed below the code; mark the exercise complete when yours matches.</p>
+    </header>
+    <article class="prose">${article}</article>
     <div class="mission-action" data-mission-action="${chapter.slug}">
       <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
       <button type="button" data-complete-mission="${chapter.slug}">Mark exercise complete</button>
     </div>
     ${pager}
     ${sourceNotes(chapter)}
-    ${archiveNote}
   </main>`;
-  return shell({ title: chapter.title, description: chapter.payoff, prefix: "../", activeSlug: chapter.slug, body, pageClass: "article-view" });
+  return shell({ title: `Lab: ${labTitle(chapter)}`, description, prefix: "../", activeSlug: chapter.slug, body, pageClass: "article-view" });
 }
 
 function skipReviewPage(item) {
@@ -405,6 +450,7 @@ fs.writeFileSync(path.join(out, "index.html"), homePage());
 fs.writeFileSync(path.join(out, "about.html"), aboutPage());
 fs.writeFileSync(path.join(out, "old", "index.html"), archiveHomePage());
 builtChapters.forEach((chapter) => fs.writeFileSync(path.join(out, "chapters", `${chapter.slug}.html`), chapterPage(chapter)));
+builtChapters.filter(hasLab).forEach((chapter) => fs.writeFileSync(path.join(out, "labs", `${chapter.slug}.html`), labPage(chapter)));
 builtEssays.forEach((essay, index) => {
   fs.writeFileSync(path.join(out, "old", "essays", `${essay.slug}.html`), essayPage(essay, index));
   fs.writeFileSync(path.join(out, "essays", `${essay.slug}.html`), redirectPage(`../old/essays/${essay.slug}.html`, essay.title));
@@ -412,4 +458,4 @@ builtEssays.forEach((essay, index) => {
 for (const asset of ["styles.css", "app.js"]) fs.copyFileSync(path.join(here, asset), path.join(out, "assets", asset));
 fs.writeFileSync(path.join(out, ".nojekyll"), "");
 fs.writeFileSync(path.join(out, "404.html"), homePage());
-console.log(`Built ${builtChapters.length} of ${chapters.length} chapters and ${builtEssays.length} archived essays in docs/.`);
+console.log(`Built ${builtChapters.length} of ${chapters.length} chapters (${builtChapters.filter(hasLab).length} with labs) and ${builtEssays.length} archived essays in docs/.`);

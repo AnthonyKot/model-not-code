@@ -265,3 +265,23 @@ button { font: inherit; }
 .archive-note { margin-top: 1rem; color: var(--muted); font-size: .85rem; line-height: 1.6; }
 .archive-note a { color: var(--forest); }
 .book-nav__intro p a { display: inline; font-family: var(--sans); font-size: .8rem; font-weight: 700; color: var(--forest); }
+
+/* Optional folds and worked answers (since 2026-09-22; book1's rule is the model): closed by default, open in print. */
+.prose details { max-width: 720px; margin: 1.6rem auto; padding: .8rem 1.1rem; border: 1px solid var(--line); border-radius: .4rem; background: rgba(235, 228, 214, .45); font-size: .94em; }
+.prose details > summary { color: var(--forest); font-family: var(--sans); font-size: .82rem; font-weight: 700; letter-spacing: .01em; cursor: pointer; }
+.prose details > summary:hover { color: var(--amber); }
+.prose details[open] > summary { margin-bottom: .6rem; }
+.prose details > :last-child { margin-bottom: .3rem; }
+.prose details table { margin-top: 1rem; margin-bottom: 1rem; }
+.prose details pre { font-size: .9em; }
+.prose .mission details { background: rgba(255, 253, 248, .08); border-color: rgba(255, 253, 248, .3); }
+.prose .mission details > summary { color: var(--amber-pale); }
+.lab-action .button-link { display: inline-block; padding: .75rem 1.1rem; color: var(--white); background: var(--forest); border-radius: .35rem; font-family: var(--sans); font-weight: 700; text-decoration: none; }
+.lab-action .button-link:hover { background: var(--forest-soft); }
+.essay-kicker a { color: inherit; }
+@media print {
+  .prose details { break-inside: avoid; border: none; padding: 0; background: transparent; }
+  .prose details > * { display: block !important; }
+  .prose details::details-content { content-visibility: visible; }
+  .prose details > summary { color: black; }
+}

@@ -21,11 +21,13 @@ const builtChapters = chapters.filter((chapter) =>
   fs.existsSync(path.join(root, "chapters", `${chapter.slug}.md`))
 );
 
+const hasLab = (chapter) => fs.existsSync(path.join(root, "labs", `${chapter.slug}.md`));
 const pages = [
   path.join(out, "index.html"),
   path.join(out, "about.html"),
   path.join(out, "old", "index.html"),
   ...builtChapters.map((c) => path.join(out, "chapters", `${c.slug}.html`)),
+  ...builtChapters.filter(hasLab).map((c) => path.join(out, "labs", `${c.slug}.html`)),
   ...builtEssays.map((e) => path.join(out, "old", "essays", `${e.slug}.html`)),
 ];
 // Old essay URLs stay alive as redirects into the archive.
@@ -60,9 +62,22 @@ for (const essay of documents) {
   const source = fs.readFileSync(essay.md, "utf8");
   if (source.match(/^# (.+)$/m)?.[1] !== essay.title) errors.push(`${essay.slug}: catalog title disagrees with the chapter`);
   if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1) errors.push(`${essay.slug}: expected one main heading`);
+  // A chapter with a lab keeps its exercise, marker and completion button on the lab page.
+  const lab = essay.number && hasLab(essay) ? path.join(out, "labs", `${essay.slug}.html`) : null;
   const missions = (html.match(/class="mission"/g) || []).length;
-  if (missions !== 1) errors.push(`${essay.slug} has ${missions} exercise sections`);
-  if (!html.includes(`data-complete-mission="${essay.slug}"`)) errors.push(`${essay.slug} has no completion action`);
+  if (lab) {
+    if (missions !== 0) errors.push(`${essay.slug} has ${missions} exercise sections on the chapter page although it has a lab`);
+    if (!html.includes(`href="../labs/${essay.slug}.html"`)) errors.push(`${essay.slug} does not link to its lab`);
+    const labHtml = fs.readFileSync(lab, "utf8");
+    const labMissions = (labHtml.match(/class="mission"/g) || []).length;
+    if (labMissions !== 1) errors.push(`${essay.slug} lab has ${labMissions} exercise sections`);
+    if ((labHtml.match(/<h1(?:\s|>)/g) || []).length !== 1) errors.push(`${essay.slug} lab: expected one main heading`);
+    if (!labHtml.includes(`data-complete-mission="${essay.slug}"`)) errors.push(`${essay.slug} lab has no completion action`);
+    if (!labHtml.includes(`href="../chapters/${essay.slug}.html"`)) errors.push(`${essay.slug} lab does not link back to the chapter`);
+  } else {
+    if (missions !== 1) errors.push(`${essay.slug} has ${missions} exercise sections`);
+    if (!html.includes(`data-complete-mission="${essay.slug}"`)) errors.push(`${essay.slug} has no completion action`);
+  }
 }
 
 const publishedText = pages.map((page) => fs.readFileSync(page, "utf8")).join("\n");

@@ -104,6 +104,8 @@ for (const essay of essays) {
 for (const chapter of chapters) {
   const file = path.join(root, "chapters", `${chapter.slug}.md`);
   if (fs.existsSync(file)) targets.push({ essay: chapter, label: chapter.slug, file });
+  const lab = path.join(root, "labs", `${chapter.slug}.md`);
+  if (fs.existsSync(lab)) targets.push({ essay: chapter, label: `${chapter.slug} (lab)`, file: lab });
 }
 
 for (const { essay: baseEssay, label, file: essayPath } of targets) {

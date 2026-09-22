@@ -65,5 +65,13 @@
     updateReadingProgress();
   }
 
+  // Printed copies include every optional fold and worked answer.
+  let closedForPrint = [];
+  addEventListener("beforeprint", () => {
+    closedForPrint = [...document.querySelectorAll("details:not([open])")];
+    closedForPrint.forEach((node) => { node.open = true; });
+  });
+  addEventListener("afterprint", () => closedForPrint.forEach((node) => { node.open = false; }));
+
   renderProgress();
 })();
