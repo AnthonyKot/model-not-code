@@ -78,8 +78,8 @@
       <h1 class="essay-title">Search the Catalogue, Then Answer From It</h1>
       <p class="essay-payoff">The shop's search box and its answer writer, built from the same parts: tokens, attention, a vector per text trained on query–title pairs, and the causal mask that turns the blocks into a generator.</p>
     </header>
-    <article class="prose"><p>A customer of an online shop types <strong>cheap keyboard for laptop</strong>. The product that should come first is listed as <em>Slim wireless keyboard</em>. Its title says neither &quot;cheap&quot; nor &quot;laptop&quot;. A keyword index ranks <em>Laptop stand</em> above it, because that title shares a word with the query. The shop wants two things. First, a search box that puts the keyboard on top. Second, a one-paragraph answer written from the products the search found, the kind a shop assistant would give.</p>
-<p>This chapter builds both as two models made from the same parts, each trained separately. Text becomes integers, the integers become vectors, the vectors look at each other through attention, and then the road forks. For search, the vectors of a text are averaged into one vector and compared with every product&#39;s vector. For the answer, a second model built from the same kind of blocks runs with one extra rule, the causal mask, and produces one token at a time. The figure is the map for the whole chapter; each section builds one box.</p>
+    <article class="prose"><p>A customer of an online shop types <strong>cheap keyboard for laptop</strong>. The product that should come first is listed as <em>Slim wireless keyboard</em>, and its title says neither &quot;cheap&quot; nor &quot;laptop&quot;. The keyword index puts <em>Laptop stand</em> on top instead, on one shared word. The shop needs two things the index cannot give: a search box that puts the keyboard first, and a one-paragraph answer written from the products the search found. What has to change for the right product to win, and for the answer to be written from it?</p>
+<p>The chapter builds both from the same parts. Text becomes numbers a loss can move. Each text becomes one vector, so a catalogue of millions is scored without running the model on every pair. The tokens of a query look at each other, which is how <em>keyboard</em> comes to carry &quot;for a laptop&quot;. And the same blocks, with one extra rule, write the answer one token at a time. The figure is the map; every example is synthetic and small enough to recompute.</p>
 <figure class="diagram">
 <div class="pipeline-scroll" role="region" aria-label="Search and answer pipeline; scroll horizontally to follow all stages" tabindex="0">
 <svg viewBox="0 0 720 340" width="100%" role="img" aria-label="Pipeline. Top row, the parts both models are built from: query text, tokenizer, token IDs, embedding rows plus positions, attention blocks. Search row: no mask and mean pool, unit vector, cosine against every catalogue vector, top titles. Answer row: prompt of question plus top titles, the generator's own blocks with a causal mask, scores divided by temperature then softmax, pick a token, which is appended and fed back." style="max-width:720px;font-family:inherit;font-size:12px">
@@ -118,17 +118,17 @@
   </g>
   <g fill="currentColor" text-anchor="middle">
     <text x="70" y="48">query text</text>
-    <text x="210" y="41">tokenizer</text><text x="210" y="57" font-size="12">§ 2</text>
+    <text x="210" y="48">tokenizer</text>
     <text x="350" y="48">token IDs</text>
     <text x="495" y="40">embedding rows</text><text x="495" y="56">+ positions</text>
-    <text x="645" y="41">attention blocks</text><text x="645" y="57" font-size="12">§ 3</text>
+    <text x="645" y="48">attention blocks</text>
     <text x="645" y="160">no mask,</text><text x="645" y="176">mean pool</text>
-    <text x="495" y="160">one unit vector</text><text x="495" y="176" font-size="12">§ 4</text>
+    <text x="495" y="168">one unit vector</text>
     <text x="350" y="160">cosine with</text><text x="350" y="176">every title</text>
     <text x="210" y="168">top titles</text>
     <text x="210" y="270">question</text><text x="210" y="286">+ top titles</text>
     <text x="350" y="270">generator blocks,</text><text x="350" y="286">causal mask</text>
-    <text x="495" y="270">scores ÷ temperature,</text><text x="495" y="286">softmax · § 5</text>
+    <text x="495" y="270">scores ÷ temperature,</text><text x="495" y="286">softmax</text>
     <text x="645" y="278">pick a token</text>
     <text x="500" y="330" font-size="12">append the token and run again</text>
   </g>
@@ -142,22 +142,68 @@
 <figcaption>The chapter's pipeline. The top row lists the parts both models are built from; each model has its own trained weights. Search averages its blocks' output into one vector; the answer runs the generator's blocks, with a mask, once per generated token.</figcaption>
 </figure>
 
-<p>Every example in this chapter is synthetic: the catalogue, the click log and every vector are chosen small enough to recompute by hand, and the exercise trains on a few sentences in seconds. The last section says what the same pipeline needs on a real catalogue.</p>
-<h2 id="what-you-ship-is-a-file-of-numbers">What you ship is a file of numbers</h2>
-<p>Start with the smallest search model that can learn. One query, two titles the shop showed for it, and a click on the first. The model gives each title a <strong>score</strong>, and at this size the scores are the model&#39;s entire set of parameters: two numbers, a for <em>Slim wireless keyboard</em> and b for <em>Laptop stand</em>, both starting at 0. Nothing about keyboards is written anywhere. The click log will set a and b.</p>
-<p>Scores become probabilities with the <strong>softmax</strong>:</p>
+<h2 id="text-becomes-numbers-a-loss-can-move">Text becomes numbers a loss can move</h2>
+<p>A model computes with numbers, so the query is first cut into pieces from a fixed list, and each piece is replaced by its row number in that list. The pieces are <strong>tokens</strong>, the row numbers <strong>token IDs</strong>, the list the <strong>vocabulary</strong>, and the code that does the cutting the <strong>tokenizer</strong>, one call, <code>tokenizer.encode(text)</code>, returning integers. Each ID selects one row of the model&#39;s <strong>embedding table</strong>, a learned vector per token, and from that point the network never sees a character again. So a typo is several rare IDs where a frequent word is one; the tokenizer belongs to the weights, since another tokenizer selects the wrong rows without an error; and tokens are what the <strong>context window</strong> is measured in and what hosted models charge for.</p>
+<details>
+<summary>Optional: how the vocabulary is built by counting</summary>
+
+<p><strong>Byte-pair encoding</strong> counts. In a query log, <em>case</em> occurs 5 times, <em>cases</em> 3, <em>base</em> 2 and <em>cash</em> once. Count every pair of neighbouring characters, weighted by its word&#39;s count: a+s occurs 11 times, s+e 10, c+a 9. Merge the winner into <code>as</code>; recounting, as+e wins round 2, giving <code>ase</code>, and c+ase wins round 3, giving <code>case</code>. Three merges leave nine entries in sorted order: a 0, as 1, ase 2, b 3, c 4, case 5, e 6, h 7, s 8. To encode, replay the merges in order:</p>
+<table>
+<thead>
+<tr>
+<th>Text</th>
+<th>After replaying a+s, as+e, c+ase</th>
+<th>IDs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>case</td>
+<td>case</td>
+<td>[5]</td>
+</tr>
+<tr>
+<td>cases</td>
+<td>case · s</td>
+<td>[5, 8]</td>
+</tr>
+<tr>
+<td>base</td>
+<td>b · ase</td>
+<td>[3, 2]</td>
+</tr>
+<tr>
+<td>cash</td>
+<td>c · as · h</td>
+<td>[4, 1, 7]</td>
+</tr>
+<tr>
+<td>caes (a typo)</td>
+<td>c · a · e · s</td>
+<td>[4, 0, 6, 8]</td>
+</tr>
+</tbody></table>
+</details>
+
+<p>Start with the smallest search model that can learn: one query, two titles shown for it, a click on the first. The model gives each title a <strong>score</strong>, and at this size the scores are its entire set of parameters, a for <em>Slim wireless keyboard</em> and b for <em>Laptop stand</em>, both starting at 0. Scores become probabilities with the <strong>softmax</strong>:</p>
 <p class="formula">p<sub>i</sub> = e<sup>s<sub>i</sub></sup> / Σ<sub>j</sub> e<sup>s<sub>j</sub></sup></p>
 
-<p>s<sub>i</sub> is title i&#39;s score. e<sup>s<sub>i</sub></sup> raises e, about 2.718, to that score, which makes every entry positive and lets a higher score take a disproportionately larger share. Σ<sub>j</sub> adds the same quantity over all titles j, so dividing by it makes the probabilities add up to one. With a = b = 0 both titles get 0.5.</p>
-<p>The <strong>loss</strong> says how wrong the model is on the click, as one number:</p>
+<p>s<sub>i</sub> is title i&#39;s score; e<sup>s<sub>i</sub></sup> raises e, about 2.718, to it, which makes every entry positive; Σ<sub>j</sub> adds the same over all titles j, so the probabilities sum to one. With a = b = 0 both titles get 0.5. The <strong>loss</strong> says how wrong the model is on the click, as one number:</p>
 <p class="formula">L = −ln p<sub>clicked</sub></p>
 
-<p>p<sub>clicked</sub> is the probability the model gave the title the customer clicked, and ln is the natural logarithm. The loss is 0 when that probability is 1 and grows without limit as it falls towards 0. At 0.5 it is ln 2 = 0.69315. This is the <strong>cross-entropy</strong> loss, and it is worth meeting carefully here, because the encoder in this chapter trains on it, the generator trains on it, and the classifier in chapter 2 will train on it.</p>
-<p>Each training step needs a direction for every score. The <strong>gradient</strong> is the list of the loss&#39;s slopes, one per parameter: how much the loss changes per unit of change in that parameter. For cross-entropy after a softmax, the slope for title i is p<sub>i</sub> − y<sub>i</sub>, where y<sub>i</sub> is 1 for the clicked title and 0 for the rest. Here that gives −0.5 for a and +0.5 for b. You do not have to take the formula on trust: raise a from 0 to 0.01 and recompute, and the loss falls to 0.68816, a change of −0.00499 for a step of 0.01, a slope of −0.499. Automatic differentiation, <code>loss.backward()</code> in PyTorch, returns the exact slopes without the nudging.</p>
-<p><strong>Gradient descent</strong> moves every parameter against its slope, by an amount the <strong>learning rate</strong> η scales:</p>
+<p>p<sub>clicked</sub> is the probability the model gave the clicked title, and ln the natural logarithm. At 0.5 it is ln 2 = 0.69315; it is 0 only when that probability is 1, and grows without limit as it falls towards 0. This is the <strong>cross-entropy</strong> loss, and the encoder, the generator and chapter 2&#39;s classifier all train on it.</p>
+<p>Each step needs a direction for every parameter. The <strong>gradient</strong> is the list of the loss&#39;s slopes, one per parameter; for cross-entropy after a softmax the slope for title i is p<sub>i</sub> − y<sub>i</sub>, where y<sub>i</sub> is 1 for the clicked title and 0 for the rest: −0.5 for a and +0.5 for b. <strong>Gradient descent</strong> moves every parameter against its slope by an amount the <strong>learning rate</strong> η scales. With η = 1 the first step takes a to 0.5 and b to −0.5, the keyboard&#39;s probability to 0.731 and the loss to 0.3133; five steps reach 0.914 and 0.0901, in shrinking steps, because the slope shrinks as p approaches 1. In PyTorch the loop is four lines, the same four for every model in this book:</p>
+<pre><code class="language-python">loss = F.cross_entropy(scores, target)   # softmax, then minus the log-probability of the target
+opt.zero_grad()                          # clear the previous step&#39;s slopes
+loss.backward()                          # compute the slope of the loss for every parameter
+opt.step()                               # move every parameter against its slope
+</code></pre>
+<p>What training produces is a file of numbers, here a and b, in a real search model many learned weights; the program you deploy is that file plus the tokenizer that turns text into its input.</p>
+<details>
+<summary>Optional: five steps of gradient descent on the two scores</summary>
+
 <p class="formula">s ← s − η · (p − y)</p>
 
-<p>The arrow replaces each score with the value on its right; p − y is its slope. With η = 1, a becomes 0 − 1 × (−0.5) = 0.5 and b becomes 0 − 1 × 0.5 = −0.5. Repeat:</p>
+<p>Each score s is replaced by the value on the right; p − y is its slope and η the learning rate. With η = 1, a becomes 0 − 1 × (−0.5) = 0.5 and b becomes −0.5. Repeat:</p>
 <div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
 <thead>
 <tr>
@@ -211,177 +257,27 @@
 <td>0.0901</td>
 </tr>
 </tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>The steps shrink because the slope p − 1 shrinks as p approaches 1. In this two-number model no learning rate is too large, since the loss has no bottom to jump over; it keeps falling as the gap between a and b widens. A real network&#39;s loss has valleys a large step can cross and land higher on the far side, and a small step makes too little progress before your budget runs out. That is why the learning rate is the first setting you lower when a training loss starts rising.</p>
-<p>In PyTorch the whole loop is four lines, and you will see the same four lines three more times in this chapter:</p>
-<pre><code class="language-python">loss = F.cross_entropy(scores, target)   # softmax, then minus the log-probability of the target
-opt.zero_grad()                          # clear the previous step&#39;s slopes
-loss.backward()                          # compute the slope of the loss for every parameter
-opt.step()                               # move every parameter against its slope
-</code></pre>
-<p>What training produces is a file of numbers. Here it holds a and b; for a real search model it holds many learned weights, and the program you deploy is that file plus the code that turns text into the model&#39;s input. That code is the next section, and it ships with the weights.</p>
-<h2 id="the-query-becomes-integers">The query becomes integers</h2>
-<p>A model computes with numbers, so the query is first cut into pieces from a fixed list, and each piece is replaced by its row number in that list. The pieces are <strong>tokens</strong>, the row numbers <strong>token IDs</strong>, the list the <strong>vocabulary</strong>, and the code that does the cutting the <strong>tokenizer</strong>. In practice you meet it as one call, <code>tokenizer.encode(text)</code>, which returns a list of integers. Each ID then selects one row of the model&#39;s <strong>embedding table</strong>, a learned vector per token, and from that point the network never sees a character again.</p>
-<p>The shop does not choose the vocabulary by hand. The usual procedure, <strong>byte-pair encoding</strong>, builds it by counting. Take a tiny query log in which four words occur: <em>case</em> 5 times, <em>cases</em> 3 times, <em>base</em> twice and <em>cash</em> once. Start with single characters: a, b, c, e, h, s. Count every pair of neighbouring symbols, weighting each word by how often it occurs, and merge the most frequent pair into a new symbol.</p>
-<table>
-<thead>
-<tr>
-<th>Round 1 pair</th>
-<th>Where it occurs</th>
-<th>Count</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>a+s</td>
-<td>case 5, cases 3, base 2, cash 1</td>
-<td>11</td>
-</tr>
-<tr>
-<td>s+e</td>
-<td>case 5, cases 3, base 2</td>
-<td>10</td>
-</tr>
-<tr>
-<td>c+a</td>
-<td>case 5, cases 3, cash 1</td>
-<td>9</td>
-</tr>
-<tr>
-<td>e+s</td>
-<td>cases 3</td>
-<td>3</td>
-</tr>
-<tr>
-<td>b+a</td>
-<td>base 2</td>
-<td>2</td>
-</tr>
-<tr>
-<td>s+h</td>
-<td>cash 1</td>
-<td>1</td>
-</tr>
-</tbody></table>
-<p>Merge a+s into <code>as</code>. Recount over the new symbols: as+e now occurs 10 times and c+as 9, so round 2 merges <code>ase</code>. In round 3, c+ase occurs 8 times (case 5, cases 3) and wins, giving <code>case</code>. Three merges on six characters leave a vocabulary of nine entries, numbered in sorted order: a 0, as 1, ase 2, b 3, c 4, case 5, e 6, h 7, s 8.</p>
-<p>To encode a word, replay the merges in the order they were learned:</p>
-<table>
-<thead>
-<tr>
-<th>Text</th>
-<th>After replaying a+s, as+e, c+ase</th>
-<th>IDs</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>case</td>
-<td>case</td>
-<td>[5]</td>
-</tr>
-<tr>
-<td>cases</td>
-<td>case · s</td>
-<td>[5, 8]</td>
-</tr>
-<tr>
-<td>base</td>
-<td>b · ase</td>
-<td>[3, 2]</td>
-</tr>
-<tr>
-<td>cash</td>
-<td>c · as · h</td>
-<td>[4, 1, 7]</td>
-</tr>
-<tr>
-<td>caes (a typo)</td>
-<td>c · a · e · s</td>
-<td>[4, 0, 6, 8]</td>
-</tr>
-</tbody></table>
-<p>Three consequences follow for the shop, and all three hold in production tokenizers, whose vocabularies run to more than a hundred thousand entries.</p>
-<p>The frequent word is one ID; the typo is four rare ones. The model receives <em>case</em> and <em>caes</em> as unrelated inputs of different lengths, and whatever it does with the typo, it learned from how often such pieces appeared in training text. Product codes, sizes and rare brand names fall into pieces the same way.</p>
-<p>The letters are gone. <em>cases</em> arrives as [5, 8]; the network never receives an s as a separate input unless the tokenizer split one off. A question about the spelling of a product name reaches the model as row numbers, not letters.</p>
-<p>The tokenizer belongs to the weights. Row 5 of the embedding table was trained to mean whatever ID 5 meant under this tokenizer&#39;s list. Encode with a different tokenizer and the same text selects different rows, so the model computes with the wrong vectors and raises no error. Ship the tokenizer file with the model and load both from the same place.</p>
-<p>Tokens are also the unit of cost. The <strong>context window</strong>, the most a model can take in one pass, is a number of tokens, and it must hold the prompt and everything the model generates. Hosted models charge per token in and per token out. When section 5 puts retrieved product titles into the answer writer&#39;s prompt, every title is paid for in tokens; chapter 7 is about that bill.</p>
-<h2 id="tokens-look-at-each-other">Tokens look at each other</h2>
-<p>After the embedding lookup, <em>keyboard</em> is the same vector wherever it appears: in <em>keyboard for laptop</em>, in <em>keyboard cleaner</em>, in <em>laptop for keyboard</em>. Search needs the vector for <em>keyboard</em> in this query to carry &quot;for a laptop&quot;. <strong>Attention</strong> is the layer that mixes context into each token&#39;s vector.</p>
-<p>It works like a dictionary lookup that returns a blend instead of one entry. From each token&#39;s vector, three learned weight matrices compute three shorter vectors: a <strong>query</strong> (what this position is looking for), a <strong>key</strong> (what it offers to be matched against) and a <strong>value</strong> (what it contributes if it matches). Each query is scored against every key, the scores become weights with a softmax, and the output for that position is the weighted sum of all the values.</p>
-<p>Take the three tokens of <em>keyboard for laptop</em> with invented vectors, chosen so each number can be checked by hand. Keys and queries have four numbers each; the two value numbers can be read as &quot;is about a keyboard&quot; and &quot;is about a laptop&quot;.</p>
-<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
-<thead>
-<tr>
-<th>Token</th>
-<th>Key</th>
-<th>Query</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1 keyboard</td>
-<td>(2, 0, 0, 0)</td>
-<td>(0, 0, 2, 0)</td>
-<td>(1, 0)</td>
-</tr>
-<tr>
-<td>2 for</td>
-<td>(0, 2, 0, 0)</td>
-<td>(1, 1, 1, 0)</td>
-<td>(0, 0)</td>
-</tr>
-<tr>
-<td>3 laptop</td>
-<td>(0, 0, 2, 0)</td>
-<td>(2, 0, 0, 0)</td>
-<td>(0, 1)</td>
-</tr>
-</tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p><strong>Score.</strong> The <strong>dot product</strong> multiplies two vectors position by position and adds the results. The keyboard&#39;s query (0, 0, 2, 0) against the three keys gives 0, 0 and 4. Each score is divided by √d<sub>k</sub>, the square root of the key length, here √4 = 2, which stops scores from growing merely because vectors are long: 0, 0, 2.</p>
-<p><strong>Weight.</strong> The softmax of 0, 0, 2 is 1, 1 and e<sup>2</sup> = 7.389 over their total 9.389: 0.107, 0.107 and 0.787.</p>
-<p><strong>Blend.</strong> 0.107 × (1, 0) + 0.107 × (0, 0) + 0.787 × (0, 1) = (0.107, 0.787). The keyboard&#39;s output now mostly carries the laptop&#39;s value. Doing the same for every row:</p>
-<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
-<thead>
-<tr>
-<th>Row</th>
-<th>Scaled scores against keys 1, 2, 3</th>
-<th>Weights</th>
-<th>Output</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1 keyboard</td>
-<td>0, 0, 2</td>
-<td>0.107, 0.107, 0.787</td>
-<td>(0.107, 0.787)</td>
-</tr>
-<tr>
-<td>2 for</td>
-<td>1, 1, 1</td>
-<td>0.333, 0.333, 0.333</td>
-<td>(0.333, 0.333)</td>
-</tr>
-<tr>
-<td>3 laptop</td>
-<td>2, 0, 0</td>
-<td>0.787, 0.107, 0.107</td>
-<td>(0.787, 0.107)</td>
-</tr>
-</tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>For all rows at once, with the queries, keys and values stacked as the rows of matrices Q, K and V:</p>
-<p class="formula">Attention(Q, K, V) = softmax(Q·K<sup>T</sup> / √d<sub>k</sub>) · V</p>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>A real network&#39;s loss has valleys a large step can cross, which is why the learning rate is the first setting you lower when a loss starts rising.</p>
+</details>
 
-<p>Q·K<sup>T</sup> is the table of every query&#39;s dot product with every key (K<sup>T</sup>, K transposed, lines the keys up as columns so one matrix multiplication computes the whole table). Dividing by √d<sub>k</sub> is the scaling step. The softmax runs along each row and gives the weights. Multiplying by V blends the values, one output row per token.</p>
-<p>In PyTorch this is <code>F.scaled_dot_product_attention(q, k, v)</code>, and its reference implementation is exactly the table above: multiply, scale, softmax along the last dimension, multiply by the values. In a real model the query, key and value vectors come from <code>nn.Linear</code> layers applied to every token vector, and a fourth <code>nn.Linear</code>, the output projection, maps each blended output before it is added back to the token&#39;s vector; the exercise leaves that fourth one out. A model runs several attentions side by side, <strong>heads</strong>, in each of many stacked layers. The arithmetic of each one is this table.</p>
-<p>Attention on its own ignores order: shuffle the tokens and the rows come out shuffled, with the same numbers. <em>keyboard for laptop</em> and <em>laptop for keyboard</em> would then give the same set of outputs, and the same average in the next section. Models add a <strong>position</strong> vector to each token&#39;s embedding before the first layer, so the same word at a different position enters with a different vector; the exercise does this with a second, learned table indexed by position.</p>
-<p>A search model reads the whole query both ways: every token may attend to every other, including later ones, because the full query is given. That changes in section 5.</p>
-<h2 id="one-vector-per-text-trained-on-clicks">One vector per text, trained on clicks</h2>
-<p>Search could run a model on the query and each title together and score the pair. The cost rules it out. With a catalogue of 2,000,000 titles and 1,000 queries a minute, a pair scorer runs 2,000,000 × 1,000 = 2,000,000,000 passes a minute. An <strong>encoder</strong> instead turns any text into one fixed-length vector: the catalogue is encoded once and stored, each query is encoded once when it arrives (1,000 passes a minute), and ranking compares vectors without running the model again.</p>
-<p><strong>One vector from many.</strong> The attention blocks return one vector per token. The common way to get one vector for the text is the <strong>mean pool</strong>: average the token vectors. Queries in a batch have different lengths, so shorter ones are filled out with padding tokens, and the average must leave padding out. With the three outputs above and one padding row of invented numbers (5, −5), the plain mean is (1.557, −0.943), dragged by a row that is not text; the mean over the three real tokens is (0.409, 0.409). The code multiplies each row by a mask of 1 for real tokens and 0 for padding, sums, and divides by the number of real tokens. Padding also needs a mask inside attention, so no real token blends it in; the exercise passes one as <code>attn_mask</code>.</p>
-<p><strong>Comparing by angle.</strong> Vectors are compared with <strong>cosine similarity</strong>:</p>
+<h2 id="one-vector-per-text-so-the-catalogue-is-scored-once">One vector per text, so the catalogue is scored once</h2>
+<p>Scoring every query–title pair with one model is ruled out by cost: with a catalogue of 2,000,000 titles and 1,000 queries a minute, a pair scorer runs 2,000,000 × 1,000 = 2,000,000,000 passes a minute. An <strong>encoder</strong> instead turns any text into one fixed-length vector: the catalogue is encoded once and stored, each query once when it arrives, 1,000 passes a minute, and ranking compares vectors.</p>
+<p>The encoder&#39;s blocks, built in the next section, return one vector per token; the <strong>mean pool</strong> averages them, leaving out the padding that fills shorter texts in a batch. Vectors are compared with <strong>cosine similarity</strong>:</p>
 <p class="formula">cos(q, d) = (q · d) / (|q| × |d|)</p>
 
-<p>q is the query&#39;s vector and d a title&#39;s. q · d is their dot product; |q| and |d| are their lengths, the square root of the sum of squared entries. The result is the cosine of the angle between them: 1 when they point the same way, 0 at right angles, −1 when opposite. If every vector is divided by its length when stored, the denominator is 1 and the cosine is the dot product, so scoring the whole catalogue is one matrix multiplication and a sort. That exact comparison with every stored vector grows with the catalogue; at millions of products, vector databases use an approximate nearest-neighbour index, which first narrows the query to a small group of likely neighbours, such as a bucket of similar vectors built offline, and accepts that it may occasionally miss the true top match.</p>
-<p><strong>Where the training pairs come from.</strong> The encoder is trained on pairs: a query and the title a customer clicked, taken from the search log. A batch holds B pairs. Encode the B queries and the B titles with the same encoder and compute the B × B table of cosines, entry (i, j) comparing query i with title j. The diagonal holds the clicks. Every other entry pairs a query with somebody else&#39;s title; the loss treats it as a wrong answer at no extra cost, even though the click log does not prove that it is irrelevant. Each row is then a classification over B titles whose correct answer is on the diagonal, trained with section 1&#39;s cross-entropy.</p>
-<p>One setting stands between the cosines and that softmax. Cosines lie between −1 and 1, and a softmax over numbers that close cannot become confident. The <strong>temperature</strong> τ divides every cosine before the softmax. You meet it in the sentence-transformers library as <code>MultipleNegativesRankingLoss(model, scale=20.0)</code>; <code>scale</code> is 1/τ, so the default means τ = 0.05. Some image–text models learn τ as one more parameter; this loss keeps it fixed.</p>
-<p>Here is one row of that table: the query <em>cheap keyboard for laptop</em> at q = (1, 0), its clicked title <em>Slim wireless keyboard</em> at (0.6, 0.8), and <em>Laptop stand</em>, another pair&#39;s title, at (0.8, −0.6). All three are unit length, so the cosines are 1 × 0.6 + 0 × 0.8 = 0.6 for the keyboard and 0.8 for the stand. The stand ranks first, as it did in the keyword index.</p>
+<p>q is the query&#39;s vector and d a title&#39;s; q · d is their <strong>dot product</strong>, multiplied position by position and added; |q| and |d| are their lengths, the square root of the sum of squared entries. The result is the cosine of the angle between them: 1 when they point the same way, 0 at right angles, −1 when opposite. If every vector is divided by its length when stored, the cosine is the dot product, and scoring the whole catalogue is one matrix multiplication and a sort.</p>
+<details>
+<summary>Optional: the mean pool with padding, and the index at millions of products</summary>
+
+<p>With the three token outputs of the next section, (0.107, 0.787), (0.333, 0.333) and (0.787, 0.107), and one padding row of invented numbers (5, −5), the plain mean is (1.557, −0.943); over the three real tokens it is (0.409, 0.409). The code multiplies each row by a mask of 1 for real tokens and 0 for padding, sums, and divides by the count of real tokens; attention needs the same mask. At millions of products, vector databases use an approximate nearest-neighbour index, which searches only likely neighbours grouped offline and may miss the true top match.</p>
+</details>
+
+<p>The training pairs come from the search log: a query and the title a customer clicked. A batch holds B pairs; encode both sides with the same encoder and compute the B × B table of cosines, entry (i, j) comparing query i with title j. The diagonal holds the clicks, every other entry pairs a query with somebody else&#39;s title, and each row is a classification over B titles trained with the cross-entropy above, the off-diagonal entries counting as wrong though the click log does not prove it.</p>
+<p>One setting stands between the cosines and that softmax. Cosines lie between −1 and 1, and a softmax over numbers that close cannot become confident, so a <strong>temperature</strong> τ divides every cosine first; in the sentence-transformers library it is <code>MultipleNegativesRankingLoss(model, scale=20.0)</code>, <code>scale</code> being 1/τ, so the default is τ = 0.05. In the worked row below, <em>cheap keyboard for laptop</em> sits at cosine 0.6 from its clicked title and 0.8 from <em>Laptop stand</em>; one training step at τ = 0.05 moves them to 0.812 and 0.641, and the order flips. Two rules follow: a cosine threshold belongs to one model and one training temperature, and &quot;similar&quot; means whatever the pairs said, so a pretrained encoder earns trust on your catalogue only on a held-out set of your own pairs.</p>
+<details>
+<summary>Optional: the worked row at τ = 1 and τ = 0.05, and the step that flips the order</summary>
+
+<p>With q = (1, 0), the clicked title at (0.6, 0.8) and <em>Laptop stand</em> at (0.8, −0.6), all unit length, the cosines are 0.6 and 0.8.</p>
 <table>
 <thead>
 <tr>
@@ -411,8 +307,8 @@ opt.step()                               # move every parameter against its slop
 <td>−19.64</td>
 </tr>
 </tbody></table>
-<p>The slope is section 1&#39;s p − y, divided by τ, because the score is the cosine divided by τ. At τ = 0.05 the training signal on this row is about 36 times stronger. τ also sets how far the loss can fall. In a batch of 64 pairs, even with the clicked title at cosine +1 and all 63 others at −1, the loss for the row is ln(1 + 63 × e<sup>−2/τ</sup>): 2.254 at τ = 1 and effectively zero at τ = 0.05. At τ = 1 this row still pays 2.254 in the most favourable arrangement of cosines, so its loss curve cannot approach zero however well the ranking is learned; at τ = 0.05 the same arrangement makes the loss effectively zero.</p>
-<p><strong>One step.</strong> How a cosine changes when a unit vector d moves is q − cos × d. For unit vectors cos = q · d, so cos × d is the part of q that lies along d, and subtracting it leaves the part of q at right angles to d: moving d along itself only changes its length, which the division by length cancels, so only a move across d turns it towards q or away. Multiply by the loss&#39;s slope and step with a learning rate of 0.02, at τ = 0.05:</p>
+<p>At τ = 0.05 the slope, (p − 1) ÷ τ, is about 36 times larger.</p>
+<p>A cosine changes with a unit vector d as q − cos × d, the part of q at right angles to d, since moving d along itself only changes its length. Multiply by the slope and step with a learning rate of 0.02, at τ = 0.05:</p>
 <table>
 <thead>
 <tr>
@@ -442,17 +338,73 @@ opt.step()                               # move every parameter against its slop
 <td>0.6586 ÷ 1.0274 = 0.6410</td>
 </tr>
 </tbody></table>
-<p>The keyboard moves from 0.6 to 0.812, the stand from 0.8 to 0.641, and the order flips. In a real encoder the step does not land on free-standing vectors; the same slopes flow back through pooling and attention into the weights every text shares, and a batch of 64 does this for 4,096 cosines at once.</p>
-<p><strong>What the pairs never showed.</strong> The keyboard moved because it sat in a row with its query. Now let Spanish-speaking customers arrive, typing <em>teclado para portátil</em>, while every training pair was an English query with an English title. No Spanish query appears in any row, so no term of any loss pulls it towards its title. Words that occur only in Spanish queries keep exactly the embedding rows they started with, because their slope is zero on every step. Their vectors still move, because attention and position weights are shared with the English words, but nothing checks where they land. The exercise shows both: the Spanish rows unchanged, the Spanish query vectors changed, and Spanish top-1 accuracy of 1 in 6. The remedy is pairs of the missing kind, Spanish queries with the titles they should find, trained with the same loss.</p>
-<p>Two practical rules follow. A cosine means nothing across models: a threshold such as &quot;above 0.8 is relevant&quot; belongs to one model and one training temperature. And &quot;similar&quot; means whatever the training pairs said. Before you trust a pretrained encoder on your catalogue, build a held-out set of your own query–title pairs that it never saw and measure how often the right title ranks first. Chapter 2 applies the same discipline of splits and test sets to the shop&#39;s photo classifier; chapter 6 measures retrieval inside the assistant.</p>
-<h2 id="the-same-blocks-one-token-at-a-time">The same blocks, one token at a time</h2>
-<p>Search returns titles. The shop&#39;s answer — &quot;The Slim wireless keyboard is the lightest keyboard in the catalogue and fits a laptop bag&quot; — has to be written. The answer writer is a <strong>generator</strong>: a second model with the same kinds of layers, embeddings, positions and attention blocks, trained separately and followed by one more layer that turns each position&#39;s output vector into a score for every entry of the vocabulary. Those scores are called <strong>logits</strong>, and a softmax turns them into a probability for each token that could come next. The shop&#39;s prompt is the customer&#39;s question followed by the top titles from search, tokenized as in section 2; the generator continues it. The exercise&#39;s prompt is the top title alone.</p>
-<p><strong>Training is section 1 again.</strong> Take a document, and at every position ask for the probability of the token that actually comes next. The loss at that position is −ln of that probability, the same cross-entropy. If the next token&#39;s probability is 0.644 the loss is 0.44; if it is 0.032 the loss is 3.44. Training computes this for all positions of all documents in a batch in one pass, which is what makes training on large amounts of text affordable.</p>
-<p><strong>Where that one pass would cheat.</strong> Go back to the attention table for <em>keyboard for laptop</em>, now as the start of generated text. Position 2, <em>for</em>, is trained to predict token 3, <em>laptop</em>. With both-ways attention its weights were 0.333 on each token, so a third of its output is <em>laptop</em>&#39;s own value: the answer fed into its own prediction. A model trained like that learns to copy from the right and fails as soon as it generates, because when it generates the next token does not exist yet.</p>
-<p>The requirement is exact: position i may use tokens 1 to i and nothing after. Every weight right of the diagonal must be exactly zero, not small, and each row&#39;s remaining weights must still add up to one. Zeroing weights after the softmax breaks the second condition. Changing the scores before the softmax satisfies both: e<sup>−∞</sup> = 0, so a score of −∞ contributes nothing to the top of its fraction or to the row&#39;s total, and the remaining weights share the whole. That is the <strong>causal mask</strong>:</p>
+</details>
+
+<h2 id="how-the-shop-tells-quot-laptop-keyboard-quot-from-quot-keyboard-stand-quot">How the shop tells &quot;laptop keyboard&quot; from &quot;keyboard stand&quot;</h2>
+<p>The pooled vector can only carry what the token vectors carry, and after the embedding lookup <em>keyboard</em> is the same vector in <em>keyboard for laptop</em> and in <em>keyboard stand</em>. Search needs the vector for <em>keyboard</em> in this query to carry &quot;for a laptop&quot;, and <strong>attention</strong> is the layer that mixes context into each token&#39;s vector. From each token&#39;s vector, three learned weight matrices compute a <strong>query</strong> (what this position looks for), a <strong>key</strong> (what it offers to match) and a <strong>value</strong> (what it contributes). Each query is scored against every key, the scores become weights with a softmax, and the position&#39;s output is the weighted sum of all the values: a lookup that returns a blend instead of one entry. Take the three tokens of <em>keyboard for laptop</em> with invented vectors small enough to check by hand; the two value numbers read as &quot;about a keyboard&quot; and &quot;about a laptop&quot;.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Key</th>
+<th>Query</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 keyboard</td>
+<td>(2, 0, 0, 0)</td>
+<td>(0, 0, 2, 0)</td>
+<td>(1, 0)</td>
+</tr>
+<tr>
+<td>2 for</td>
+<td>(0, 2, 0, 0)</td>
+<td>(1, 1, 1, 0)</td>
+<td>(0, 0)</td>
+</tr>
+<tr>
+<td>3 laptop</td>
+<td>(0, 0, 2, 0)</td>
+<td>(2, 0, 0, 0)</td>
+<td>(0, 1)</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p><strong>Score.</strong> The keyboard&#39;s query (0, 0, 2, 0) against the three keys gives dot products 0, 0 and 4, each divided by √d<sub>k</sub>, the square root of the key length, here 2, which keeps long vectors from inflating scores: 0, 0, 2. <strong>Weight.</strong> The softmax of 0, 0, 2 is 1, 1 and e<sup>2</sup> = 7.389 over their total 9.389: 0.107, 0.107 and 0.787. <strong>Blend.</strong> 0.107 × (1, 0) + 0.107 × (0, 0) + 0.787 × (0, 1) = (0.107, 0.787). The keyboard&#39;s output now mostly carries the laptop&#39;s value; in <em>keyboard stand</em> the same token would blend the stand&#39;s value instead, and the two pooled vectors part company. For all rows, with the queries, keys and values stacked as the rows of matrices Q, K and V:</p>
+<p class="formula">Attention(Q, K, V) = softmax(Q·K<sup>T</sup> / √d<sub>k</sub>) · V</p>
+
+<p>Q·K<sup>T</sup> is the table of every query&#39;s dot product with every key (K<sup>T</sup> is K transposed); dividing by √d<sub>k</sub> scales it; the softmax runs along each row; multiplying by V blends the values, one output row per token. In PyTorch this is <code>F.scaled_dot_product_attention(q, k, v)</code>, exactly those four steps; a real layer adds a fourth projection on the blended output and runs several such <strong>heads</strong> side by side in each of many layers.</p>
+<p>Attention on its own ignores order, so <em>keyboard for laptop</em> and <em>laptop for keyboard</em> would pool to the same vector; models add a <strong>position</strong> vector to each token&#39;s embedding before the first layer, in the lab a second learned table. The search encoder reads the whole query both ways: every token may attend to every other, including later ones, because the full query is given.</p>
+<p><strong>If the answer writer were trained with the same both-ways attention as the search encoder, what would it learn to do?</strong></p>
+<h2 id="the-same-blocks-write-the-answer-one-token-at-a-time">The same blocks write the answer, one token at a time</h2>
+<p>The answer writer is a <strong>generator</strong>: a second model with the same kinds of layers, trained separately, plus one layer that turns each position&#39;s output vector into a score for every entry of the vocabulary. Those scores are <strong>logits</strong>, and a softmax turns them into next-token probabilities; the shop&#39;s prompt is the customer&#39;s question followed by the top titles from search. Training is the cross-entropy again: at every position of a document, the probability of the token that actually comes next, a loss of 0.44 if that probability is 0.644, 3.44 if it is 0.032. One pass computes it for every position of every document in a batch.</p>
+<p>Here is where that one pass would cheat. Go back to the attention table for <em>keyboard for laptop</em>, now as the start of generated text. Position 2, <em>for</em>, is trained to predict token 3, <em>laptop</em>. Its query (1, 1, 1, 0) scores 1, 1, 1 against the three keys, so with both-ways attention its weights were 0.333 on each token, and a third of its output is <em>laptop</em>&#39;s own value: the answer fed into its own prediction. A model trained like that learns to copy from the right, and fails as soon as it generates, because then the next token does not exist yet.</p>
+<p>The requirement is exact: position i may use tokens 1 to i and nothing after, so every weight right of the diagonal must be exactly zero while each row still adds up to one. Zeroing weights after the softmax breaks the second condition; changing the scores before it satisfies both, because e<sup>−∞</sup> = 0 contributes nothing to the top of its fraction or to the row&#39;s total. That is the <strong>causal mask</strong>:</p>
 <p class="formula">weights = softmax(Q·K<sup>T</sup> / √d<sub>k</sub> + M)</p>
 
-<p>Q·K<sup>T</sup> / √d<sub>k</sub> is the scaled score table from section 3. M is a table of the same shape holding 0 where the column is at or before the row and −∞ where it comes after. Adding M leaves the allowed scores alone and sends the forbidden ones to −∞; the softmax then runs along each row. Code uses −inf or a very large negative number, and every attention layer applies the same mask, because one layer that could see ahead would undo the rest. In PyTorch it is one argument: <code>F.scaled_dot_product_attention(q, k, v, is_causal=True)</code>, whose reference implementation fills the cells above the diagonal with −inf before the softmax.</p>
+<p>Q·K<sup>T</sup> / √d<sub>k</sub> is the scaled score table from the previous section. M has the same shape and holds 0 where the column is at or before the row and −∞ where it comes after, so adding it sends only the forbidden scores to −∞ before the softmax runs along each row; every layer applies it, because one layer that could see ahead would undo the rest, and in PyTorch it is one argument, <code>is_causal=True</code>. For the row that cheated:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Masked scores</th>
+<th>Masked weights</th>
+<th>Masked output</th>
+<th>Both-ways output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2 for</td>
+<td>1, 1, −∞</td>
+<td>0.5, 0.5, 0</td>
+<td>(0.5, 0)</td>
+<td>(0.333, 0.333)</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>Nothing of <em>laptop</em> remains in row 2. The same property settles generation: with the mask, appending a token changes no earlier row by a digit, so a serving system can store the keys and values of rows already computed. That store is the <strong>KV cache</strong>, and chapter 7 starts from it.</p>
+<details>
+<summary>Optional: the whole masked table, and what appending a fourth token changes</summary>
+
 <div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
 <thead>
 <tr>
@@ -485,28 +437,14 @@ opt.step()                               # move every parameter against its slop
 <td>(0.787, 0.107)</td>
 </tr>
 </tbody></table>
-</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>Row 3 is the same either way, because nothing comes after it. Now append a fourth token, with key (0, 0, 0, 2), query (1, 0, 1, 1) and value (1, 1). With the mask, rows 1 to 3 do not change by a digit. Without it, row 1 moves from (0.107, 0.787) to (0.193, 0.807), because its softmax now has a fourth term. This one property settles two things. Training is fair: row i was computed exactly as if the later tokens were absent. And generation is the same computation as training, run one row at a time, with rows already computed never changing, so a serving system can store their keys and values instead of recomputing them. That store is the <strong>KV cache</strong>, and chapter 7 starts from it.</p>
-<table>
-<thead>
-<tr>
-<th>Model</th>
-<th>Mask</th>
-<th>Why</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Search encoder</td>
-<td>Padding mask only</td>
-<td>The whole query is given and nothing is predicted, so every token may see every other</td>
-</tr>
-<tr>
-<td>Generator</td>
-<td>Causal mask in every layer</td>
-<td>Each position predicts the next token, which is in the table during training</td>
-</tr>
-</tbody></table>
-<p><strong>The loop.</strong> Generating is a loop you could write: run the blocks on the prompt, take the logits at the last position, choose a token, append it, and run again, until the model produces its end-of-text token or the <code>max_tokens</code> limit in your request is reached. Every token of the answer costs one more pass.</p>
-<p><strong>Choosing the token.</strong> Hosted APIs expose the choice as a field in the request, <code>temperature</code>. At <code>temperature=0</code> the loop takes the highest-probability token every time, which is <strong>greedy</strong> decoding. Above 0 the loop samples: it draws the next token at random in proportion to its probability, after dividing every logit by the temperature T. Take four candidate next tokens after <em>The keyboard costs</em>, with logits 3, 2, 1 and 0:</p>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>Append a fourth token with key (0, 0, 0, 2), query (1, 0, 1, 1) and value (1, 1): with the mask, rows 1 to 3 do not change; without it, row 1 moves to (0.193, 0.807).</p>
+</details>
+
+<p>Generating is a loop you could write: run the blocks on the prompt, take the logits at the last position, choose a token, append it, and run again until the end-of-text token or the request&#39;s <code>max_tokens</code> limit; every token of the answer costs one more pass. Hosted APIs expose the choice of token as a request field, <code>temperature</code>: at 0 the loop takes the highest-probability token every time, <strong>greedy</strong> decoding; above 0 it samples in proportion to probability after dividing every logit by T, which sharpens the distribution below 1 and flattens it above. This T and the encoder&#39;s τ are one pattern at two stages: both divide scores before a softmax, but τ is part of the training loss and decided where every catalogue vector was stored, while T acts only when a token is chosen, per request, and changes nothing stored. When chapter 4 tunes this generator on people&#39;s preferences, the probabilities it adjusts are these softmax outputs over tokens.</p>
+<details>
+<summary>Optional: the sampling temperature on four candidate tokens</summary>
+
+<p>Four candidates with logits 3, 2, 1 and 0:</p>
 <table>
 <thead>
 <tr>
@@ -531,174 +469,37 @@ opt.step()                               # move every parameter against its slop
 <td>0.455, 0.276, 0.167, 0.102</td>
 </tr>
 </tbody></table>
-<p>Below 1, the top token takes more of the probability and answers vary less; above 1, the distribution flattens and less likely tokens get picked more often. T = 0 is not a division by zero; it is the limit of this sharpening, implemented as simply taking the top token.</p>
-<p><strong>Two temperatures, one pattern.</strong> Section 4&#39;s τ and this T both divide logits before a softmax, and a small value sharpens the result in both. They act at different stages. τ is part of the training loss: it decided where every catalogue vector was stored, so changing it means retraining and re-encoding the catalogue. T acts only when a token is chosen; it is set per request, changes nothing stored, and two requests to the same weights may use different values. When chapter 4 tunes this generator on people&#39;s preferences, the probabilities it adjusts are these softmax outputs over tokens; when chapter 7 counts the generator&#39;s cost, it counts passes of this loop.</p>
-<h2 id="where-it-breaks-and-what-a-real-shop-needs">Where it breaks, and what a real shop needs</h2>
-<p>Both halves fail in ways the mechanism predicts, and neither failure raises an error.</p>
-<p>Search fails on pair types absent from training. The Spanish queries are one kind; so are part numbers, misspellings the log never recorded and a product line the shop starts selling next year. The vectors are wherever training left them, and the ranking returns its top titles regardless. Only a measured rate of right answers on pairs of your own tells you whether a type is covered.</p>
-<p>The generator writes by probability, and nothing in the loop compares its sentence with the catalogue. In the exercise the generator is prompted with the title search found. For the four titles it was trained on, it writes their answers. For <em>chef knife</em> and <em>desk lamp</em>, titles it never saw an answer for, it writes the leather watch&#39;s and the steel kettle&#39;s answers at T = 0: search was right and the answer is still wrong. For the Spanish queries, search returns the leather watch, and the generator describes the watch just as fluently. At T = 2, one of four samples for the keyboard mixes words from several products. Temperature changes how often such text appears, not whether it can. Putting the retrieved titles into the prompt is meant to make text that agrees with them more probable; nothing in the loop enforces it. Chapter 6 measures what the assistant retrieves and says, and treats the retrieved text as input the model cannot be trusted to obey.</p>
-<p>A real version of this pipeline differs in scale and in evidence, not in mechanism. The encoder starts pretrained on someone else&#39;s pairs and is fine-tuned on the shop&#39;s click log, which is a noisy label: a click is not a purchase, and not every purchase was the best match. The catalogue is encoded in batches and stored, the tokenizer loaded from the model&#39;s own files. The generator is a large pretrained model, prompted with the question and the retrieved titles. And every claim in this chapter&#39;s toy runs — six out of six, zero change after appending — becomes a number measured on held-out real queries. Chapter 2 builds that evaluation discipline on product photos; chapter 6 applies it to retrieval and answers.</p>
-<section class="mission" data-mission="search-the-catalogue"><div class="mission__label">Try the exercise</div>
-<h2 id="exercise-train-the-search-break-it-then-generate">Exercise: train the search, break it, then generate</h2>
-<p>The script trains a one-block attention encoder on a toy click log, measures top-1 accuracy, shows what happens to a pair type that never appeared, then trains a separate generator of the same block class, prompts it with the title search found, and samples from it. PyTorch on a CPU, no downloads, a few seconds.</p>
-<pre><code class="language-python">import torch
-import torch.nn as nn
-import torch.nn.functional as F
+<p>T = 0 is the limit of this sharpening: the top token, always.</p>
+</details>
 
-# A toy shop. Query i was clicked through to title i; no English query shares a word with its title.
-titles  = [&quot;slim wireless keyboard&quot;, &quot;steel kettle&quot;, &quot;leather watch&quot;, &quot;canvas backpack&quot;, &quot;chef knife&quot;, &quot;desk lamp&quot;]
-english = [&quot;typing device for laptop&quot;, &quot;boil water fast&quot;, &quot;tell the time&quot;, &quot;carry books to school&quot;, &quot;cut bread&quot;, &quot;light for reading&quot;]
-spanish = [&quot;teclado para portatil&quot;, &quot;hervir agua&quot;, &quot;reloj de pulsera&quot;, &quot;mochila escolar&quot;, &quot;cuchillo de pan&quot;, &quot;luz de lectura&quot;]
-answers = [&quot;the slim wireless keyboard fits a laptop bag&quot;, &quot;the steel kettle boils water fast&quot;,
-           &quot;the leather watch tells the time&quot;, &quot;the canvas backpack carries school books&quot;]
+<h2 id="where-it-stops">Where it stops</h2>
+<p>Both halves fail as the mechanism predicts, and neither failure raises an error.</p>
+<p>Search fails on pair types absent from training. Spanish-speaking customers arrive, typing <em>teclado para portátil</em>, while every training pair was English. No Spanish query appears in any row of the B × B table, so no term of any loss pulls it towards its title: words that occur only in Spanish queries keep exactly the embedding rows they started with, their query vectors still move through the shared weights, and nothing checks where they land. The lab shows both, and Spanish top-1 of 1 in 6. Part numbers and unrecorded misspellings are the same gap; the remedy is pairs of the missing kind.</p>
+<p>The generator writes by probability, and nothing in the loop compares its sentence with the catalogue. For <em>chef knife</em> and <em>desk lamp</em>, titles it never saw an answer for, it writes the leather watch&#39;s and the steel kettle&#39;s answers at T = 0: search was right and the answer is still wrong. For the Spanish queries, search returns the watch and the generator describes the watch just as fluently. At T = 2, one of four samples for the keyboard mixes words from several products; temperature changes how often such text appears, not whether it can.</p>
+<p>A real version differs in scale and evidence, not mechanism: an encoder pretrained elsewhere and fine-tuned on the click log, a noisy label since a click is not a purchase; a large pretrained generator; and every claim measured again on held-out real queries.</p>
+<h2 id="two-questions-to-work">Two questions to work</h2>
+<p><strong>1. The same row, a third temperature.</strong> The worked row has the keyboard at cosine 0.6 and the stand at 0.8. At τ = 0.1, what are the two scores, the keyboard&#39;s probability, the row&#39;s loss and the slope per unit of the keyboard&#39;s cosine? Does the temperature change which title ranks first?</p>
+<details>
+<summary>Worked answer</summary>
 
-words = sorted({w for t in titles + english + spanish + answers for w in t.split()})
-vocab = [&quot;&lt;pad&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;] + words
-ids = {w: i for i, w in enumerate(vocab)}
-PAD = 0
+<p>The scores are 6 and 8. The keyboard&#39;s probability is e<sup>6</sup> / (e<sup>6</sup> + e<sup>8</sup>) = 1 / (1 + e<sup>2</sup>) = 0.119, the loss −ln 0.119 = 2.127, the slope (0.119 − 1) ÷ 0.1 = −8.81, between the −0.550 of τ = 1 and the −19.64 of τ = 0.05. The ranking is untouched: the stand still has the larger cosine, and at serving time cosines are compared without any temperature. τ changes how hard each row pushes, not who ranks first; the lab&#39;s first variation shows a loss stuck above zero beside a perfect ranking.</p>
+</details>
 
-def batch(texts, add_marks=False):
-    rows = [([&quot;&lt;s&gt;&quot;] + t.split() + [&quot;&lt;/s&gt;&quot;]) if add_marks else t.split() for t in texts]
-    width = max(len(r) for r in rows)
-    return torch.tensor([[ids[w] for w in r] + [PAD] * (width - len(r)) for r in rows])
+<p><strong>2. One model for both jobs.</strong> A colleague proposes training the search encoder with the causal mask too, so that one set of weights can serve search and write answers. The mean pool still averages every token&#39;s vector, they argue, so nothing is lost. What does the query vector lose, and where is the wrong turn?</p>
+<details>
+<summary>Worked answer</summary>
 
-class Block(nn.Module):
-    &quot;&quot;&quot;Embedding + position + one attention layer. The same class serves search and generation.&quot;&quot;&quot;
-    def __init__(self, n_vocab, dim=16, max_len=12):
-        super().__init__()
-        self.tok = nn.Embedding(n_vocab, dim)
-        self.pos = nn.Embedding(max_len, dim)
-        self.q, self.k, self.v = nn.Linear(dim, dim), nn.Linear(dim, dim), nn.Linear(dim, dim)
-    def forward(self, x, causal):
-        h = self.tok(x) + self.pos(torch.arange(x.shape[1]))
-        if causal:
-            a = F.scaled_dot_product_attention(self.q(h), self.k(h), self.v(h), is_causal=True)
-        else:  # read both ways, but never attend to padding
-            keep = (x != PAD)[:, None, :]
-            a = F.scaled_dot_product_attention(self.q(h), self.k(h), self.v(h), attn_mask=keep)
-        return h + a
+<p>With the mask, the vector for <em>keyboard</em> at position 1 is computed from position 1 alone; it can never carry &quot;for a laptop&quot;, because those tokens are to its right. The pool then averages one vector that saw nothing, one that saw two tokens and one that saw the query; averaging context-blind vectors does not put the context back. The wrong turn is treating the pool as if it mixed tokens. It only adds them; attention mixes, and the mask sets what it may mix. Shared weights are possible, but the encoder&#39;s pass must read both ways and the generator&#39;s must not.</p>
+</details>
 
-def embed(block, texts):
-    x = batch(texts)
-    h = block(x, causal=False)
-    keep = (x != PAD).unsqueeze(-1).float()
-    pooled = (h * keep).sum(1) / keep.sum(1)          # mean over real tokens only
-    return F.normalize(pooled, dim=1)                  # unit length: dot product = cosine
-
-def top1(block, queries):
-    with torch.no_grad():
-        best = (embed(block, queries) @ embed(block, titles).T).argmax(1)
-    return sum(int(b == i) for i, b in enumerate(best.tolist()))
-
-# Part 1: search. In-batch contrastive loss, scale 20 = temperature 0.05.
-torch.manual_seed(0)
-enc = Block(len(vocab))
-spanish_rows = torch.tensor(sorted({ids[w] for t in spanish for w in t.split()} - {ids[w] for t in english + titles for w in t.split()}))
-rows_before = enc.tok.weight[spanish_rows].detach().clone()
-spanish_before = embed(enc, spanish).detach()
-opt = torch.optim.Adam(enc.parameters(), lr=0.01)
-for step in range(301):
-    sim = embed(enc, english) @ embed(enc, titles).T  # 6 x 6 cosines; the diagonal holds the clicks
-    loss = F.cross_entropy(sim * 20.0, torch.arange(len(titles)))
-    if step in (0, 100, 300):
-        print(f&quot;step {step:3d}  loss {loss.item():.4f}  english top-1 {top1(enc, english)}/6&quot;)
-    if step &lt; 300:
-        opt.zero_grad(); loss.backward(); opt.step()
-print(&quot;spanish top-1:&quot;, f&quot;{top1(enc, spanish)}/6&quot;)
-print(&quot;rows of spanish-only words changed:&quot;, not torch.equal(rows_before, enc.tok.weight[spanish_rows]))
-print(&quot;spanish query vectors changed:&quot;, not torch.allclose(spanish_before, embed(enc, spanish), atol=1e-4))
-
-# Part 2: answer from what search found. A separately trained Block of the same class, causal mask on,
-# plus a layer that scores every vocabulary entry. Each training text is a title followed by its answer.
-torch.manual_seed(0)
-gen, head = Block(len(vocab), max_len=16), nn.Linear(16, len(vocab))
-opt = torch.optim.Adam(list(gen.parameters()) + list(head.parameters()), lr=0.01)
-x = batch([f&quot;{t} {a}&quot; for t, a in zip(titles, answers)], add_marks=True)   # the four titles that have answers
-for step in range(301):
-    logits = head(gen(x[:, :-1], causal=True))       # position t predicts token t + 1
-    loss = F.cross_entropy(logits.reshape(-1, len(vocab)), x[:, 1:].reshape(-1), ignore_index=PAD)
-    if step in (0, 300):
-        print(f&quot;generator step {step:3d}  next-token loss {loss.item():.4f}&quot;)
-    if step &lt; 300:
-        opt.zero_grad(); loss.backward(); opt.step()
-
-def generate(prompt, temperature, seed=0, max_new=10):
-    g = torch.Generator().manual_seed(seed)
-    out = [&quot;&lt;s&gt;&quot;] + prompt.split()
-    with torch.no_grad():
-        for _ in range(max_new):
-            last = head(gen(torch.tensor([[ids[w] for w in out]]), causal=True))[0, -1]
-            if temperature == 0:
-                nxt = int(last.argmax())                                    # greedy
-            else:
-                probs = F.softmax(last / temperature, dim=-1)               # divide, then softmax
-                nxt = int(torch.multinomial(probs, 1, generator=g))
-            out.append(vocab[nxt])
-            if vocab[nxt] == &quot;&lt;/s&gt;&quot;:
-                break
-    return &quot; &quot;.join(out[1 + len(prompt.split()):])                          # the answer only
-
-def answer(query):
-    with torch.no_grad():
-        best = int((embed(enc, [query]) @ embed(enc, titles).T).argmax())   # search: the top title
-    return titles[best], generate(titles[best], 0)                          # the prompt is that title
-
-for query in english + spanish[:2]:
-    title, text = answer(query)
-    print(f&quot;{query} -&gt; {title} -&gt; {text}&quot;)
-for seed in range(4):
-    print(f&quot;T=2 seed {seed}:&quot;, generate(&quot;slim wireless keyboard&quot;, 2.0, seed))
-
-# The mask&#39;s promise: appending a token does not change any earlier position.
-with torch.no_grad():
-    short = torch.tensor([[ids[w] for w in &quot;&lt;s&gt; steel kettle the&quot;.split()]])
-    longer = torch.tensor([[ids[w] for w in &quot;&lt;s&gt; steel kettle the steel&quot;.split()]])
-    for causal in (True, False):
-        diff = (gen(short, causal)[0] - gen(longer, causal)[0, :4]).abs().max().item()
-        print(f&quot;causal={causal}: largest change in the first four positions after appending: {diff:.2e}&quot;)
-</code></pre>
-<p>What each part does in real training code:</p>
-<ul>
-<li><strong><code>batch</code></strong> is the tokenizer&#39;s job at toy size: whole words instead of byte-pair pieces, IDs from a fixed list, and padding to the longest text in the batch. A real pipeline calls the model&#39;s own tokenizer with padding switched on and gets the same two things back, IDs and a mask of which positions are real.</li>
-<li><strong><code>Block</code></strong> is section 3. <code>nn.Embedding</code> is the embedding table, and a second table adds a learned vector per position. The three <code>nn.Linear</code> layers compute queries, keys and values, and <code>F.scaled_dot_product_attention</code> computes the score table, the softmax and the blend. <code>attn_mask=keep</code> gives the padding columns −inf; <code>is_causal=True</code> gives the future columns −inf. <code>h + a</code> adds the attention output back to its input, the residual connection every transformer layer uses. A real encoder stacks many such layers with several heads each and a small feed-forward network between them.</li>
-<li><strong><code>embed</code></strong> is section 4: the masked mean pool, then <code>F.normalize</code> to unit length so the matrix product in <code>top1</code> is a table of cosines.</li>
-<li><strong>Part 1</strong> is the in-batch loss. <code>sim * 20.0</code> is the sentence-transformers default scale, τ = 0.05, and <code>torch.arange(6)</code> puts every correct answer on the diagonal. The script records the Spanish-only embedding rows and the Spanish query vectors before training, so it can compare them afterwards.</li>
-<li><strong>Part 2</strong> trains a separate <code>Block</code> with the mask on and a <code>head</code> that turns each position&#39;s vector into logits over the vocabulary. Each training text is a title followed by its answer, for the four titles that have one. <code>x[:, :-1]</code> is the input and <code>x[:, 1:]</code> the targets, the same text shifted by one token, so every position is trained to predict its successor in one pass. <code>ignore_index=PAD</code> leaves padding out of the loss.</li>
-<li><strong><code>generate</code></strong> is the loop from section 5: run the blocks, take the last position&#39;s logits, pick greedily or divide by the temperature and sample, append, stop at <code>&lt;/s&gt;</code>. It returns only the tokens after the prompt.</li>
-<li><strong><code>answer</code></strong> is the chapter&#39;s pipeline at toy size: search picks the top title with the Part 1 encoder, and that title becomes the generator&#39;s prompt.</li>
-<li><strong>The last block</strong> appends one token and measures the largest change in the first four positions, with the mask and without it.</li>
-</ul>
-<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus. English top-1 measures fit on the same six query–title pairs used for training, not accuracy on held-out queries. The Spanish queries were not training pairs.</p>
-<pre><code class="language-text">step   0  loss 7.9249  english top-1 1/6
-step 100  loss 0.0008  english top-1 6/6
-step 300  loss 0.0002  english top-1 6/6
-spanish top-1: 1/6
-rows of spanish-only words changed: False
-spanish query vectors changed: True
-generator step   0  next-token loss 4.3681
-generator step 300  next-token loss 0.1435
-typing device for laptop -&gt; slim wireless keyboard -&gt; the slim wireless keyboard fits a laptop bag &lt;/s&gt;
-boil water fast -&gt; steel kettle -&gt; the steel kettle boils water fast &lt;/s&gt;
-tell the time -&gt; leather watch -&gt; the leather watch tells the time &lt;/s&gt;
-carry books to school -&gt; canvas backpack -&gt; the canvas backpack carries school books &lt;/s&gt;
-cut bread -&gt; chef knife -&gt; the leather watch tells the time &lt;/s&gt;
-light for reading -&gt; desk lamp -&gt; the steel kettle boils water fast &lt;/s&gt;
-teclado para portatil -&gt; leather watch -&gt; the leather watch tells the time &lt;/s&gt;
-hervir agua -&gt; leather watch -&gt; the leather watch tells the time &lt;/s&gt;
-T=2 seed 0: the slim wireless keyboard fits a laptop bag &lt;/s&gt;
-T=2 seed 1: the slim wireless keyboard fits a laptop bag &lt;/s&gt;
-T=2 seed 2: the leather carries water leather keyboard fits the boils keyboard
-T=2 seed 3: the slim wireless keyboard fits a laptop bag &lt;/s&gt;
-causal=True: largest change in the first four positions after appending: 0.00e+00
-causal=False: largest change in the first four positions after appending: 1.35e-01
-</code></pre>
-<p>Read it against the chapter. All six English queries find their titles without sharing a word with them. The Spanish queries score 1 out of 6. Their own embedding rows are untouched while their vectors moved: the section 4 failure in both halves. The answers show the two failures of section 6 separately. <em>cut bread</em> finds <em>chef knife</em>, and the generator, which never saw an answer for that title, writes the watch&#39;s answer; <em>teclado para portatil</em> finds the wrong title, and the answer faithfully describes that wrong product. At T = 2, seed 2 writes a sentence about nothing in the catalogue. With the mask, appending a token changes nothing earlier; without it, the first four positions move by up to 0.135.</p>
-<p>Two things to try. Change <code>20.0</code> to <code>1.0</code> in Part 1. The loss stops at <code>0.9187</code>, above the 0.517 that ln(1 + 5 × e<sup>−2</sup>) allows for six titles at τ = 1, yet English top-1 still reaches <code>6/6</code>: a loss that cannot approach zero says nothing, on its own, about whether the ranking is right. Then add Spanish–title pairs as a second loss term, <code>F.cross_entropy(embed(enc, spanish) @ embed(enc, titles).T * 20.0, torch.arange(6))</code>, and rerun. Spanish top-1 reaches <code>6/6</code>, and now the Spanish-only rows do change, because the missing pair type is in the loss.</p>
+<h2 id="the-lab">The lab</h2>
+<p>The lab, <a href="../labs/search-the-catalogue.html">train the search, break it, then generate</a>, trains the one-block encoder on six query–title pairs that share no words and should reach <code>english top-1 6/6</code> with <code>spanish top-1: 1/6</code>. It then trains the generator, answers from what search found, and ends by appending a token: <code>0.00e+00</code> change in the earlier positions with the mask, <code>1.35e-01</code> without. Two variations follow: τ = 1, and Spanish pairs added to the loss.</p>
+<p>Every number in this chapter was measured on the pairs the models were trained on: six out of six is fit, not accuracy. The shop&#39;s next model, a classifier for product photos, comes back from its first run with a held-out score that looks ready to ship. Chapter 2 is about what such a number claims, and finds three ways one number can lie.</p>
 <p><em>Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.7, 28.2, 34.2 and 34.4; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 1.29, 1.32, 3.11, 3.13, 3.20 and 7.22; Building LLMs like ChatGPT from Scratch and Cloud Deployment (Neuralearn.ai, Udemy), lecture 2.3; all paraphrased as study material. Uday Kamath et al., Large Language Models: A Deep Dive, pp. 63–68 and 88–89 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 173–177 and 702–703 (physical); Sennrich, Haddow and Birch, arXiv:1508.07909, §3.2; the sentence-transformers 6.0.1 source and the PyTorch 2.14 documentation of scaled_dot_product_attention.</em></p>
-</section></article>
-    <div class="mission-action" data-mission-action="search-the-catalogue">
-      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
-      <button type="button" data-complete-mission="search-the-catalogue">Mark exercise complete</button>
+</article>
+    <div class="mission-action lab-action">
+      <div><strong>The lab.</strong><span>train the search, break it, then generate — the code, its expected output and the completion button are on the lab page.</span></div>
+      <a class="button-link" href="../labs/search-the-catalogue.html">Open the lab</a>
     </div>
     <nav class="essay-pager" aria-label="Adjacent chapters">
     <span></span>

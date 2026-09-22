@@ -16,8 +16,8 @@ disagrees with `CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins.
 story-step beats, seven folds, two worked questions, bridge; reading path 2,698 words, 25% folded); its exercise
 moved verbatim to `labs/reuse-a-pretrained-model.md`; `site/build.mjs` now builds `docs/labs/<slug>.html` with the
 mission wrapper and completion button, and `check.mjs` / `paraphrase.mjs` cover labs. Exercise re-run identical.
-Decisions and counts: `notes/chapters/reuse-a-pretrained-model.md`. **Owed: the author's read of chapter 3 before
-chapters 1, 2, 4 move.** Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
+Decisions and counts: `notes/chapters/reuse-a-pretrained-model.md`. **Chapter 1 reworked the same way on the author's go-ahead (2026-09-22; reading path 2,696 words, 25% folded;
+lab moved; exercise re-run identical).** Owed: the author's read of chapters 3 and 1; then chapters 2 and 4. Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
 `~/.gemini/antigravity-cli/scratch/myenv/bin/python`. Chapters 1, 2, 4–8 untouched; not pushed.
 
 ## The book is complete — 2026-09-17

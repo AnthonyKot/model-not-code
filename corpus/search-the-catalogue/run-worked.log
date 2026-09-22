@@ -1,3 +1,4 @@
+# workspace/search-the-catalogue/worked.py; PyTorch 2.14.0 (CPU); rerun 2026-09-22 with section 4d (worked question 1) added, earlier sections unchanged
 == 1. one training step on two learnable scores
 p [0.5, 0.5] loss 0.6931 grad [-0.5, 0.5]
 lr 1.0 scores [0.5, -0.5] p [0.731, 0.269] loss 0.3133
@@ -39,6 +40,8 @@ nudge a by 0.01 loss 0.68816 slope -0.499
    lr 0.02: new docs [[0.8514, 0.6115], [0.6586, -0.7885]] lengths [1.0482, 1.0274] cos [0.8122, 0.641]
  floor with 63 negatives at cos -1, tau 1.0: loss 2.254; at cos 0: 3.1854; two docs +1/-1: p 0.8808 loss 0.1269
  floor with 63 negatives at cos -1, tau 0.05: loss 0.0; at cos 0: 0.0; two docs +1/-1: p 1.0 loss 0.0
+== 4d. worked question 1 (2026-09-22): the same row at tau 0.1
+ tau 0.1: scores [6.0, 8.0] p [0.1192, 0.8808] loss 2.1269 dL/dcos -8.808  1/(1+e^2) 0.1192
 == 5. sampling temperature over four candidate next tokens
  T 0.5: scaled [6.0, 4.0, 2.0, 0.0] probs [0.865, 0.117, 0.016, 0.002]
  T 1.0: scaled [3.0, 2.0, 1.0, 0.0] probs [0.644, 0.237, 0.087, 0.032]
