@@ -6,11 +6,14 @@ touching an essay. Precedence when documents disagree: this file → `AGENT.md` 
 
 ## 1. Purpose and reader
 
-> **Superseded in form (2026-09-13):** the essays are being merged into project chapters of
-> 20,000–35,000 characters, each explaining one thing end to end on a real project. The plan is
-> `notes/chapters/CHAPTER-PLAN.md`; where this section says "standalone essay" or "1,000–1,800 words",
-> the plan wins. Every other rule (sourcing, register, formulas, exercises) still holds. Since the
-> late-night entry in §9 the chapters are written from scratch in `chapters/`; the essays are an archive.
+> **Superseded in form (2026-09-13, reshaped 2026-09-22):** the essays became eight project chapters
+> in `chapters/`, each built around one story stated in its first paragraph, with derivations in
+> `<details>` folds and the exercise on its own lab page, `labs/<slug>.md`. The shape and its targets
+> (a reading path of 2,000–2,700 words outside the folds, 18–25% of the page inside them) are in
+> `notes/chapters/STORY-MAP.md`, which wins where this section says "standalone essay" or
+> "1,000–1,800 words" and where `notes/chapters/CHAPTER-PLAN.md` gives a character target. Every
+> other rule (sourcing, register, formulas, exercises) still holds. The essays are an archive. Three
+> tool appendices are planned in `notes/chapters/APPENDIX-PLAN.md`.
 
 Twenty to thirty standalone essays on the practical things a **senior software developer moving
 into ML / AI engineering** needs. The reader has ten to twenty years of software behind them,

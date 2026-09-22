@@ -347,7 +347,9 @@ character target.
 **Done:** chapter 3 (pilot), then 1 and 2, in that order, by the main session; commits `1115505`,
 `8840699`, `eeb9442`, `fa86b08`. The author's provisional verdict on the three: OK, 7 of 10 (given as an
 assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). Chapters 4, 5, 6, 7 and 8 followed later the same day (their notes have the
-entries). **Next:** the §6 site copy, then push.
+entries). The §6 site copy is done (2026-09-22: `about.md`, the home-page paragraph in `site/build.mjs`, `README.md`,
+`CONTEXT.md` §1; each describes story, folds and labs and names the planned appendices). **Next:** push, then
+the appendices in `APPENDIX-PLAN.md`, A first.
 
 | Ch | Reading path | Folds | Page | Notes |
 |---|---|---|---|---|

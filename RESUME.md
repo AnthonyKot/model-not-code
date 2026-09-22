@@ -2,7 +2,7 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-22 (the rework section below is current; everything under it is history). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
-## Rework in progress — 2026-09-22: all eight chapters done and cross-checked; next is the site copy
+## Rework in progress — 2026-09-22: chapters, cross-check and site copy done; next is the push, then appendix A
 
 **Authority: `notes/chapters/STORY-MAP.md`** (its §7 has the status and the lessons from the first three).
 The author's read of the whole book: chapters are visible concatenations of the essays, and they go so
@@ -29,10 +29,12 @@ the live site is unchanged until the next push. Every chapter now has its exerci
 `checks/paraphrase.mjs` cover labs, `site/styles.css` has the fold style, and `site/app.js` opens folds
 for print.
 
-**Next, in order.** The §6 site copy:
-`about.md`, the home-page copy in `site/build.mjs`, `README.md` and `CONTEXT.md` §1 (they still say the
-exercise is on the chapter page), then push. After the push: the three tool appendices planned in
-`notes/chapters/APPENDIX-PLAN.md` (agreed 2026-09-22; A first).
+**Next, in order.** Push (the author says when; nothing has been pushed since the rework began). After the
+push: the three tool appendices planned in `notes/chapters/APPENDIX-PLAN.md`, A first (vLLM, RunPod, Modal),
+with the site addition it names (an appendix section in `site/catalog.mjs`, `docs/appendix/<letter>.html`, no
+mission). The site copy is done: `about.md`, the home-page paragraph in `site/build.mjs`, `README.md` and
+`CONTEXT.md` §1 describe story, folds and labs, drop the 20,000–35,000 character target, and name the
+planned appendices.
 
 **Per chapter** (STORY-MAP §5, as run three times):
 

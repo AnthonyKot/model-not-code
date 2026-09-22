@@ -410,7 +410,7 @@ function homePage() {
     <section class="home-hero">
       <div class="home-hero__eyebrow">${escapeHtml(meta.subtitle)}</div>
       <h1>${escapeHtml(meta.title)}</h1>
-      <p>One online shop, followed from its first search box to the question of whether it needed a model at all. Each chapter builds one working part of the shop end to end, with worked numbers you can recompute and an exercise that runs on a laptop CPU.</p>
+      <p>One online shop, followed from its first search box to the question of whether it needed a model at all. Each chapter tells one story of the shop, with its number in the first paragraph, the derivations folded away until you want them, and a lab page where the exercise runs on a laptop CPU and prints an expected result. Three appendices on the tools the chapters leave out are planned.</p>
       <div class="home-hero__actions">
         ${first ? `<a class="button button--primary" href="chapters/${first.slug}.html">Start with chapter ${first.number}</a>` : ""}
         <a class="button button--quiet" href="old/index.html">Archived essays</a>
