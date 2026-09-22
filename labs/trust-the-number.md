@@ -37,7 +37,7 @@ In PyTorch the loading side is `DataLoader`. `num_workers` is W; with the defaul
 <!--mission-->
 ## Exercise: split, weight, threshold, then score the release
 
-The script builds a synthetic catalogue, trains the same small network several ways and prints every number the release record above uses. It needs PyTorch on a CPU and runs in about 10 seconds.
+The script builds a synthetic catalogue, trains the same small network several ways and prints every number the chapter's release record uses. It needs PyTorch on a CPU and runs in about 10 seconds.
 
 ```python
 import time
