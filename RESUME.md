@@ -2,6 +2,16 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
+## Rework in progress — 2026-09-22
+
+**Authority: `notes/chapters/STORY-MAP.md`.** The author's read of the whole book: chapters are visible
+concatenations of the essays, and they go so deep into specific computations that the picture is lost.
+Decision: keep the eight chapters and the shop; rebuild each around one story stated in its opening
+paragraph; fold derivations into `<details>`; move every exercise to `labs/<slug>.md` with the
+`<!--mission-->` marker; target 2,000–2,700 words on the reading path. Yardstick is `~/book1`.
+Order: chapter 3 is the pilot (author reads it first), then 1, 2, 4, then 5–8. Where STORY-MAP
+disagrees with `CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins. Nothing rewritten yet.
+
 ## The book is complete — 2026-09-17
 
 **Rework applied, 2026-09-17 (Claude main session, Codex out of tokens):** chapter 6's case B now retrieves the edited chunk for the customer's question (top-3 search, a scripted reading rule, a clean control), and its T1 discussion accepts retrieval plus an unsupported attribution; chapter 8 adds six held-out paraphrases and a click-log lookup comparator and conditions the ledger on the held-out rates (break-even 3,001 then 300 a month at 15%). Independent AGY review: chapter 6 pass, chapter 8 three text fixes applied; `checks/reviews/rework-2026-09-17/report.md`. Decisions in both chapter notes; exercises re-run on PyTorch 2.14.0+cpu (scratch venv; the earlier interpreter no longer exists). The tabular chapter stays deferred. The author's read of chapters 5–8 remains outstanding.

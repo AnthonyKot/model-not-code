@@ -15,3 +15,7 @@ node_modules/
 
 # local python env for exercises
 .venv/
+
+# Review and reader-run scratch output (scripts/review.sh, scripts/readers.sh)
+checks/**/*.log
+checks/**/*.err
