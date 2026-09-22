@@ -30,7 +30,8 @@ for print.
 **Next, in order.** Chapter 8 (the lab move, the story paragraph, the pause and heading rewrites; it
 closes the book, so no bridge). After all eight:
 `about.md`, the home-page copy in `site/build.mjs`, `README.md` and `CONTEXT.md` §1 (they still say the
-exercise is on the chapter page), then push.
+exercise is on the chapter page), then push. After the push: the three tool appendices planned in
+`notes/chapters/APPENDIX-PLAN.md` (agreed 2026-09-22; A first).
 
 **Per chapter** (STORY-MAP §5, as run three times):
 
