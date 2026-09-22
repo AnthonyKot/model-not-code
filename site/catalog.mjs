@@ -227,6 +227,12 @@ export const appendices = [
     [C("6100015", "01-01", "01-16", "01-19", "02-04", "02-05", "02-07", "02-08", "02-09", "02-10", "02-11", "02-12", "02-13", "02-15", "02-16", "02-17", "02-18")],
     { status: "published",
       caution: "A tool walkthrough, as of the lectures' recordings; model names and sizes are as of then and the libraries are unversioned. The code is illustrative and was not executed: no local model runner is installed on the book's machine, and pulling one is a download. Sizes, costs and the two-coins result are one instructor's, one session." }),
+  AP("c", "Appendix C. Shipping the Classifier: ONNX Runtime, FastAPI, TensorBoard and a Page for the Reviewers",
+    "Chapter 5's bundle boundary on a real export: what the graph of chapter 2's classifier carries and what the service must carry itself, the reload test made real against the runtime, and the endpoint, profiler and reviewers' page around it.",
+    [2, 5],
+    [C("4735368", "18-02", "18-03", "17-04", "10-05")],
+    { status: "published",
+      caution: "The recordings are from a TensorFlow course and export a different classifier; the appendix applies their steps to chapter 2's in PyTorch 2.14.0 with onnx 1.23.0 and onnxruntime 1.30.0. The export and its check ran on a CPU (corpus/appendix-c/run.log); the endpoint, profiler and reviewers' page are illustrative and were not run. The recordings' preprocessing slip (225 against 255, no training normalisation) is stated, not staged." }),
 ];
 
 const CH = (number, slug, title, payoff, builtFrom, sources, extra = {}) => ({

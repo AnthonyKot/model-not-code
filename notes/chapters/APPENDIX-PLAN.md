@@ -1,6 +1,6 @@
 # APPENDIX-PLAN — three tool appendices (planned 2026-09-22, not started)
 
-**Status (2026-09-22): A and B written and published locally (`appendix/a.md`, `appendix/b.md`; notes `notes/chapters/appendix-{a,b}.md`); C not started.** B's loop was not executed: no local model runner is installed on the book's machine and pulling one is a download, so B is illustrative throughout. The site support in "Site" below is built. The rework's
+**Status (2026-09-22): A, B and C written (`appendix/{a,b,c}.md`; notes `notes/chapters/appendix-{a,b,c}.md`).** C's export ran (`corpus/appendix-c/run.log`); its endpoint, profiler and page are illustrative. Lecture 33.14 turned out to be a transcript of the same vLLM/RunPod deployment as Neuralearn 4.1 and is not used by C. B's loop was not executed: no local model runner is installed on the book's machine and pulling one is a download, so B is illustrative throughout. The site support in "Site" below is built. The rework's
 own order comes first: chapter 8, then the §6 site copy in `STORY-MAP.md`, then the push. The
 appendices follow, A first. Up to three appendices of 2,000–4,000 words each; optional reading
 after chapter 8; the chapter rules in `CONTEXT.md` §4–§5 apply unchanged.

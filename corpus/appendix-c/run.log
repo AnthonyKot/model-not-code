@@ -1,0 +1,9 @@
+bundle release.pt: keys ['version', 'categories', 'classifier', 'blade_threshold', 'autoencoder', 'alarm_level']; classifier tensors 6; blade threshold 0.05; categories ['cable', 'kettle', 'lamp', 'blade']; size 60,741 bytes
+classifier.onnx: opset 17; 7 nodes ['Conv', 'Relu', 'ReduceMax', 'Gemm', 'Flatten', 'Gemm', 'Add']; 6 weight tensors; input ['photo'] output ['logits']; size 38,773 bytes
+what the graph does not carry: the blade threshold, the category names, the four-photo mean, the autoencoder and its alarm level
+largest logit difference over 2000 photos: 4.77e-06
+largest blade-score difference over 500 listings: 1.19e-07
+flags at threshold 0.05: saved 68, served 68, identical: True
+the same photos scaled by 255/225 (the recorded slip): flags 61, identical to saved: False
+one listing (four photos) through torch: 0.193 ms per call (measured, varies)
+one listing (four photos) through onnxruntime: 0.084 ms per call (measured, varies)
