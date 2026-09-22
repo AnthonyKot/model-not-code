@@ -1,3 +1,4 @@
+# workspace/reuse-a-pretrained-model/worked.py; PyTorch 2.14.0 (CPU); rerun 2026-09-22 with the worked-question-1 section appended (earlier sections unchanged)
 == BatchNorm unit: pretrained mean 0 var 1; new batches mean 1.0 sd 0.6; momentum 0.1; input 1.6
  n  0: mean 0.0 var 1.0 output 1.6
  n  1: mean 0.1 var 0.936 output 1.55
@@ -21,3 +22,7 @@
  per layer 655360  x28 18350080  bytes 73400320  vs q full matrix 9437184
  q projection: full 9437184 adapter 196608 ratio 2.08 %
 == alpha/r scales: 2.0 0.25 2.0 2.0 2.0
+== worked question 1 (2026-09-22): same freeze A, new batches mean 0.4 sd 0.5 (variance 0.25); momentum 0.1; input 1.6
+ n 50: mean 0.3979 var 0.2539 output 2.386  limit 2.4
+ closed form n=50: 0.3979 0.2539
+ torch after 50 batches: 0.3979 0.2539 2.3856

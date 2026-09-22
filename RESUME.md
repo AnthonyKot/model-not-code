@@ -10,7 +10,15 @@ Decision: keep the eight chapters and the shop; rebuild each around one story st
 paragraph; fold derivations into `<details>`; move every exercise to `labs/<slug>.md` with the
 `<!--mission-->` marker; target 2,000–2,700 words on the reading path. Yardstick is `~/book1`.
 Order: chapter 3 is the pilot (author reads it first), then 1, 2, 4, then 5–8. Where STORY-MAP
-disagrees with `CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins. Nothing rewritten yet.
+disagrees with `CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins.
+
+**Pilot done, 2026-09-22 (Claude main session):** chapter 3 reworked to the card (story paragraph, pause, four
+story-step beats, seven folds, two worked questions, bridge; reading path 2,698 words, 25% folded); its exercise
+moved verbatim to `labs/reuse-a-pretrained-model.md`; `site/build.mjs` now builds `docs/labs/<slug>.html` with the
+mission wrapper and completion button, and `check.mjs` / `paraphrase.mjs` cover labs. Exercise re-run identical.
+Decisions and counts: `notes/chapters/reuse-a-pretrained-model.md`. **Owed: the author's read of chapter 3 before
+chapters 1, 2, 4 move.** Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
+`~/.gemini/antigravity-cli/scratch/myenv/bin/python`. Chapters 1, 2, 4–8 untouched; not pushed.
 
 ## The book is complete — 2026-09-17
 

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The lab for chapter 3, Reuse a Pretrained Model: freeze three ways, thaw, then fit a LoRA adapter.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Lab: freeze three ways, thaw, then fit a LoRA adapter">
+  <meta property="og:description" content="The lab for chapter 3, Reuse a Pretrained Model: freeze three ways, thaw, then fit a LoRA adapter.">
+  <meta property="og:type" content="website">
+  <title>Lab: freeze three ways, thaw, then fit a LoRA adapter · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script defer src="../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="reuse-a-pretrained-model">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 8 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 8 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <nav aria-label="Book contents">
+    <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
+      <span class="book-nav__number">01</span>
+      <span>Search the Catalogue, Then Answer From It</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
+      <span class="book-nav__number">02</span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
+      <span class="book-nav__number">03</span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
+      <span class="book-nav__number">04</span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/keep-it-right-after-launch.html" data-mission-link="keep-it-right-after-launch">
+      <span class="book-nav__number">05</span>
+      <span>Keep It Right After Launch</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/build-the-assistant.html" data-mission-link="build-the-assistant">
+      <span class="book-nav__number">06</span>
+      <span>Build the Assistant</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/serve-the-assistant-cheaply.html" data-mission-link="serve-the-assistant-cheaply">
+      <span class="book-nav__number">07</span>
+      <span>Serve the Assistant Cheaply</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/did-the-shop-need-a-model.html" data-mission-link="did-the-shop-need-a-model">
+      <span class="book-nav__number">08</span>
+      <span>Did the Shop Need a Model?</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page lab-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>03</span>Lab · <a href="../chapters/reuse-a-pretrained-model.html">Chapter 3, Reuse a Pretrained Model</a></div>
+      <h1 class="essay-title">freeze three ways, thaw, then fit a LoRA adapter</h1>
+      <p class="essay-payoff">Runs on a laptop CPU. The expected output is printed below the code; mark the exercise complete when yours matches.</p>
+    </header>
+    <article class="prose"><p>The lab for chapter 3, <a href="../chapters/reuse-a-pretrained-model.html">Reuse a Pretrained Model</a>. It shows the three freezes and the thaw on a small photo backbone with BatchNorm layers, then LoRA and a full fine-tune on the shop&#39;s answer writer, with the numbers the chapter quotes.</p>
+<section class="mission" data-mission="reuse-a-pretrained-model"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-freeze-three-ways-thaw-then-fit-a-lora-adapter">Exercise: freeze three ways, thaw, then fit a LoRA adapter</h2>
+<p>The script pretrains a small photo backbone with BatchNorm layers, adapts it to a shifted product line under each freeze and a thaw, then pretrains chapter 1&#39;s attention block as a tiny answer writer and adapts it to the shop&#39;s format with LoRA and with a full fine-tune. PyTorch on a CPU, about six seconds.</p>
+<pre><code class="language-python">import copy
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# ---------- Part 1: a pretrained photo backbone, a new product line ----------
+def catalogue_photos(n):                     # the photos the backbone was pretrained on
+    x = torch.randn(n, 6)
+    return x, (x[:, 0] - x[:, 2] &gt; 0).long()
+
+def new_supplier_photos(n):                  # a new product line, shot under different lighting
+    x = 1.0 + 0.6 * torch.randn(n, 6)
+    return x, (x[:, 1] + x[:, 3] &gt; 2.0).long()
+
+torch.manual_seed(0)
+backbone = nn.Sequential(nn.Linear(6, 16), nn.BatchNorm1d(16), nn.ReLU(),
+                         nn.Linear(16, 16), nn.BatchNorm1d(16), nn.ReLU())
+old_head = nn.Linear(16, 2)
+opt = torch.optim.Adam([*backbone.parameters(), *old_head.parameters()], lr=1e-2)
+for _ in range(300):                         # stands in for the downloaded checkpoint
+    x, y = catalogue_photos(64)
+    opt.zero_grad(); F.cross_entropy(old_head(backbone(x)), y).backward(); opt.step()
+checkpoint = copy.deepcopy(backbone.state_dict())   # weights and BatchNorm buffers together
+batchnorms = [m for m in backbone if isinstance(m, nn.BatchNorm1d)]
+old_val, new_val = catalogue_photos(1000), new_supplier_photos(1000)
+
+def accuracy(head, data):
+    backbone.eval()
+    with torch.no_grad():
+        return (head(backbone(data[0])).argmax(1) == data[1]).float().mean().item()
+
+def weights_moved():
+    now = backbone.state_dict()
+    return max((now[k] - checkpoint[k]).abs().max().item() for k in now if k.endswith((&quot;weight&quot;, &quot;bias&quot;)))
+
+def train_head(bn_eval, momentum=0.1, steps=200):
+    backbone.load_state_dict(checkpoint)
+    for p in backbone.parameters():
+        p.requires_grad = False                          # the freeze
+    for m in batchnorms:
+        m.momentum = momentum
+    torch.manual_seed(1)
+    head = nn.Linear(16, 2)
+    opt = torch.optim.Adam(head.parameters(), lr=1e-2)
+    for _ in range(steps):
+        backbone.train()                                 # what model.train() does every epoch
+        if bn_eval:
+            for m in batchnorms:
+                m.eval()                                 # ...undone here for the BatchNorm layers
+        x, y = new_supplier_photos(64)
+        opt.zero_grad(); F.cross_entropy(head(backbone(x)), y).backward(); opt.step()
+    return head
+
+print(&quot;pretrained: old-task accuracy&quot;, round(accuracy(old_head, old_val), 3))
+for label, bn_eval, momentum in [(&quot;A requires_grad=False only  &quot;, False, 0.1),
+                                 (&quot;B + BatchNorm in eval()     &quot;, True, 0.1),
+                                 (&quot;C + momentum=0, train mode  &quot;, False, 0.0)]:
+    head = train_head(bn_eval, momentum)
+    print(f&quot;{label} weights moved {weights_moved():.1e}  running_mean[0] {batchnorms[0].running_mean[0].item():+.3f}&quot;
+          f&quot;  old task {accuracy(old_head, old_val):.3f}  new task {accuracy(head, new_val):.3f}&quot;)
+
+head = train_head(bn_eval=True)                          # stage 1 as in B, then thaw
+for p in backbone.parameters():
+    p.requires_grad = True
+opt = torch.optim.Adam([{&quot;params&quot;: head.parameters(), &quot;lr&quot;: 1e-2},
+                        {&quot;params&quot;: backbone.parameters(), &quot;lr&quot;: 1e-3}])   # parameter groups
+for _ in range(300):
+    backbone.train()
+    for m in batchnorms:
+        m.eval()
+    x, y = new_supplier_photos(64)
+    opt.zero_grad(); F.cross_entropy(head(backbone(x)), y).backward(); opt.step()
+print(f&quot;thaw at 1/10 the head&#39;s rate: weights moved {weights_moved():.3f}  old task {accuracy(old_head, old_val):.3f}&quot;
+      f&quot;  new task {accuracy(head, new_val):.3f}&quot;)
+
+# ---------- Part 2: LoRA on the attention matrices of the shop&#39;s answer writer ----------
+old_text = [&quot;the steel kettle boils water fast&quot;, &quot;the leather watch tells the time&quot;,
+            &quot;the canvas backpack carries school books&quot;, &quot;the desk lamp lights the desk&quot;,
+            &quot;note : the kettle is in stock&quot;, &quot;note : the watch ships today&quot;]
+shop_format = [&quot;kettle : boils water fast : in stock&quot;, &quot;watch : tells the time : ships today&quot;,
+               &quot;backpack : carries school books : in stock&quot;, &quot;lamp : lights the desk : ships today&quot;]
+vocab = [&quot;&lt;pad&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;] + sorted({w for t in old_text + shop_format for w in t.split()})
+ids = {w: i for i, w in enumerate(vocab)}
+
+def batch(texts):
+    rows = [[&quot;&lt;s&gt;&quot;] + t.split() + [&quot;&lt;/s&gt;&quot;] for t in texts]
+    width = max(len(r) for r in rows)
+    return torch.tensor([[ids[w] for w in r] + [0] * (width - len(r)) for r in rows])
+
+class Writer(nn.Module):
+    &quot;&quot;&quot;Chapter 1&#39;s block plus an output projection, named q, k, v, o.&quot;&quot;&quot;
+    def __init__(self, n_vocab, dim=32, max_len=12):
+        super().__init__()
+        self.tok, self.pos = nn.Embedding(n_vocab, dim), nn.Embedding(max_len, dim)
+        self.q, self.k, self.v, self.o = (nn.Linear(dim, dim) for _ in range(4))
+        self.head = nn.Linear(dim, n_vocab)
+    def forward(self, x):
+        h = self.tok(x) + self.pos(torch.arange(x.shape[1]))
+        a = F.scaled_dot_product_attention(self.q(h), self.k(h), self.v(h), is_causal=True)
+        return self.head(h + self.o(a))
+
+class LoRALinear(nn.Module):
+    &quot;&quot;&quot;A frozen nn.Linear plus a trainable rank-r diff: W x + (alpha / r) B A x.&quot;&quot;&quot;
+    def __init__(self, base, r, alpha):
+        super().__init__()
+        self.base = base
+        for p in base.parameters():
+            p.requires_grad = False
+        self.A = nn.Parameter(0.01 * torch.randn(r, base.in_features))   # r x d_in, small random
+        self.B = nn.Parameter(torch.zeros(base.out_features, r))         # d_out x r, zeros
+        self.scale = alpha / r
+    def forward(self, x):
+        return self.base(x) + self.scale * (x @ self.A.T @ self.B.T)
+
+def loss_on(model, texts):
+    x = batch(texts)
+    logits = model(x[:, :-1])
+    return F.cross_entropy(logits.reshape(-1, len(vocab)), x[:, 1:].reshape(-1), ignore_index=0).item()
+
+def fit(model, params, texts, steps=300):
+    opt = torch.optim.Adam(params, lr=1e-2)
+    x = batch(texts)
+    for _ in range(steps):
+        logits = model(x[:, :-1])
+        loss = F.cross_entropy(logits.reshape(-1, len(vocab)), x[:, 1:].reshape(-1), ignore_index=0)
+        opt.zero_grad(); loss.backward(); opt.step()
+
+def write(model, prompt):
+    out = [&quot;&lt;s&gt;&quot;] + prompt.split()
+    with torch.no_grad():
+        for _ in range(8):
+            out.append(vocab[int(model(torch.tensor([[ids[w] for w in out]]))[0, -1].argmax())])
+            if out[-1] == &quot;&lt;/s&gt;&quot;:
+                break
+    return &quot; &quot;.join(out[1:])
+
+torch.manual_seed(0)
+writer = Writer(len(vocab))
+fit(writer, writer.parameters(), old_text)              # stands in for the pretrained language model
+pretrained = copy.deepcopy(writer.state_dict())
+print(f&quot;\npretrained writer: loss on its own text {loss_on(writer, old_text):.4f}, on the shop format {loss_on(writer, shop_format):.4f}&quot;)
+print(&quot;  writes:&quot;, write(writer, &quot;kettle :&quot;))
+
+for r in (1, 4):
+    writer = Writer(len(vocab))
+    writer.load_state_dict(pretrained)
+    for p in writer.parameters():
+        p.requires_grad = False
+    torch.manual_seed(2)
+    adapters = {name: LoRALinear(getattr(writer, name), r, alpha=2 * r) for name in &quot;qkvo&quot;}
+    for name, lora in adapters.items():
+        setattr(writer, name, lora)                      # wrap chapter 1&#39;s attention projections
+    trainable = [p for p in writer.parameters() if p.requires_grad]
+    fit(writer, trainable, shop_format)
+    n_train = sum(p.numel() for p in trainable)
+    n_frozen = sum(p.numel() for p in writer.parameters() if not p.requires_grad)
+    print(f&quot;LoRA r={r} on q,k,v,o: trainable {n_train}, frozen {n_frozen}, adapter {4 * n_train} bytes&quot;
+          f&quot;  | shop-format loss {loss_on(writer, shop_format):.4f}, own-text loss {loss_on(writer, old_text):.4f}&quot;)
+    print(&quot;  writes:&quot;, write(writer, &quot;kettle :&quot;), &quot;|&quot;, write(writer, &quot;backpack :&quot;))
+
+x = batch(shop_format)[:, :-1]
+with torch.no_grad():
+    with_adapter = writer(x)
+for name, lora in adapters.items():
+    setattr(writer, name, lora.base)                     # unplug the r=4 adapters
+print(f&quot;adapter unplugged: own-text loss {loss_on(writer, old_text):.4f}, base weights unchanged:&quot;,
+      all(torch.equal(v, pretrained[k]) for k, v in writer.state_dict().items()))
+with torch.no_grad():                                    # plug back in by merging: W &lt;- W + (alpha / r) B A
+    for name, lora in adapters.items():
+        lora.base.weight += lora.scale * (lora.B @ lora.A)
+    print(f&quot;merged into W: largest output difference {(writer(x) - with_adapter).abs().max().item():.1e}&quot;)
+
+writer = Writer(len(vocab))
+writer.load_state_dict(pretrained)
+torch.manual_seed(2)
+fit(writer, writer.parameters(), shop_format)            # full fine-tune: every weight moves
+print(f&quot;full fine-tune: trainable {sum(p.numel() for p in writer.parameters())}&quot;
+      f&quot;  | shop-format loss {loss_on(writer, shop_format):.4f}, own-text loss {loss_on(writer, old_text):.4f}&quot;)
+</code></pre>
+<p>What each part does in real fine-tuning code:</p>
+<ul>
+<li><strong><code>catalogue_photos</code> and <code>new_supplier_photos</code></strong> stand in for pretraining data and the garden range: six features per photo, with the new supplier&#39;s features shifted to mean 1.0 and spread 0.6 and labelled by a different rule. The 300-step loop stands in for the checkpoint you would download, and <code>state_dict()</code> copies weights and BatchNorm buffers together, as a checkpoint file does.</li>
+<li><strong><code>train_head</code></strong> is stage one. <code>requires_grad = False</code> is the freeze; the optimiser receives only the new head&#39;s parameters; <code>backbone.train()</code> at every step is what <code>model.train()</code> does at every epoch. <code>bn_eval=True</code> puts the BatchNorm layers back into <code>eval()</code> after it (freeze B), and <code>momentum=0.0</code> gives freeze C.</li>
+<li><strong><code>weights_moved</code></strong> compares only weights and biases with the checkpoint, so its zero under every freeze shows that the accuracy changes come from the buffers.</li>
+<li><strong>The thaw</strong> reopens the backbone with <code>requires_grad = True</code> and builds two parameter groups, the backbone at a tenth of the head&#39;s rate, with BatchNorm kept in <code>eval()</code>.</li>
+<li><strong><code>Writer</code></strong> is chapter 1&#39;s block with the four attention projections as separate <code>nn.Linear</code> layers named the way real models name them. Trained on <code>old_text</code>, it stands in for the pretrained language model.</li>
+<li><strong><code>LoRALinear</code></strong> is the formula: the wrapped layer&#39;s parameters get <code>requires_grad = False</code>, A starts small and random, B starts at zero, and <code>forward</code> computes <code>x @ A.T</code> first, r numbers per token, before <code>@ B.T</code> stretches them back, so the full diff is never built. <code>setattr(writer, name, lora)</code> is what PEFT&#39;s <code>get_peft_model</code> does to every module named in <code>target_modules</code>.</li>
+<li><strong>The rank loop</strong> trains rank 1 and rank 4 from the same pretrained weights and counts trainable and frozen numbers; each 32 × 32 projection gets (32 + 32) × r adapter numbers.</li>
+<li><strong>Unplugging and merging</strong> put the original <code>nn.Linear</code> layers back and compare every tensor with the pretrained state, then fold (α/r)·B·A into each W and compare outputs with the adapter version.</li>
+<li><strong>The full fine-tune</strong> gives the optimiser every parameter, for comparison.</li>
+</ul>
+<p><strong>Expected result.</strong> PyTorch 2.14 on a CPU; the output is in the chapter&#39;s corpus and is identical between runs. The writer&#39;s <code>shop-format loss</code> and <code>own-text loss</code> are measured on the same strings used for adaptation and pretraining, respectively: fit and interference on those strings, not performance on held-out prompts. The photo accuracies use separate validation examples.</p>
+<pre><code class="language-text">pretrained: old-task accuracy 0.981
+A requires_grad=False only   weights moved 0.0e+00  running_mean[0] -0.044  old task 0.952  new task 0.765
+B + BatchNorm in eval()      weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.824
+C + momentum=0, train mode   weights moved 0.0e+00  running_mean[0] +0.162  old task 0.981  new task 0.639
+thaw at 1/10 the head&#39;s rate: weights moved 0.215  old task 0.932  new task 0.980
+
+pretrained writer: loss on its own text 0.2502, on the shop format 10.3556
+  writes: kettle : the watch ships today &lt;/s&gt;
+LoRA r=1 on q,k,v,o: trainable 256, frozen 6428, adapter 1024 bytes  | shop-format loss 0.8303, own-text loss 6.6182
+  writes: kettle : boils water in stock &lt;/s&gt; | backpack : carries school books : the stock &lt;/s&gt;
+LoRA r=4 on q,k,v,o: trainable 1024, frozen 6428, adapter 4096 bytes  | shop-format loss 0.3883, own-text loss 12.4983
+  writes: kettle : boils water fast : in stock &lt;/s&gt; | backpack : carries school books : in stock &lt;/s&gt;
+adapter unplugged: own-text loss 0.2502, base weights unchanged: True
+merged into W: largest output difference 1.2e-05
+full fine-tune: trainable 6428  | shop-format loss 0.1934, own-text loss 5.4382
+</code></pre>
+<p>Read it against the chapter. <code>running_mean[0]</code> belongs to a feature computed by the <code>nn.Linear</code> before the first BatchNorm, not to a raw input, so it is not expected to approach the worked table&#39;s 1.0. Under freeze A it has moved from +0.162 to −0.044 with no weight changed, and the old head lost three points. Freeze C kept the buffers still and left the new head at 0.639, because it was trained on batch statistics and evaluated on stored ones. The rank-4 adapter trains 1,024 numbers, a sixth of the model, and writes the full format. Unplugged, the writer is its pretrained self again, tensor for tensor.</p>
+<p>Two things to try. Give the backbone&#39;s parameter group the head&#39;s learning rate, <code>1e-2</code>, and change the printed label to match: the thawed garden head reaches 0.942 instead of 0.980, and the old head falls to 0.882 instead of 0.932. Then wrap only <code>&quot;qv&quot;</code> instead of <code>&quot;qkvo&quot;</code>, again changing the label that prints <code>q,k,v,o</code>: at rank 4 the adapter halves to 512 numbers and the shop-format loss is 0.4027 against 0.3883, most of the effect for half the file, which is why query and value projections are a common minimal target.</p>
+</section></article>
+    <div class="mission-action" data-mission-action="reuse-a-pretrained-model">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="reuse-a-pretrained-model">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Back to the chapter">
+    <a href="../chapters/reuse-a-pretrained-model.html"><span>Back to chapter 3</span>Reuse a Pretrained Model</a>
+    <a class="essay-pager__next" href="../chapters/train-from-reward.html"><span>Next</span>Train From Reward</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lectures 13.1–13.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 7.2–7.6, 7.12, 7.20</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 406–409, 414–416, 436, 492–493</li><li>Machine Learning Q and AI, pp. 132–134</li><li>arXiv:2106.09685, 4.1</li></ul><p>The backbone, the product-line shift and the answer writer are synthetic and tiny. Model sizes for Llama 3.2 are as of the recording they come from; PyTorch behaviour as of 2.14; PEFT and torchvision snippets are illustrative; the Keras BatchNormalization behaviour is as of TensorFlow 2.</p></details>
+  </main>
+  </div>
+</body>
+</html>
