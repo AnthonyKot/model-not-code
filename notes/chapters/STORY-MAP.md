@@ -341,18 +341,19 @@ The book is done when all eight are done, `about.html` describes the shape (stor
 and `README.md`, `RESUME.md` and `CONTEXT.md` §1 point here instead of at the 20,000–35,000
 character target.
 
-## 7. Status and lessons (2026-09-22, after chapters 3, 1 and 2)
+## 7. Status and lessons (2026-09-22, after chapters 3, 1, 2 and 4)
 
 **Done:** chapter 3 (pilot), then 1 and 2, in that order, by the main session; commits `1115505`,
 `8840699`, `eeb9442`, `fa86b08`. The author's provisional verdict on the three: OK, 7 of 10 (given as an
-assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). **Next:** 4, then
-5–8, then the §6 site copy, then push.
+assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). Chapter 4 followed later the same day (its note has the
+entry). **Next:** 5–8, then the §6 site copy, then push.
 
 | Ch | Reading path | Folds | Page | Notes |
 |---|---|---|---|---|
 | 3 | 2,698 | 900 (25.0%) | 3,598 | seven folds; page ~200 over §2's 3,400 |
 | 1 | 2,696 | 898 (25.0%) | 3,594 | eight folds; beat 4 at 599 words; six glossed formulas on the path |
 | 2 | 2,431 | 794 (24.6%) | 3,225 | six folds; input pipeline moved to the lab as setup |
+| 4 | 2,696 | 902 (25.1%) | 3,598 | six folds; corridor one beat of 443 words; eight trims; five tables kept on the path |
 
 **What the three taught, for chapters 4–8.**
 

@@ -1,0 +1,13 @@
+== corridor returns, gamma 0.9, four steps right
+ returns from cell 0..3: [0.729, 0.81, 0.9, 1.0]
+== label noise: sigma(2 x gap) for a one-point gap
+ sigma(2) = 0.881
+== reward-model worked pair: chosen 0.5, rejected 1.0
+ sigma(-0.5) = 0.3775  loss 0.9741  slope on r_w -0.6225  on r_l 0.6225
+== scoring answers from the printed weights (run.log, rounded to 2 dp) and the hidden rule
+ 'in stock ships today': reward model 2.34  hidden 1.0  words 4
+ 'in stock stock stock stock stock stock stock': reward model 6.12  hidden -0.2  words 8
+ 'stock stock stock': reward model 2.52  hidden 0.0  words 3
+ 'buy now ships today': reward model -0.37  hidden 0.0  words 4
+== worked question 2: a perfect ranker's expected agreement with the held-out labels
+ 64 x 0.904 + 36 x 0.5 = 57.9 + 18.0 = 75.9  ->  0.759  (lab prints 0.770)
