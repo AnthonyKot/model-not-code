@@ -75,4 +75,4 @@ batch 16, not 8x) and receipt sac-48 were updated. The decision and its reasons 
 
 **Not done.** The author's read and the author's own attempt at the serving report; chapter 8; the §6 site copy.
 
-**Cross-reference repair — 2026-09-22 (chapter 8 cross-check).** The bridge's last two sentences misread chapter 8's break-even ("3,001 questions a month, then at 300 once a 15% held-out rate is allowed for"); they now say the model pays back its build after 3,001 queries and its upkeep with 300 a month at a 15% paraphrase share. Nothing else in the chapter changed; path 2103 → 2105.
+**Cross-reference repair — 2026-09-22 (chapter 8 cross-check).** The bridge's last two sentences misread chapter 8's break-even ("3,001 questions a month, then at 300 once a 15% held-out rate is allowed for"); they now say the model pays back its build after 3,001 queries and its upkeep with 300 a month at a 15% paraphrase share. Nothing else in the chapter changed; path 2103 → 2111.
