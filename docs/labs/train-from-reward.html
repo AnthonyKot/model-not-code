@@ -192,7 +192,7 @@ for product in PRODUCTS:
                 demonstrations.append([product, &quot;:&quot;] + a + b)
 
 class Writer(nn.Module):
-    &quot;&quot;&quot;Chapter 3&#39;s writer (q, k, v, o) with a small feed-forward layer added.&quot;&quot;&quot;
+    &quot;&quot;&quot;Chapter 1&#39;s block with the output projection (q, k, v, o) and a small feed-forward layer added.&quot;&quot;&quot;
     def __init__(self, dim=32, max_len=12):
         super().__init__()
         self.tok, self.pos = nn.Embedding(len(vocab), dim), nn.Embedding(max_len, dim)
@@ -332,7 +332,7 @@ for label, beta, eps, epochs in [(&quot;no KL, clip 0.2, 4 epochs&quot;, 0.0, 0.
 <li><strong>The clip check</strong> calls <code>ppo_loss</code> on one sample per row of the chapter&#39;s table and prints the loss and its slope with respect to the current log-probability.</li>
 <li><strong>The corridor policy</strong> is a table of two scores per cell. Each round collects 16 episodes, turns returns into advantages by normalising over the batch, stores the old log-probabilities under <code>torch.no_grad()</code>, and reuses the batch for 4 epochs.</li>
 <li><strong><code>hidden_score</code></strong> stands in for people and is used only to label pairs and to report; the policy&#39;s optimization uses the learned reward model and the reference penalty instead. <strong><code>demonstrations</code></strong> are the 48 curated answers.</li>
-<li><strong><code>Writer</code></strong> is chapter 3&#39;s block plus a feed-forward layer, trained from random weights on the demonstrations with chapter 1&#39;s next-token cross-entropy. <strong><code>reference</code></strong> is its frozen copy and <strong><code>start_state</code></strong> lets every tuning run start from the same writer.</li>
+<li><strong><code>Writer</code></strong> is chapter 1&#39;s block with the output projection plus a feed-forward layer, trained from random weights on the demonstrations with chapter 1&#39;s next-token cross-entropy. <strong><code>reference</code></strong> is its frozen copy and <strong><code>start_state</code></strong> lets every tuning run start from the same writer.</li>
 <li><strong><code>sample</code></strong> generates at temperature 1 up to <code>MAX_NEW</code> tokens; <strong><code>token_logps</code></strong> returns the log-probability of every generated token and a mask over them, the per-token numbers PPO and the KL penalty need.</li>
 <li><strong>The pair loop</strong> samples two answers per product from the fine-tuned writer and labels them with probability σ(2 × score difference), counting how often the label agrees with the hidden score.</li>
 <li><strong><code>RewardModel</code></strong> sums one learned weight per word. It trains on 500 pairs with <code>-F.logsigmoid(r_w - r_l)</code>, the chapter&#39;s loss, and is scored on the other 100, both against the labels and against the hidden order.</li>

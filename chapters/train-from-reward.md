@@ -1,6 +1,6 @@
 # Train From Reward
 
-Chapter 3 taught the shop's answer writer a format. The shop now needs its answers to be *good*: a customer asking about a kettle is served by *in stock ships today*, not by *buy now*, and four words beat eight. Nobody can write "good" down as a label at every token, but people shown two answers can say which they prefer, so the shop collected 600 such comparisons, trained a scorer on them, and tuned the writer to raise that score. After 40 rounds the scorer's mean over fresh answers had risen from 0.34 to 6.12, and the writer's typical answer was *in stock stock stock stock stock stock stock*. Judged by the preferences the scorer was trained on, the answers had got worse, from 0.33 to −0.20. Why does the number you optimise stop meaning what it measured?
+Chapter 3 taught the shop's answer writer a format. The shop now needs its answers to be *good*: a customer asking about a kettle is served by *in stock ships today*, not by *buy now*, and four words beat eight. Nobody can write "good" down as a label at every token, but people shown two answers can say which they prefer, so the shop collected 600 such comparisons, trained a scorer on them, and tuned the writer to raise that score. After 40 rounds the scorer's mean over fresh answers had risen from 0.34 to 6.12, and the writer's typical answer was *in stock stock stock stock stock stock stock*. Judged by the hidden scorer that stands in for the people, the one the labels were sampled from, the answers had got worse, from 0.33 to −0.20. Why does the number you optimise stop meaning what it measured?
 
 The chapter first shows what can be learned from a score that arrives only when an answer is finished, on a corridor small enough to follow by hand, then reads the writer as the same learner with tokens for moves. It then shows where the people's preferences enter and what the scorer built from them cannot have learned, runs the tuning and watches it exploit that gap, and ends with the two guards that keep it honest. Everything is synthetic; a hidden scorer stands in for the people.
 
@@ -113,7 +113,7 @@ In the lab this loop takes the corridor's policy from a coin flip per cell, 16.5
 
 ## Where the people's preferences become the score
 
-People are shown two answers to the same prompt and pick the better one. Comparisons are noisy: in one such pipeline the training labellers agreed with each other on about 73% of them. They come after pretraining and chapter 3's demonstrations, in far larger numbers, since comparing is easier than writing. The lab's writer is chapter 3's block, trained from random weights on 48 demonstrations, each a product with one or two of the phrases *in stock*, *ships today*, *great value*, *buy now*.
+People are shown two answers to the same prompt and pick the better one. Comparisons are noisy: in one such pipeline the training labellers agreed with each other on about 73% of them. They come after pretraining and chapter 3's supervised stage that taught the format, in larger numbers, since comparing is easier than writing. The lab's writer is not chapter 3's: it is chapter 1's block with a feed-forward layer, trained from random weights on 48 demonstrations, each a product with one or two of the phrases *in stock*, *ships today*, *great value*, *buy now*.
 
 A hidden scoring function stands in for the people: +1 if the answer says *in stock* or *ships today*, −1 for every *buy now*, and −0.3 for every word beyond four. It is never shown to the writer being tuned. Each of 600 pairs of answers sampled from the writer is labelled at random, with a probability that rises with the gap between their hidden scores, so that tied pairs are a coin flip; where the scores differed, 374 pairs, the label picked the better answer 0.904 of the time.
 
@@ -143,7 +143,7 @@ The lab's reward model is deliberately the smallest that can learn from pairs: o
 The tuning loop is PPO with the reward model in place of the corridor: each round the writer answers 64 prompts, each answer gets a reward, and the batch is reused for a few epochs through the clipped loss.
 
 <figure class="diagram">
-<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="Two stages. Stage one, top row: the fine-tuned writer answers prompts twice; people choose one answer of each pair; the pairs train the reward model with minus log sigma of r winner minus r loser. Stage two, a loop below: the writer being tuned writes 64 answers; each is scored by the reward model minus beta times its summed log-probability ratio against a frozen reference copy of the fine-tuned writer; the scores become advantages normalised over the 64; ppo_loss updates the writer being tuned, and the loop repeats." style="max-width:720px;font-family:inherit;font-size:12px">
+<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="Two stages. Stage one, top row: the demonstration-trained writer answers prompts twice; people choose one answer of each pair; the pairs train the reward model with minus log sigma of r winner minus r loser. Stage two, a loop below: the writer being tuned writes 64 answers; each is scored by the reward model minus beta times its summed log-probability ratio against a frozen reference copy of the demonstration-trained writer; the scores become advantages normalised over the 64; ppo_loss updates the writer being tuned, and the loop repeats." style="max-width:720px;font-family:inherit;font-size:12px">
   <defs><marker id="tfr-arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
   <g fill="none" stroke="currentColor" stroke-width="1.3">
     <rect x="10" y="20" width="130" height="46" rx="5"/>
@@ -169,7 +169,7 @@ The tuning loop is PPO with the reward model in place of the corridor: each roun
     <path d="M625,250 V210" marker-end="url(#tfr-arrow2)"/>
   </g>
   <g fill="currentColor" text-anchor="middle">
-    <text x="75" y="40">fine-tuned writer</text><text x="75" y="56" font-size="11">answers twice</text>
+    <text x="75" y="40">trained writer</text><text x="75" y="56" font-size="11">answers twice</text>
     <text x="255" y="40">people choose</text><text x="255" y="56" font-size="11">one of each pair</text>
     <text x="435" y="40">pairs</text><text x="435" y="56" font-size="11">(chosen, rejected)</text>
     <text x="630" y="40">reward model r</text><text x="630" y="56" font-size="11">−ln σ(r<tspan baseline-shift="sub" font-size="8">w</tspan> − r<tspan baseline-shift="sub" font-size="8">l</tspan>)</text>
@@ -182,7 +182,7 @@ The tuning loop is PPO with the reward model in place of the corridor: each roun
     <text x="495" y="320" font-size="11">stage 2: the writer is tuned, round after round</text>
   </g>
 </svg>
-<figcaption>Where people and the learned reward enter. People only label pairs; the reward model turns their labels into a score; PPO tunes another copy of the fine-tuned writer against that score, held near a frozen reference copy.</figcaption>
+<figcaption>Where people and the learned reward enter. People only label pairs; the reward model turns their labels into a score; PPO tunes another copy of the demonstration-trained writer against that score, held near a frozen reference copy.</figcaption>
 </figure>
 
 **If the reward model's score rises round after round, what additional observation would make that improvement convincing?**
@@ -191,12 +191,12 @@ The first run uses the reward model's score alone; after 40 rounds, averaged ove
 
 | Run | Reward model | Hidden score | Words | KL to reference | A sample answer |
 |---|---|---|---|---|---|
-| Fine-tuned writer, before tuning | 0.34 | 0.33 | 3.5 | 0.00 | buy now ships today |
+| Demonstration-trained writer, before tuning | 0.34 | 0.33 | 3.5 | 0.00 | buy now ships today |
 | Reward model only, clip 0.2, 4 epochs | 6.12 | −0.20 | 8.0 | 49.51 | in stock stock stock stock stock stock stock |
 
-The reward model's mean rose while the hidden score, the thing it stood for, fell, and eight words is the length limit. Score the sample answer yourself from the printed weights: *in* 0.24 plus seven times *stock* 0.84 is 6.12, while the hidden scorer gives it +1 for *in stock* and −0.3 for each of the four words past the fourth, −0.20. The answers in its pairs came from the fine-tuned writer: every one of the 1,200 had two or four words, and one of them repeated a word. Nothing in that data could teach it that a second *stock* is worth less than the first, or that a sixth word costs anything; each extra *stock* adds 0.84, and PPO found it. A real reward model is a large network and fails less transparently, but what carries over is the assumed row of the table: the writer being tuned produces answers unlike anything in the pairs, and the reward model's score on those answers was never checked against anyone.
+The reward model's mean rose while the hidden score, the thing it stood for, fell, and eight words is the length limit. Score the sample answer yourself from the printed weights: *in* 0.24 plus seven times *stock* 0.84 is 6.12, while the hidden scorer gives it +1 for *in stock* and −0.3 for each of the four words past the fourth, −0.20. The answers in its pairs came from the demonstration-trained writer: every one of the 1,200 had two or four words, and one of them repeated a word. Nothing in that data could teach it that a second *stock* is worth less than the first, or that a sixth word costs anything; each extra *stock* adds 0.84, and PPO found it. A real reward model is a large network and fails less transparently, but what carries over is the assumed row of the table: the writer being tuned produces answers unlike anything in the pairs, and the reward model's score on those answers was never checked against anyone.
 
-The standard guard keeps the writer near where it started. Keep a frozen copy of the fine-tuned writer, the **reference**, and subtract from each answer's reward β times how much more likely, in log terms and summed over the answer's tokens, the writer being tuned made those tokens than the reference would have. Averaged over the answers the writer produces, that sum is the **KL divergence** between the two writers, one number for how differently they spread probability, 0 while they are the same; β sets how hard the penalty pulls and is a setting you choose. The penalty is part of the reward, computed once per answer when the batch is collected.
+The standard guard keeps the writer near where it started. Keep a frozen copy of the demonstration-trained writer, the **reference**, and subtract from each answer's reward β times how much more likely, in log terms and summed over the answer's tokens, the writer being tuned made those tokens than the reference would have. Averaged over the answers the writer produces, that sum is the **KL divergence** between the two writers, one number for how differently they spread probability, 0 while they are the same; β sets how hard the penalty pulls and is a setting you choose. The lab copies its small writer whole; at chapter 3's size the tuned weights are an adapter on a frozen base and the reference is that base with the adapter as it was, so chapter 3's unaffordable second copy is never made. The penalty is part of the reward, computed once per answer when the batch is collected.
 
 <details>
 <summary>Optional: the penalised reward, term by term</summary>
@@ -226,9 +226,7 @@ With the penalty on, the writer still escaped into repetition, because of where 
 
 ## Where it stops
 
-A real run has to establish what the synthetic one assumed. The labels are the product: who labels, with what instructions, and how often they disagree bound what the reward model can learn, so measure their agreement on a sample labelled twice and report it beside the reward model's. The reward model is a model with errors, evaluated as chapter 2 evaluates a classifier, on pairs held out and split by prompt, then checked where it will be used: on answers sampled from partly tuned writers, which it has never seen. And the tuned writer is judged by people choosing between its answers and the reference's on fresh prompts, not by its reward, which is expected to rise and proves nothing.
-
-Hosted fine-tuning services hide most of this: preference tuning is a job type that takes good and bad answers to the same prompts, such as users' thumbs up and down on alternatives, and reinforcement fine-tuning takes a grader you write, a program or another model that scores each answer. A grader is a reward function, and the tuned model learns what it rewards, whether or not that is what you meant.
+A real run has to establish what the synthetic one assumed. The labels are the product: who labels, with what instructions, and how often they disagree bound what the reward model can learn, so measure their agreement on a sample labelled twice and report it beside the reward model's. The reward model is a model with errors, evaluated as chapter 2 evaluates a classifier, on pairs held out and split by prompt, then checked where it will be used: on answers sampled from partly tuned writers. And the tuned writer is judged by people choosing between its answers and the reference's on fresh prompts, not by its reward, which is expected to rise. Hosted tuning services hide most of this behind a job type, and the grader you hand one, a program or another model that scores each answer, is a reward function: the tuned model learns what it rewards, whether or not that is what you meant.
 
 ## Two questions to work
 
@@ -246,7 +244,7 @@ Hosted fine-tuning services hide most of this: preference tuning is a job type t
 <details>
 <summary>Worked answer</summary>
 
-The wrong turn is reading agreement with noisy labels as the model's error. Of the 100 held-out pairs, 64 have hidden scores that differ and 36 are ties whose label was a coin flip. A reward model that ranks every differing pair correctly agrees with the label on those 64 only as often as the label itself was right, 0.904, and on the 36 ties half the time: 64 × 0.904 + 36 × 0.5 = 57.9 + 18 = 75.9, so a perfect ranker scores about 0.76 against these labels, and the lab's 0.770 is that ceiling, not a shortfall. More pairs help only if they are the missing check: labels on answers sampled from the writer being tuned.
+The wrong turn is reading agreement with noisy labels as the model's error. Of the 100 held-out pairs, 64 have hidden scores that differ and 36 are ties whose label was a coin flip. A reward model that ranks every differing pair correctly agrees with the label on those 64 only as often as the label itself was right, 0.904, and on the 36 ties half the time: 64 × 0.904 + 36 × 0.5 = 57.9 + 18 = 75.9, so a perfect ranker scores about 0.76 against these labels, and the lab's 0.770 sits at that ceiling, within the noise of 100 pairs, not a shortfall. More pairs help only if they are the missing check: labels on answers sampled from the writer being tuned.
 
 </details>
 

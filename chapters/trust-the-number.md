@@ -60,7 +60,7 @@ The best of twelve reports 0.903 on average and is still 0.880 on photos it was 
 
 </details>
 
-## The second lie: right 94% of the time by never flagging
+## The second lie: right 95% of the time by never flagging
 
 The split is fixed and the number is honest about new products. It is still silent about the one row the rule exists for. Blades are 5% of listings, so a flagger that never flags answers "does this listing need an age check?" correctly 95% of the time, and on the lab's validation photos, where blades happen to be 6.2%, it scores 0.938. Overall accuracy averages away the rare category; report each category's **recall**, the fraction of true blades the model called blades. The imbalance comes from the shop's mix, not from the method: on a public dataset of cell images with equal numbers of infected and uninfected cells, a model that never says "infected" scores 50%.
 
@@ -110,7 +110,7 @@ x is the photo, T a transform and y the label, unchanged on both sides of the ar
 
 ## The third lie: the model was deciding who gets checked
 
-The rare row now has a number of its own, and it is low. The third lie is about who chose it. The classifier's last layer produces a score per category, and a softmax turns them into four numbers that add up to one; showing the most likely category is the default, and it flags a blade only when the blade score beats the other three, which on these photos is rare. "Flag for an age check" is a separate decision on one of the four numbers: flag when the blade score is at least a **threshold** t, and the threshold is the shop's to choose.
+The rare row now has a number of its own, and it is low. The third lie is about who chose it. The classifier's last layer produces a score per category, chapter 1's logits, and a softmax turns them into four numbers that add up to one; the **blade score** from here on is the blade's one of those four, a probability, not a logit. Showing the most likely category is the default, and it flags a blade only when the blade score beats the other three, which on these photos is rare. "Flag for an age check" is a separate decision on one of the four numbers: flag when the blade score is at least a **threshold** t, and the threshold is the shop's to choose.
 
 The two mistakes cost different amounts. A false flag sends a harmless listing to a reviewer, say 2 per check; a missed blade is a blade sold without an age check, say 20. Both prices are invented here, and in a real shop somebody in operations or compliance has to name them; until then the threshold is a guess. With them it is a calculation. Ten listings, sorted by blade score, four of them blades:
 
@@ -177,6 +177,6 @@ The instinct is right that 337 false flags is a real cost and that a price of 2 
 
 The lab, [split, weight, threshold, then score the release](../labs/trust-the-number.md), opens with the input pipeline, why a training run waits on the JPEG decoder and how many loading processes it takes, then runs the chapter's numbers on the synthetic catalogue in about ten seconds. It should print 0.994 for held-out photos with a sibling in training, 0.924 against 0.878 for the two splits, 0.938 for never flagging, the sweep choosing 0.02 per photo and 0.05 per listing, and a release line of `blades caught 13 of 19`. Two variations follow: a horizontal flip, and a missed blade priced at 5.
 
-The shop's next classifier job arrives with a new supplier: a garden range, photographed under different lighting, with a few hundred labelled photos. Chapter 3 starts from a model somebody else trained, freezes it, trains a new head on top, and watches the frozen part change anyway.
+The shop's next classifier job arrives with a new supplier: a garden range, photographed under different lighting, with a few hundred labelled photos. Chapter 3 starts from a model somebody else trained, freezes it, trains a new head on top, and watches the frozen part change anyway. Then it asks the same question of the answer writer, about three billion weights that the shop cannot train whole, and the answer there is a small diff trained beside weights that never move.
 
 *Sources: Deep Learning Masterclass with TensorFlow 2 (Neuralearn.ai, Udemy), lectures 3.9, 3.11, 4.3, 6.2, 6.3, 6.4, 7.4, 8.5, 11.4, 11.5 and 15.2; AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents (Ed Donner, Udemy), lectures 4.4 and 7.20; all paraphrased as study material. Chip Huyen, Designing Machine Learning Systems, early release, pp. 116, 120–133, 163–166 and 223 (physical); Daniel Vaughan, Data Science: The Hard Parts, pp. 139–143 (physical); Aurélien Géron, Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 146–151, 367 and 468–469 (physical); Yuan Tang, Distributed Machine Learning Patterns, pp. 29 and 59–60; the PyTorch 2.14 documentation and source for CrossEntropyLoss and DataLoader.*

@@ -103,7 +103,7 @@ for product in PRODUCTS:
                 demonstrations.append([product, ":"] + a + b)
 
 class Writer(nn.Module):
-    """Chapter 3's writer (q, k, v, o) with a small feed-forward layer added."""
+    """Chapter 1's block with the output projection (q, k, v, o) and a small feed-forward layer added."""
     def __init__(self, dim=32, max_len=12):
         super().__init__()
         self.tok, self.pos = nn.Embedding(len(vocab), dim), nn.Embedding(max_len, dim)
@@ -244,7 +244,7 @@ What each part does in real reinforcement-learning and preference-tuning code:
 - **The clip check** calls `ppo_loss` on one sample per row of the chapter's table and prints the loss and its slope with respect to the current log-probability.
 - **The corridor policy** is a table of two scores per cell. Each round collects 16 episodes, turns returns into advantages by normalising over the batch, stores the old log-probabilities under `torch.no_grad()`, and reuses the batch for 4 epochs.
 - **`hidden_score`** stands in for people and is used only to label pairs and to report; the policy's optimization uses the learned reward model and the reference penalty instead. **`demonstrations`** are the 48 curated answers.
-- **`Writer`** is chapter 3's block plus a feed-forward layer, trained from random weights on the demonstrations with chapter 1's next-token cross-entropy. **`reference`** is its frozen copy and **`start_state`** lets every tuning run start from the same writer.
+- **`Writer`** is chapter 1's block with the output projection plus a feed-forward layer, trained from random weights on the demonstrations with chapter 1's next-token cross-entropy. **`reference`** is its frozen copy and **`start_state`** lets every tuning run start from the same writer.
 - **`sample`** generates at temperature 1 up to `MAX_NEW` tokens; **`token_logps`** returns the log-probability of every generated token and a mask over them, the per-token numbers PPO and the KL penalty need.
 - **The pair loop** samples two answers per product from the fine-tuned writer and labels them with probability σ(2 × score difference), counting how often the label agrees with the hidden score.
 - **`RewardModel`** sums one learned weight per word. It trains on 500 pairs with `-F.logsigmoid(r_w - r_l)`, the chapter's loss, and is scored on the other 100, both against the labels and against the hidden order.

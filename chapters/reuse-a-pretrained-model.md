@@ -1,12 +1,12 @@
 # Reuse a Pretrained Model
 
-Chapter 2's classifier learned its categories from 10,000 labelled photos. A new supplier brings a garden range, photographed under different lighting, and the shop has a few hundred labelled photos of it: not enough to train from zero, enough to adapt a model somebody else trained on far more. The standard move is to download a pretrained backbone, set `requires_grad = False` on every one of its weights, and train a new output layer on top. Nothing in the backbone has a gradient. Yet in the worked run below, one fixed input goes into one frozen layer and the output slides 1.600 → 1.550 → 1.242 → 1.004 as training batches pass, and in the lab the old head that reads the same backbone falls from 0.981 to 0.952 on the categories it was trained for. A frozen backbone became a different function under an unchanged weights file. What did the freeze not freeze?
+Chapter 2's classifier learned its categories from 8,000 labelled photos. A new supplier brings a garden range, photographed under different lighting, and the shop has a few hundred labelled photos of it: not enough to train from zero, enough to adapt a model somebody else trained on far more. The standard move is to download a pretrained backbone, set `requires_grad = False` on every one of its weights, and train a new output layer on top. Nothing in the backbone has a gradient. Yet in the worked run below, one fixed input goes into one frozen layer and the output slides 1.600 → 1.550 → 1.242 → 1.004 as training batches pass, and in the lab the old head that reads the same backbone falls from 0.981 to 0.952 on the categories it was trained for. A frozen backbone became a different function under an unchanged weights file. What did the freeze not freeze?
 
 The chapter first says what the checkpoint hands you and what a freeze promises, then finds the state that `requires_grad` leaves loose and measures three ways of freezing against each other. That answer then goes into the frame the shop needs: how much of a pretrained model to let change, from a new head on frozen weights, through a slow thaw, to a small diff trained beside weights that never move, which is what the answer writer needs at a size where nothing can move at all. The runs are synthetic and small enough to recompute.
 
 ## What the checkpoint hands you, and what the freeze promises
 
-A pretrained image network splits into two parts. The **backbone** runs from the input to the last pooled feature vector: one list of numbers per photo, computed by layers that learned edges, textures and shapes on a large photo collection. The **head** is the small layer on top that turns that vector into scores for the original task's classes. Those classes are not the shop's, so the head is replaced and the backbone is kept. In code it is a download and one assignment:
+A pretrained image network splits into two parts. The **backbone** runs from the input to the last pooled feature vector: one list of numbers per photo, computed by layers that learned edges, textures and shapes on a large photo collection. The **head** is the small layer on top that turns that vector into scores for the original task's classes. Those classes are not the shop's, so the head is replaced and the backbone is kept. Two words shift meaning here: the **checkpoint** is the downloaded file, not chapter 2's snapshots of your own run to choose among; and the head is one layer, where chapter 2's lab called its two summed output layers heads. In code it is a download and one assignment:
 
 ```python
 # illustrative, not executed (torchvision is not installed here); API as of the time of writing
@@ -75,7 +75,7 @@ Re-estimated statistics can be a form of adaptation; here they cost the old task
 
 ## How much of the model to let change
 
-Stage one now carries a condition: the freeze keeps its promise only while the BatchNorm layers stay in evaluation mode. It is also only the first of three answers to one question, how much of the pretrained model to let change. The garden classifier has more labels than a frozen backbone can use, and the answer writer has a job no new head can do.
+Stage one now carries a condition: the freeze keeps its promise only while the BatchNorm layers stay in evaluation mode. It is also only the first of the answers to one question, how much of the pretrained model to let change. The garden classifier has more labels than a frozen backbone can use, and the answer writer has a job no new head can do.
 
 | Situation | Change | Why |
 |---|---|---|
@@ -104,7 +104,7 @@ On one photo task, thawing at the unchanged learning rate dropped validation acc
 
 </details>
 
-**The third row is the answer writer's.** The shop needs answers in its own format, `kettle : boils water fast : in stock`, and chapter 1's writer produces ordinary sentences. The writer is a language model with about three billion weights; holding it on an accelerator at 32 bits takes about 13 GB before training starts, and a full fine-tune needs the weight, its gradient and Adam's two running averages: 16 bytes a weight, 48 GB for three billion, before the activations saved for the backward pass. A new head does not help, because the format of an answer is produced by the whole stack, not by the last layer. The way out is to keep every weight frozen, as in stage one, and train something much smaller beside it.
+**The third row is the answer writer's.** The shop needs answers in its own format, `kettle : boils water fast : in stock`, and chapter 1's writer produces ordinary sentences. The writer is a language model with about three billion weights; holding it on an accelerator at 32 bits takes about 12 GB before training starts, and a full fine-tune needs the weight, its gradient and Adam's two running averages: 16 bytes a weight, 48 GB for three billion, before the activations saved for the backward pass. A new head does not help, because the format of an answer is produced by the whole stack, not by the last layer. The way out is to keep every weight frozen, as in stage one, and train something much smaller beside it.
 
 <details>
 <summary>Optional: the 48 GB, row by row, and what an adapter removes</summary>
@@ -219,11 +219,11 @@ model.print_trainable_parameters()            # 18,350,080 for this model: 655,3
 
 ## Where it stops
 
-Rank is a ceiling. If the change the task needs spans more independent directions than r, the adapter fits what it can and stops, which is the gap between 0.8303 and 0.3883 above. Raising r raises the ceiling and the file size together; target modules, r and α are settings, chosen on validation.
+Rank is a ceiling. If the change the task needs spans more independent directions than r, the adapter fits what it can and stops. Raising r raises the ceiling and the file size together; target modules, r and α are settings, chosen on validation.
 
 The adapter does not protect the old behaviour while it is plugged in. With the rank-4 adapter attached, the writer's loss on its original sentences is 12.50, worse than the full fine-tune's 5.44: both runs were trained only on the new format, and nothing asked either to keep the old one. What LoRA guarantees is narrower: the base weights are never edited, so removing the adapter restores the original model exactly, and one base can serve several tasks. If the old behaviour must survive in the same model, it has to be in the training data and in the evaluation.
 
-The runs show the mechanics, not a release choice. Every row of the choice table ends where chapter 2 did, with the old task and the new task measured on held-out products, chosen on validation, the test scored once. A language-model project also measures peak memory at the batch size and sequence length it will train with, because the activations are not in the adapter's budget.
+The runs show the mechanics, not a release choice. Every row of the choice table ends where chapter 2 did, with the old task and the new task measured on held-out products, chosen on validation, the test scored once.
 
 ## Two questions to work
 

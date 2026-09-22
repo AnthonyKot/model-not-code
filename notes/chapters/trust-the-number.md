@@ -85,3 +85,7 @@ scrolls, no page overflow.
 **Not done.** The author's read; chapters 4–8.
 
 **Author, 2026-09-22 (provisional):** OK, 7 of 10, given in chat as an assumption rather than a line-by-line read; no changes requested. Chapters 4–8 proceed on the same pattern.
+
+### Cross-read repairs — 2026-09-22 (pair reviews 1+2 and 2+3)
+
+Two independent read-only reviewers (chapters 1+2, 2+3) reported: the lab's setup opener "Every section so far ends in 'train again and compare'" had no antecedent after the move and contradicted the third beat (the threshold costs no run); the second-lie heading said 94% (the lab's 0.938 rounded) where the body leads with 95%; "score" meant the logit in chapter 1 and the softmax output here. Applied: the lab's opener now says the first two lies were answered by training again and the third by a threshold that costs no run; the heading says 95%; the third-lie paragraph names the last layer's scores as chapter 1's logits and defines the **blade score** as the blade's softmax probability. The bridge gained one sentence previewing chapter 3's writer half (about three billion weights, a small diff beside frozen weights), which the 2+3 reviewer found unpreviewed. No number changed; path 2486, folds 24.2%.

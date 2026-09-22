@@ -95,7 +95,7 @@
     </header>
     <article class="prose"><p>The lab for chapter 2, <a href="../chapters/trust-the-number.html">Trust the Number Before You Ship the Classifier</a>. It builds the synthetic catalogue, trains the same small network under both splits and with a class weight, chooses the blade threshold on validation, scores the release per listing, and measures the input pipeline the setup section below describes.</p>
 <h2 id="before-you-run-it-the-gpu-waits-on-the-jpeg-decoder">Before you run it: the GPU waits on the JPEG decoder</h2>
-<p>Every section so far ends in &quot;train again and compare&quot;, so how fast one training run goes decides how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.</p>
+<p>The chapter answered its first two lies by training again and comparing, and its third with a threshold that costs no run at all; when the answer is a run, how fast one goes sets how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.</p>
 <p>When that CPU work is slower than the training step, the accelerator sits idle between batches, and the fix is more loading processes, <code>DataLoader(num_workers=…)</code> in PyTorch, until loading stops being the slower side. Measure the two sides before buying a faster accelerator: if loading is the bottleneck, the new accelerator waits just as long.</p>
 <details>
 <summary>Optional: forecast the step time and tune the loader</summary>

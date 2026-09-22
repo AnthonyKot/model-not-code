@@ -4,7 +4,7 @@ The lab for chapter 2, [Trust the Number Before You Ship the Classifier](../chap
 
 ## Before you run it: the GPU waits on the JPEG decoder
 
-Every section so far ends in "train again and compare", so how fast one training run goes decides how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.
+The chapter answered its first two lies by training again and comparing, and its third with a threshold that costs no run at all; when the answer is a run, how fast one goes sets how many honest comparisons you can afford. Real product photos arrive as JPEG files that have to be read, decoded, resized and augmented on the CPU before the accelerator sees a tensor.
 
 When that CPU work is slower than the training step, the accelerator sits idle between batches, and the fix is more loading processes, `DataLoader(num_workers=…)` in PyTorch, until loading stops being the slower side. Measure the two sides before buying a faster accelerator: if loading is the bottleneck, the new accelerator waits just as long.
 
