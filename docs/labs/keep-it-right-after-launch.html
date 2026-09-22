@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The lab for chapter 5, Keep It Right After Launch: ten weeks of a live classifier, then your call.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Lab: ten weeks of a live classifier, then your call">
+  <meta property="og:description" content="The lab for chapter 5, Keep It Right After Launch: ten weeks of a live classifier, then your call.">
+  <meta property="og:type" content="website">
+  <title>Lab: ten weeks of a live classifier, then your call · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script defer src="../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="keep-it-right-after-launch">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 8 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 8 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <nav aria-label="Book contents">
+    <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
+      <span class="book-nav__number">01</span>
+      <span>Search the Catalogue, Then Answer From It</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
+      <span class="book-nav__number">02</span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
+      <span class="book-nav__number">03</span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
+      <span class="book-nav__number">04</span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../chapters/keep-it-right-after-launch.html" data-mission-link="keep-it-right-after-launch">
+      <span class="book-nav__number">05</span>
+      <span>Keep It Right After Launch</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/build-the-assistant.html" data-mission-link="build-the-assistant">
+      <span class="book-nav__number">06</span>
+      <span>Build the Assistant</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/serve-the-assistant-cheaply.html" data-mission-link="serve-the-assistant-cheaply">
+      <span class="book-nav__number">07</span>
+      <span>Serve the Assistant Cheaply</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/did-the-shop-need-a-model.html" data-mission-link="did-the-shop-need-a-model">
+      <span class="book-nav__number">08</span>
+      <span>Did the Shop Need a Model?</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page lab-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>05</span>Lab · <a href="../chapters/keep-it-right-after-launch.html">Chapter 5, Keep It Right After Launch</a></div>
+      <h1 class="essay-title">ten weeks of a live classifier, then your call</h1>
+      <p class="essay-payoff">Runs on a laptop CPU. The expected output is printed below the code; mark the exercise complete when yours matches.</p>
+    </header>
+    <article class="prose"><p>The lab for chapter 5, <a href="../chapters/keep-it-right-after-launch.html">Keep It Right After Launch</a>. It trains chapter 2&#39;s classifier and its alarm, saves and reloads the release bundle, runs the ten weeks with the banner and the folding knives, tests the two explanations with the audit, retrains on the shop&#39;s labels and gates the result in shadow, then hands you another quarter&#39;s report to decide on.</p>
+<section class="mission" data-mission="keep-it-right-after-launch"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-ten-weeks-of-a-live-classifier-then-your-call">Exercise: ten weeks of a live classifier, then your call</h2>
+<p>The script trains chapter 2&#39;s classifier and its alarm, saves and reloads the release bundle, runs ten weeks with the banner and the folding knives, tests the two explanations with the audit, retrains on the shop&#39;s labels and gates the result in shadow. It writes <code>release.pt</code> to the current directory, needs PyTorch on a CPU and runs in about eight seconds. After it, a report from another quarter waits for your decision.</p>
+<pre><code class="language-python">import copy
+import math
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+S, WEEK = 12, 1000                                        # 12 x 12 photos; 1,000 new listings a week
+CATS = [&quot;cable&quot;, &quot;kettle&quot;, &quot;lamp&quot;, &quot;blade&quot;]
+FLAG_COST, MISS_COST = 2.0, 20.0                          # chapter 2&#39;s prices: a false flag, a missed blade
+AUDIT_RATE, AUDIT_COST = 0.10, 3.0                        # audit 10% of unflagged listings at 3 each (synthetic)
+SHARE = torch.tensor([0.50, 0.30, 0.15, 0.05])
+SHAPES = torch.tensor([[[0, 0, 0], [1, 1, 1], [0, 0, 0]],   # cable
+                       [[0, 1, 0], [0, 1, 0], [0, 1, 0]],   # kettle
+                       [[0, 0, 1], [0, 1, 0], [1, 0, 0]],   # lamp
+                       [[1, 0, 0], [0, 1, 0], [0, 0, 1]]]).float()  # blade
+FOLDED = torch.tensor([[0, 0, 0], [1, 1, 0], [0, 0, 0]]).float()    # a folding knife, photographed closed
+
+def listings(n, gen, banner=False, folding=0.0):
+    &quot;&quot;&quot;n listings of four photos each, as in chapter 2; optionally a sales banner or folding knives.&quot;&quot;&quot;
+    cat = torch.multinomial(SHARE, n, replacement=True, generator=gen)
+    look = 1.5 * torch.randn(n, S, S, generator=gen)
+    look[:, 2:-2, 2:-2] = 0                               # background and packaging around the border
+    shape = SHAPES[cat].clone()
+    folded = (cat == 3) &amp; (torch.rand(n, generator=gen) &lt; folding)
+    shape[folded] = FOLDED
+    x = look.repeat_interleave(4, 0) + 0.5 * torch.randn(4 * n, S, S, generator=gen)
+    for i in range(4 * n):
+        r, c = torch.randint(2, S - 4, (2,), generator=gen).tolist()
+        x[i, r:r + 3, c:c + 3] += 1.8 * shape[i // 4]
+    if banner:
+        x[:, S - 1, :] += 2.0                             # a bright strip along the bottom edge
+    return x[:, None], cat, folded
+
+class Net(nn.Module):                                     # chapter 2&#39;s classifier
+    def __init__(self):
+        super().__init__()
+        self.conv = nn.Conv2d(1, 16, 3, padding=1)
+        self.shape = nn.Linear(16, 4)
+        self.layout = nn.Linear(16 * S * S, 4)
+    def forward(self, x):
+        h = F.relu(self.conv(x))
+        return self.shape(h.amax(dim=(2, 3))) + self.layout(h.flatten(1))
+
+def fit(model, x, y, epochs, lr, loss_fn):
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    for _ in range(epochs):
+        for idx in torch.randperm(len(x)).split(64):
+            opt.zero_grad(); loss_fn(model(x[idx]), y[idx]).backward(); opt.step()
+    return model
+
+def blade_score(model, x):                                # mean of the four photos&#39; softmax, per listing
+    with torch.no_grad():
+        return F.softmax(model(x), dim=1).view(-1, 4, 4).mean(1)[:, 3]
+
+def surprise(ae, x):                                      # reconstruction error, averaged over a listing&#39;s photos
+    with torch.no_grad():
+        return ((ae(x) - x.flatten(1)) ** 2).mean(1).view(-1, 4).mean(1)
+
+def cost(flag, blade):                                    # per listing: 2 for a false flag, 20 for a miss
+    return FLAG_COST * (flag &amp; ~blade) + MISS_COST * (~flag &amp; blade)
+
+if __name__ == &quot;__main__&quot;:
+    # ---------- Part 1: the release, saved as one bundle ----------
+    gen = torch.Generator().manual_seed(0)
+    torch.manual_seed(1)
+    x, cat, _ = listings(2500, gen)
+    train_rows = torch.arange(10000) &gt;= 2000               # the first 500 listings are validation
+    y = cat.repeat_interleave(4)
+    net = fit(Net(), x[train_rows], y[train_rows], 8, 3e-3, nn.CrossEntropyLoss())
+    val_score, val_blade = blade_score(net, x[~train_rows]), cat[:500] == 3
+    grid = [0.5, 0.2, 0.1, 0.05, 0.02, 0.01]
+    threshold = min(grid, key=lambda t: cost(val_score &gt;= t, val_blade).sum().item())
+    ae = nn.Sequential(nn.Flatten(), nn.Linear(S * S, 16), nn.ReLU(), nn.Linear(16, S * S))
+    fit(ae, x[train_rows], x[train_rows].flatten(1), 10, 3e-3, nn.MSELoss())   # no labels: the target is the photo
+    alarm_level = torch.quantile(surprise(ae, x[~train_rows]), 0.99).item()
+    bundle = {&quot;version&quot;: &quot;classifier-2026-09-01&quot;, &quot;categories&quot;: CATS, &quot;classifier&quot;: net.state_dict(),
+              &quot;blade_threshold&quot;: threshold, &quot;autoencoder&quot;: ae.state_dict(), &quot;alarm_level&quot;: alarm_level}
+    torch.save(bundle, &quot;release.pt&quot;)
+    loaded = torch.load(&quot;release.pt&quot;)
+    live = Net(); live.load_state_dict(loaded[&quot;classifier&quot;])
+    T = loaded[&quot;blade_threshold&quot;]
+    same = torch.equal(blade_score(live, x[~train_rows]) &gt;= T, val_score &gt;= threshold)
+    print(f&quot;release {loaded[&#39;version&#39;]}: blade threshold {T}, alarm level {alarm_level:.3f}, reloaded flags identical: {same}&quot;)
+
+    # ---------- Part 2: ten weeks after launch ----------
+    history = []
+    print(&quot;week  alarm  flags  confirmed  precision  audited  found | true blades  missed  recall  cost&quot;)
+    for week in range(1, 11):
+        xw, cw, _ = listings(WEEK, gen, banner=week &gt;= 3, folding=0.5 if week &gt;= 6 else 0.0)
+        flag, blade = blade_score(live, xw) &gt;= T, cw == 3
+        audit = ~flag &amp; (torch.rand(WEEK, generator=gen) &lt; AUDIT_RATE)
+        alarm = (surprise(ae, xw) &gt; alarm_level).float().mean().item()
+        conf, found = (flag &amp; blade).sum().item(), (audit &amp; blade).sum().item()
+        print(f&quot;{week:4d}  {alarm:5.3f}  {flag.sum().item():5d}  {conf:9d}  {conf / flag.sum().item():9.2f}  {audit.sum().item():7d}  &quot;
+              f&quot;{found:5d} | {blade.sum().item():11d}  {(~flag &amp; blade).sum().item():6d}  {conf / blade.sum().item():6.2f}  {cost(flag, blade).sum().item():4.0f}&quot;)
+        history.append((xw, cw, flag, audit))
+
+    # ---------- Part 3: fewer blades listed, or more blades missed? ----------
+    def pooled(weeks):
+        hs = [history[w - 1] for w in weeks]
+        return (sum((h[2] &amp; (h[1] == 3)).sum().item() for h in hs), sum((h[3] &amp; (h[1] == 3)).sum().item() for h in hs),
+                sum(h[3].sum().item() for h in hs), sum((~h[2]).sum().item() for h in hs))
+    conf_a, found_a, aud_a, unflag_a = pooled(range(1, 6))
+    conf_b, found_b, aud_b, unflag_b = pooled(range(6, 11))
+    miss_rate = found_a / aud_a                            # blades per unflagged listing, weeks 1-5
+    fewer = miss_rate * (conf_b / conf_a) * aud_b          # blades listed fell, recall unchanged
+    recall_a = conf_a / (conf_a + miss_rate * unflag_a)
+    missed = (conf_a / recall_a - conf_b) / unflag_b * aud_b   # blades listed unchanged, the rest were missed
+    poisson_le = lambda k, m: sum(math.exp(-m) * m ** i / math.factorial(i) for i in range(k + 1))
+    print(f&quot;weeks 1-5: confirmed {conf_a}, audit found {found_a} in {aud_a}; weeks 6-10: confirmed {conf_b}, audit found {found_b} in {aud_b}&quot;)
+    print(f&quot;expected finds, weeks 6-10: {fewer:.1f} if fewer blades were listed, {missed:.1f} if more were missed&quot;)
+    print(f&quot;P(finds &gt;= {found_b} | {fewer:.1f}) = {1 - poisson_le(found_b - 1, fewer):.3f}   P(finds &lt;= {found_b} | {missed:.1f}) = {poisson_le(found_b, missed):.3f}&quot;)
+
+    # ---------- Part 4: retrain on the labels the shop has, then gate the candidate ----------
+    xs = torch.cat([h[0] for h in history]); cs = torch.cat([h[1] for h in history])
+    fs = torch.cat([h[2] for h in history]); au = torch.cat([h[3] for h in history])
+    with torch.no_grad():
+        shown = F.softmax(live(xs), dim=1).view(-1, 4, 4).mean(1).argmax(1)   # the category the shop displayed
+    presumed = torch.where(shown == 3, torch.zeros_like(shown), shown)     # unflagged, so presumed not a blade
+    labels = torch.where(fs | au, cs, presumed)                            # reviewed or audited: the true category
+    torch.manual_seed(1)
+    candidate = fit(copy.deepcopy(live), torch.cat([x[train_rows], xs]), torch.cat([y[train_rows], labels.repeat_interleave(4)]),
+                    3, 1e-3, nn.CrossEntropyLoss())
+    xg, cg, knife = listings(2 * WEEK, gen, banner=True, folding=0.5)   # two shadow weeks: both models score every listing
+    blade = cg == 3
+    f_live, f_cand = blade_score(live, xg) &gt;= T, blade_score(candidate, xg) &gt;= T
+    reviewed = f_live | f_cand                               # a reviewer checks anything either model flags
+    audit = ~reviewed &amp; (torch.rand(2 * WEEK, generator=gen) &lt; AUDIT_RATE)
+    diff = cost(f_cand, blade) - cost(f_live, blade)         # zero wherever neither model flags
+    print(f&quot;shadow: reviewed {reviewed.sum().item()}, the models disagree on {(f_live ^ f_cand).sum().item()}; &quot;
+          f&quot;candidate minus live cost {diff.sum().item():.0f} ± {diff.std().item() * math.sqrt(2 * WEEK):.0f}&quot;)
+    unseen = (audit &amp; blade).sum().item() / AUDIT_RATE      # estimated blades that neither model flagged
+    for name, f in ((&quot;live&quot;, f_live), (&quot;candidate&quot;, f_cand)):
+        caught, other = (f &amp; blade).sum().item(), (reviewed &amp; ~f &amp; blade).sum().item()
+        print(f&quot;{name:9s}: estimated recall {caught / (caught + other + unseen):.3f} (true {caught / blade.sum().item():.3f}); &quot;
+              f&quot;folding knives caught {(f &amp; knife).sum().item()} of {knife.sum().item()}&quot;)
+    print(f&quot;audit: {audit.sum().item()} listings, {(audit &amp; blade).sum().item()} blades, cost {AUDIT_COST * audit.sum().item():.0f}; &quot;
+          f&quot;shadow review of candidate-only flags: {(f_cand &amp; ~f_live).sum().item()}&quot;)
+</code></pre>
+<p>What each part does in real monitoring code:</p>
+<ul>
+<li><strong><code>listings</code></strong> is chapter 2&#39;s photo generator with two switches. <code>banner</code> adds a bright strip to the bottom row of every photo; <code>folding</code> replaces a share of blade shapes with a partial diagonal and returns which listings those were, so the simulation can report what no reviewer would know in advance.</li>
+<li><strong>Part 1</strong> trains the classifier, chooses the threshold on validation listings with chapter 2&#39;s prices, trains the autoencoder with <code>nn.MSELoss()</code> against the photos themselves, and puts the alarm level at the 99th percentile of validation surprise. Everything a prediction and its alarm depend on goes into one dictionary; <code>torch.load</code> reads it back with its default <code>weights_only=True</code>, and <code>torch.equal</code> confirms the reloaded model flags the same listings.</li>
+<li><strong>Part 2</strong> is the weekly job. <code>blade_score(live, xw) &gt;= T</code> is the decision; <code>audit</code> draws a random 10% of the unflagged listings; the alarm share is the fraction of listings whose surprise exceeds the saved level. Everything left of the <code>|</code> in the printout is known to the shop that week; the columns to its right use <code>cw</code>, the true categories, which only the simulation has.</li>
+<li><strong>Part 3</strong> pools weeks 1–5 and 6–10 and computes the two expected audit counts and their Poisson probabilities exactly as the chapter&#39;s table does.</li>
+<li><strong>Part 4</strong> builds the training labels the shop would have: <code>torch.where(fs | au, cs, presumed)</code> keeps true categories for reviewed and audited listings and the displayed category, with blade replaced by cable, for the rest. <code>fit(copy.deepcopy(live), ...)</code> fine-tunes a copy, so the live model is untouched. The shadow section scores two weeks with both models, reviews anything either flags, audits a random 10% of the rest, and computes Δ with its standard error and the audit-based recall estimate for each model.</li>
+</ul>
+<p><strong>Expected result</strong>, deterministic on a CPU:</p>
+<pre><code>release classifier-2026-09-01: blade threshold 0.05, alarm level 1.820, reloaded flags identical: True
+week  alarm  flags  confirmed  precision  audited  found | true blades  missed  recall  cost
+   1  0.005    142         36       0.25       78      1 |          46      10    0.78   412
+   2  0.004    138         32       0.23      106      0 |          39       7    0.82   352
+   3  0.150    164         54       0.33       99      2 |          67      13    0.81   480
+   4  0.168    139         43       0.31       83      1 |          56      13    0.77   452
+   5  0.155    138         41       0.30       90      1 |          57      16    0.72   514
+   6  0.155    115         26       0.23       93      4 |          51      25    0.51   678
+   7  0.156    126         17       0.13       81      1 |          34      17    0.50   558
+   8  0.140    127         16       0.13       98      2 |          48      32    0.33   862
+   9  0.143    135         17       0.13       83      2 |          43      26    0.40   756
+  10  0.138    137         31       0.23       92      4 |          53      22    0.58   652
+weeks 1-5: confirmed 206, audit found 5 in 456; weeks 6-10: confirmed 107, audit found 13 in 447
+expected finds, weeks 6-10: 2.5 if fewer blades were listed, 15.0 if more were missed
+P(finds &gt;= 13 | 2.5) = 0.000   P(finds &lt;= 13 | 15.0) = 0.367
+shadow: reviewed 317, the models disagree on 190; candidate minus live cost -414 ± 107
+live     : estimated recall 0.550 (true 0.484); folding knives caught 14 of 62
+candidate: estimated recall 0.651 (true 0.573); folding knives caught 10 of 62
+audit: 167 listings, 3 blades, cost 501; shadow review of candidate-only flags: 52
+</code></pre>
+<p>Read it against the chapter. The first line is the release from chapter 2, with the same threshold. The alarm column jumps at week 3 and ignores week 6; the confirmed and precision columns drop at week 6 and the true recall column says why. The audit line decides between the two explanations, and the last three lines are the gate: cheaper by about four standard errors, below the recall floor, and worse on folding knives than the model it would replace.</p>
+<p>Two things to try. First, set <code>AUDIT_RATE</code> to <code>0.03</code>: the weeks are the same, the audit finds 1 blade in 128 and then 3 in 145, the expected counts become 0.6 and 4.4 with probabilities 0.022 and 0.359, and in the shadow weeks 66 audited listings contain no blade, so the recall estimates jump to 0.769 and 0.910 while the truth stays at 0.484 and 0.573. A cheaper audit does not just blur the answer; it makes the floor look passed. Second, replace <code>labels = torch.where(fs | au, cs, presumed)</code> with <code>labels = cs</code>, as if every launch week had been labelled: the candidate catches 30 of 62 folding knives, its estimated recall is 0.793 (true 0.742), and the cost difference is −616 ± 130.</p>
+<h3 id="your-call-the-same-release-in-another-quarter">Your call: the same release in another quarter</h3>
+<p>The same bundle is live in another quarter: same threshold, same alarm level, the sales banner in every photo since week 3, and the audit at 10% of unflagged listings for 3 each. This is the report the shop sees. The last column counts the extra listings that would have been flagged if the threshold had been 0.02, which the shop can compute from the logged scores; it is there so the proposal can be priced.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table; scroll horizontally if needed" tabindex="0"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Alarm share</th>
+<th>Flags</th>
+<th>Confirmed blades</th>
+<th>Precision</th>
+<th>Audited</th>
+<th>Blades found</th>
+<th>Unflagged</th>
+<th>Extra flags at 0.02</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0.004</td>
+<td>144</td>
+<td>44</td>
+<td>0.31</td>
+<td>70</td>
+<td>2</td>
+<td>856</td>
+<td>102</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.004</td>
+<td>146</td>
+<td>40</td>
+<td>0.27</td>
+<td>85</td>
+<td>1</td>
+<td>854</td>
+<td>90</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.169</td>
+<td>163</td>
+<td>41</td>
+<td>0.25</td>
+<td>81</td>
+<td>2</td>
+<td>837</td>
+<td>76</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.138</td>
+<td>137</td>
+<td>41</td>
+<td>0.30</td>
+<td>84</td>
+<td>0</td>
+<td>863</td>
+<td>71</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.130</td>
+<td>123</td>
+<td>40</td>
+<td>0.33</td>
+<td>83</td>
+<td>1</td>
+<td>877</td>
+<td>86</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0.173</td>
+<td>114</td>
+<td>12</td>
+<td>0.11</td>
+<td>93</td>
+<td>1</td>
+<td>886</td>
+<td>80</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0.152</td>
+<td>130</td>
+<td>14</td>
+<td>0.11</td>
+<td>85</td>
+<td>1</td>
+<td>870</td>
+<td>85</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0.161</td>
+<td>117</td>
+<td>18</td>
+<td>0.15</td>
+<td>86</td>
+<td>0</td>
+<td>883</td>
+<td>94</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0.142</td>
+<td>108</td>
+<td>16</td>
+<td>0.15</td>
+<td>75</td>
+<td>1</td>
+<td>892</td>
+<td>92</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.146</td>
+<td>117</td>
+<td>17</td>
+<td>0.15</td>
+<td>81</td>
+<td>0</td>
+<td>883</td>
+<td>75</td>
+</tr>
+</tbody></table>
+</div><p class="table-hint">Scroll the table sideways to see all columns.</p><p>In weeks 6 to 10 the audit also checked 37 listings whose blade score was between 0.02 and 0.05; 1 of them was a blade. The analytics team proposes lowering the threshold to 0.02 from next week &quot;to win back the confirmed blades&quot;.</p>
+<p>Write down, before opening the discussion below:</p>
+<ol>
+<li>Whether the blade flag&#39;s quality has changed enough to justify any action. Confirmed blades fell; say which explanation of that fall the audit supports, how strongly, and the numbers behind it.</li>
+<li>What you would do next week: for example keep everything, lower the threshold, retrain, roll back, or change the audit, or something else. &quot;Keep the live model and gather more evidence&quot; is an acceptable answer if you say what evidence and what it costs.</li>
+<li>One option you rejected, and why.</li>
+<li>What you would need to see in the next two weeks to change your decision.</li>
+</ol>
+<p>A sound answer uses the audit to judge the missed blades rather than the confirmed count alone, prices both sides of any threshold change in the chapter&#39;s units, and does not treat the alarm share as evidence about the flag either way. Arriving at a defensible action by a diagnosis the numbers do not support is not a pass.</p>
+<details>
+<summary>Hints, if you are stuck</summary>
+
+<p>The report has the same shape as the ten weeks in the chapter: the alarm has been up since the banner, and confirmed blades and precision fall together from week 6. Use the table from &quot;Two explanations fit the reviewers, and the audit picks one&quot; with this report&#39;s counts. For the threshold, compare the extra review work with the blades it could recover, estimated from the 37 audited listings in that score band.</p>
+</details>
+
+<details>
+<summary>Discussion — open after writing your decision</summary>
+
+<p><strong>The two explanations.</strong> Weeks 1 to 5: 206 confirmed, 6 blades found in 403 audited, 4,287 unflagged, so about 6 / 403 × 4,287 = 63.8 missed and recall about 206 / 269.8 = 0.763. Weeks 6 to 10: 77 confirmed, 3 blades in 420 audited, 4,414 unflagged. If fewer blades were listed and recall is unchanged, the audit should find about 6 / 403 × 77 / 206 × 420 = 2.34; if as many were listed and the rest were missed, about (269.8 − 77) / 4,414 × 420 = 18.35. It found 3. A count of 3 or more has a chance of 0.414 when 2.34 is expected, and a count of 3 or fewer has a chance of about 0.00001 when 18.35 is expected. The evidence says sellers are listing fewer blades and the flag catches them as well as before.</p>
+<p><strong>The threshold proposal.</strong> In weeks 6 to 10, 0.02 would have added 426 flags, 852 in review cost at 2 each. The audited band suggests 1 blade in 37 among them, about 11.5 blades or 230 in avoided misses, and one blade in 37 is too thin to promise even that. The proposal answers a fall in confirmed blades that the audit attributes to fewer blades listed, and pays about 850 for about 230. Rejecting it is well supported.</p>
+<p><strong>The alarm.</strong> It rose with the banner in week 3 and confirmed blades stayed at 41, 41 and 40 through week 5, so the banner is not what moved week 6. It is not a reason to retrain, and nothing in the report says retraining would help the flag.</p>
+<p><strong>Decisions that hold up.</strong> Keep the live model and the threshold. Keep the audit at 10%: it is what separated the two explanations, and cutting it because confirmed blades fell would remove the one measurement of misses. Ask whoever owns seller categories whether blade listings actually fell in week 6, which is evidence independent of the model. Refitting the alarm level on banner photos is a reasonable housekeeping step, logged with the release. Reconsider if the audit finds several blades in the next two weeks, or if blade listings turn out not to have fallen.</p>
+<p><strong>Decisions that do not.</strong> Lowering the threshold because confirmed blades fell; retraining because the alarm is up; cutting the audit because there seem to be fewer blades to find.</p>
+<p><strong>What the simulation knows.</strong> Blades listed per week fell from about 53 to about 23 in week 6. True recall in weeks 6 to 10 was 0.52, 0.67, 0.69, 0.73 and 0.77, week-to-week noise on about two dozen blades each around the earlier level. The true cost of those five weeks was 1,758 at 0.05 and would have been 2,192 at 0.02.</p>
+</details>
+</section></article>
+    <div class="mission-action" data-mission-action="keep-it-right-after-launch">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="keep-it-right-after-launch">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Back to the chapter">
+    <a href="../chapters/keep-it-right-after-launch.html"><span>Back to chapter 5</span>Keep It Right After Launch</a>
+    <a class="essay-pager__next" href="../chapters/build-the-assistant.html"><span>Next</span>Build the Assistant</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Deep Learning Masterclass with TensorFlow 2 Over 20 Projects</em> (Udemy, Neuralearn.ai), lecture 18.2</li><li><em>Machine Learning Projects for Industry 4.0</em> (Udemy, (Udemy instructor)), lectures 8.1–8.2</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 4.18, 6.8</li><li>Machine Learning Engineering, pp. 77, 139–140, 235–236, 249, 260</li><li>Designing Machine Learning Systems, pp. 318–319, 323–325, 331–336</li><li>Hands-On Machine Learning with Scikit-Learn and PyTorch, pp. 129, 131, 133, 728, 733</li><li>Machine Learning System Design, §13.1, §14.4.4</li><li>Continuous Machine Learning with Kubeflow, pp. 283–284, 289–290</li><li>MLOps with Red Hat OpenShift, pp. 155, 171–173</li><li>https://github.com/pytorch/pytorch/blob/v2.14.0/torch/serialization.py</li><li>https://github.com/pytorch/pytorch/blob/v2.14.0/torch/nn/modules/module.py</li></ul><p>Every example is synthetic: 12 x 12 photos, a banner and folding knives introduced on purpose, invented prices for a false flag, a missed blade and an audited listing. PyTorch behaviour as of 2.14; the ONNX description is as of the recording it comes from.</p></details>
+  </main>
+  </div>
+</body>
+</html>

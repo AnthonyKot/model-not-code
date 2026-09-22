@@ -9,3 +9,7 @@ ordinary week, 1000 listings, threshold at 99th percentile of launch errors: exp
 found 13 at rate 0.1: estimated unflagged blades 130, Poisson sd of that estimate 36
 found 3 at rate 0.1: estimated unflagged blades 30, Poisson sd of that estimate 17
 found 0 at rate 0.03: estimated unflagged blades 0, Poisson sd of that estimate 33
+5% audit, fewer blades listed: share 0.0057 x 224 = 1.28 expected
+5% audit, more blades missed: share 0.0335 x 224 = 7.50 expected
+found 6: P(>= 6 | 1.28) = 0.002; P(<= 6 | 7.50) = 0.379
+found 6 at rate 0.05: estimated unflagged blades 120, Poisson sd 49; audit saving per week 135

@@ -2,7 +2,7 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-22 (the rework section below is current; everything under it is history). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
-## Rework in progress — 2026-09-22: chapters 3, 1, 2, 4 done; next is chapter 5, then 6–8
+## Rework in progress — 2026-09-22: chapters 3, 1, 2, 4, 5 done; next is chapter 6, then 7–8
 
 **Authority: `notes/chapters/STORY-MAP.md`** (its §7 has the status and the lessons from the first three).
 The author's read of the whole book: chapters are visible concatenations of the essays, and they go so
@@ -15,16 +15,17 @@ every exercise to `labs/<slug>.md` with the `<!--mission-->` marker. Where STORY
 lab link repairs `fa86b08`); the author's provisional verdict on all three is OK, 7 of 10 (2026-09-22,
 given as an assumption in chat rather than a line-by-line read). Chapter 4 is reworked (2026-09-22,
 later the same day; path 2,696, folds 25.1%, page 3,598; the corridor is one beat of 443 words and the
-writer is named in the first sentence; see the note's "Story-map rework" entry). Nothing is pushed;
-catalog status is still `published` for all eight, so the live site is unchanged until the next push.
-Chapters 5–8 are untouched and still carry their exercises on the chapter page. Site support for labs is in place:
+writer is named in the first sentence; see the note's "Story-map rework" entry). Chapter 5 is reworked (2026-09-22; path 2697, folds 25.4%, page 3613; the "chapter 1's mean squared error"
+reference now points at the formula glossed beside it). Nothing is pushed; catalog status is still
+`published` for all eight, so the live site is unchanged until the next push. Chapters 6–8 are untouched
+and still carry their exercises on the chapter page. Site support for labs is in place:
 `site/build.mjs` builds `docs/labs/<slug>.html` with the mission wrapper and completion button when
 `labs/<slug>.md` exists, the chapter page gets an "Open the lab" block, `site/check.mjs` and
 `checks/paraphrase.mjs` cover labs, `site/styles.css` has the fold style, and `site/app.js` opens folds
 for print.
 
-**Next, in order.** Chapter 5, then 6, 7, 8 (mostly the lab move, the story paragraph, the pause and
-heading rewrites; 6 and 7 have labs larger than their bodies). While in chapter 5, fix its "chapter 1's mean squared error", which chapter 1 never introduces. After all eight:
+**Next, in order.** Chapter 6, then 7, 8 (mostly the lab move, the story paragraph, the pause and
+heading rewrites; 6 and 7 have labs larger than their bodies). After all eight:
 `about.md`, the home-page copy in `site/build.mjs`, `README.md` and `CONTEXT.md` §1 (they still say the
 exercise is on the chapter page), then push.
 
@@ -57,8 +58,8 @@ exercise is on the chapter page), then push.
    and read what is left) before calling it done.
 6. Re-run the lab's code block and diff against `corpus/<slug>/run.log`. Interpreter: the scratch venv
    named below no longer exists; use `~/.gemini/antigravity-cli/scratch/myenv/bin/python` (PyTorch
-   2.14.0+cu130, runs on CPU, prints a harmless NumPy warning to stderr). Chapters 1–4 reproduced their
-   logs byte for byte (chapter 2's four `num_workers` timings vary, as its text says).
+   2.14.0+cu130, runs on CPU, prints a harmless NumPy warning to stderr). Chapters 1–5 reproduced their
+   logs byte for byte (chapter 5 writes `release.pt`, so run it in a scratch directory) (chapter 2's four `num_workers` timings vary, as its text says).
 7. Log what was folded, moved and cut in `notes/chapters/<slug>.md` under a dated "Story-map rework"
    heading (the three existing entries are the template); update this section; commit with the
    session's trailer. Status stays `published`; do not push until the author says.
