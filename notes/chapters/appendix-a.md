@@ -29,3 +29,7 @@ The transcript writes "VLM" for vLLM and "Chongqing prefilled" for chunked prefi
 ## Owed
 
 The author's read. Appendices B and C.
+
+## Cross-read repairs — 2026-09-22 (appendix A against chapter 7)
+
+Twelve phrasing repairs from a read-only review, no number changed: the opening credits each lever to what chapter 7 actually worked it on (cache on the generator, mapping on a block by hand, batching on a matrix product); the feature-list framing counts its six rows; the CUDA-graphs cell no longer carries an unreceipted gloss (only FlashAttention's is receipted, apa-15); the sequence cap alone maps onto chapter 7's crossover table, which prices decode only; `max_tokens` is an upper bound where the report's 120 is a measured mean; two section pointers corrected; the active-worker remedy is tied to the empty-machine sentence of chapter 7's batching section, not "its last paragraph"; the 0.353 GB row names the cache figure and the batch line; the lever ranking is stated as chapter 7 states it, conditional on the complaint (latency at low load against a bill or a queue); "Where it stops" sends the quantised generator through chapter 6's golden set and judge with the standard error on the difference (chapter 7's words), says a speculatively decoded generator reproduces the target's output and needs its acceptance rate measured, and no longer claims chapter 8 has a cold-start line item.

@@ -35,7 +35,11 @@ in `site/catalog.mjs`, `docs/appendix/<letter>.html`, no mission), not pushed. A
 (`appendix/b.md`, `corpus/appendix-b/receipts.tsv`, note `notes/chapters/appendix-b.md`; illustrative throughout, since no
 local model runner is installed here). Appendix C is written (`appendix/c.md`, `corpus/appendix-c/{receipts.tsv,run.log}`,
 `workspace/appendix-c/export.py`, note `notes/chapters/appendix-c.md`); its export ran, the rest is illustrative. All three
-appendices are pushed with this entry. Next: the author's read of the eight chapters and three appendices. The author decided
+appendices are pushed. **Cross-read sweep (2026-09-22):** read-only subagents read every adjacent pair 1+2 … 7+8 and each
+appendix against its chapters; three rounds of sentence-sized repairs are logged under "Cross-read repairs" in each chapter
+and appendix note (chapter 4's writer identity, chapter 6's 0.833 pair marked as the lab's illustration, chapter 7's request
+against chapter 6's three calls, the assistant's price per token derived in chapter 7, and about sixty smaller pointers and
+terms). Chapters 4, 5 and 8 sit 20–30 words over the 2,700 path guideline with folds at the ceiling. Next: the author's read. The author decided
 (2026-09-22) to keep the three tool appendices and not to add chapters; the tabular and bandit chapter ideas are
 not planned. The site copy is done: `about.md`, the home-page paragraph in `site/build.mjs`, `README.md` and
 `CONTEXT.md` §1 describe story, folds and labs, drop the 20,000–35,000 character target, and name the

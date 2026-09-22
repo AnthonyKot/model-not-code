@@ -25,3 +25,7 @@ Version line (model names as of the recordings, libraries unversioned; nothing e
 ## Owed
 
 The author's read. Appendix C. A run of the rewritten loop against a local runner, if the author installs one; the appendix says which lines change.
+
+## Cross-read repairs — 2026-09-22 (appendix B against chapters 1 and 6)
+
+Six repairs from a read-only review: the trade of a local model against a hosted one is attributed to chapter 8's ledger, not chapter 7; "3-billion-parameter" (inferred from a model name, unreceipted) → "the small model" / "the recorded small local model"; the schema check compares against the tool's full parameter list (`properties`), as chapter 6's does, not the `required` subset; the checks paragraph names the permissions item chapter 6's figure carries between schema and confirmation; the coupon sentence says the answer is governed by chapter 6's fourth line, the check of the answer against the tool results, and its judge, and states chapter 6's finding as settled; "chapter 5's side of the shop" and "not chapter 5's audit" (chapter 5 has no login or tunnel) → "whoever runs the page" and "not a release process"; "golden set" → "golden set and judge" in "Where it stops". No number changed. The reviewer's note that the "three checks" triple differs from chapter 6's figure is left to chapter 6.

@@ -2,7 +2,7 @@
 
 *As of: the recordings this appendix follows are from a TensorFlow course and export a different, larger image classifier; the appendix applies their steps to chapter 2's classifier in PyTorch 2.14.0, with onnx 1.23.0 and onnxruntime 1.30.0 installed by pip, the library's legacy exporter and opset 17. The export and its check were run on a CPU and their output is in the book's corpus; the serving endpoint, the profiler and the reviewers' page were not run, since their libraries are not installed on the book's machine, and their code is illustrative. The two timings are measured and vary.*
 
-Chapter 2 trained a photo classifier and chose its blade threshold on validation listings; chapter 5 put the trained weights, the threshold, the category names, the alarm and its level into one release bundle, reloaded it and checked that the reloaded flags were identical. This appendix takes that bundle the rest of the way to a running service and shows, on a real export, where chapter 5's bundle boundary falls: what a portable graph of the model carries, and what it does not, which is exactly the part the service has to carry itself. Then it puts the graph behind an HTTP endpoint with the preprocessing written beside it, looks at what a profiler shows about a training run's input pipeline, and sketches the page chapter 5's reviewers would use to check a flag.
+Chapter 2 trained a photo classifier and chose its blade threshold on validation listings; chapter 5 put the trained weights, the threshold, the category names, the alarm and its level into one release bundle, reloaded it and checked that the reloaded flags were identical. This appendix takes that bundle the rest of the way to a running service and shows, on a real export, where the boundary of chapter 5's bundle falls, the released function chapter 5 lists as weights, preprocessing, threshold, category names and the code that joins them: what a portable graph of the model carries, and what it does not, which is exactly the part the service has to carry itself. Then it puts the graph behind an HTTP endpoint with the preprocessing written beside it, looks at what a profiler shows about a training run's input pipeline, and sketches the page chapter 5's reviewers would use to check a flag.
 
 ## What the graph carries, and what the bundle carried
 
@@ -14,7 +14,7 @@ torch.onnx.export(live, dummy, "classifier.onnx", input_names=["photo"], output_
                   dynamic_axes={"photo": {0: "batch"}, "logits": {0: "batch"}}, opset_version=17, dynamo=False)
 ```
 
-Run on chapter 5's bundle, the export is small enough to read whole. The graph has seven nodes, the convolution, its activation, the maximum over the map, two matrix products, a flatten and an add, which is chapter 2's `forward` line by line, and six weight tensors, the classifier's weights and biases. The bundle and the graph do not hold the same things:
+Run on chapter 5's bundle, the export is small enough to read whole. The graph has seven nodes, the convolution, its activation, the maximum over the map and its matrix product, a flatten and its matrix product, and the add that joins them, which is chapter 2's `forward` in order, and six weight tensors, the classifier's weights and biases. The bundle and the graph do not hold the same things:
 
 | | In chapter 5's bundle (`release.pt`, 60,741 bytes) | In the exported graph (`classifier.onnx`, 38,773 bytes) |
 |---|---|---|
@@ -25,7 +25,7 @@ Run on chapter 5's bundle, the export is small enough to read whole. The graph h
 | The autoencoder and its alarm level | yes | no |
 | The version string | yes | no |
 
-The graph is the model and only the model. Everything the release decision depended on, the threshold chosen on validation with chapter 2's prices, the rule that a listing's score is the mean of its four photos, the alarm that watches the inputs, lives outside it, and a service built on the graph alone has silently dropped all of it. That is chapter 5's bundle boundary, seen from the other side: the bundle exists because the model file is not the release.
+The graph is the model and only the model. Everything the release decision depended on, the threshold chosen on validation with chapter 2's prices, the rule that a listing's score is the mean of its four photos, the alarm that watches the inputs, lives outside it, and a service built on the graph alone has silently dropped all of it. That is the boundary of chapter 5's bundle, seen from the other side: the bundle exists because the model file is not the release.
 
 Two things do ride with the graph and are worth knowing by name. The **opset** version, 17 here, names the set of operations the runtime has to implement, so a runtime older than the opset refuses the file rather than running it wrong. And the **dynamic axis** declared at export, the batch, is the only dimension a request may vary; a service that sends one photo, four, or forty is within the contract, and one that sends a photo of another size is not, and finds out at the call.
 
@@ -52,7 +52,7 @@ On the 500 validation listings, 2,000 photos, the largest difference between the
 
 The recordings carry a slip that the same test catches. Their preprocessing rescales pixels by dividing by 225 in one place and 255 in another, and neither applies the normalisation the model was trained with. Chapter 2's photos need no rescaling, so the appendix inserts the slip deliberately: the same 2,000 photos multiplied by 255/225, as if the service divided by 225 where training had divided by 255, and the graph flags 61 listings instead of 68. The model did not change; the flag count fell by seven because the service fed it something training never saw. The check that the served flags equal the saved flags is the only line that would have caught it, which is why it belongs in the service's tests and not in a notebook.
 
-One listing of four photos takes about 0.17 ms through the saved model and about 0.08 ms through the runtime on this CPU, measured and varying by machine; at chapter 5's 1,000 listings a week, either is nothing. The runtime's advantage is not speed here but the two things the graph bought: a service that installs the runtime and nothing of the training stack, and one file whose contents can be listed.
+One listing of four photos takes about 0.19 ms through the saved model and about 0.08 ms through the runtime on this CPU, measured and varying by machine; at chapter 5's 1,000 listings a week, either is nothing. The runtime's advantage is not speed here but the two things the graph bought: a service that installs the runtime and nothing of the training stack, and one file whose contents can be listed.
 
 ## The endpoint, with the preprocessing beside it
 
@@ -85,7 +85,7 @@ async def flag(listing: UploadFile):
     return {"blade_score": score, "flag": score >= state["threshold"], "version": state["version"]}
 ```
 
-Three things in that sketch are the appendix's and not the recordings'. The threshold is read from the bundle, not typed into the service. The version is returned with every answer, so that a flag in chapter 5's audit log can be traced to the release that made it. And `preprocess` is the function the check above tested, on the photos the check used, before the endpoint existed. The recordings' endpoint returns an index and nothing else, and its preprocessing is where their slip lives.
+Three things in that sketch are the appendix's and not the recordings'. The threshold is read from the bundle, not typed into the service. The version is returned with every answer, so that a flag in the reviewers' records can be traced to the release that made it. And `preprocess` is the function the check above tested, on the photos the check used, before the endpoint existed. The recordings' endpoint returns an index and nothing else, and its preprocessing is where their slip lives.
 
 <details>
 <summary>Optional: the recorded service, step by step</summary>
@@ -96,9 +96,9 @@ A virtual environment with the runtime, the web framework, a multipart parser fo
 
 ## What a profiler shows about a training run
 
-The recordings profile a training run with TensorBoard's profiler and read its overview page: the average step time split into input time, compute time and the rest, and a summary that says where to look first. In the recorded run the input pipeline took 68.4% of the step, the tool's first recommendation was to reduce it, and its breakdown put the time in the dataset's map and batch stages rather than in reading files. That is chapter 2's lab setup measured by a tool instead of by two timings: the accelerator waits on the loader, and the remedy is more loading parallelism or preprocessing done once, offline. The same page showed that none of the device computation was in 16-bit arithmetic and suggested mixed precision, which is a different lever, and a trace viewer that shows every operation in one step on a timeline, with a ruler to time any of them.
+The recordings profile a training run with TensorBoard's profiler and read its overview page: the average step time split into input time, compute time and the rest, and a summary that says where to look first. In the recorded run the input pipeline took 68.4% of the step, the tool's first recommendation was to reduce it, and its breakdown put the time in the dataset's map and batch stages rather than in reading files. That is chapter 2's lab setup measured by a tool instead of by its four step timings against a forecast: the accelerator waits on the loader, and the remedy is more loading parallelism or preprocessing done once, offline. The same page showed that none of the device computation was in 16-bit arithmetic and suggested mixed precision, which is a different lever, and a trace viewer that shows every operation in one step on a timeline, with a ruler to time any of them.
 
-In PyTorch the equivalent is the built-in profiler, which records the same timeline for a few steps and writes it for the same viewer; the appendix does not run it, since the viewer is a separate install. What it would show for chapter 2's lab is what the lab's own two timings already show, which is the point: a profiler is those two timings taken at every operation, and it earns its place when the two timings disagree with the intuition, not before.
+In PyTorch the equivalent is the built-in profiler, which records the same timeline for a few steps and writes it for the same viewer; the appendix does not run it, since the viewer is a separate install. What it would show for chapter 2's lab is what the lab's own step timings already show, which is the point: a profiler is the loader's time and the step's time taken at every operation, and it earns its place when the two timings disagree with the intuition, not before.
 
 ```python
 # illustrative, not executed
@@ -124,7 +124,7 @@ gr.Interface(fn=review, inputs=gr.Image(type="pil", label="The listing's photos"
              outputs=gr.JSON(label="What the classifier said"), title="Blade check").launch()
 ```
 
-The recordings stop at the label. The shop's page needs one more field, the reviewer's own verdict, written to the log that chapter 5's audit reads: without it the page shows the model's answer and records nothing, and the audit that separates fewer blades from more misses has no data. The recordings also score their model on a test set and draw a confusion matrix that shows no errors at all, which they read as success; on the shop's terms it is a test set too easy or too small to say anything, and chapter 2's standard error on 19 blades is the reason.
+The recordings stop at the label. The shop's page needs one more field, the reviewer's own verdict, recorded where chapter 5's reviewers' and auditors' verdicts are kept: without it the page shows the model's answer and records nothing, and the audit that separates fewer blades from more misses has no data. The recordings also score their model on a test set and draw a confusion matrix that shows no errors at all, which they read as success; on the shop's terms it is a test set too easy or too small to say anything, and chapter 2's standard error on 19 blades is the reason.
 
 ## Where it stops
 

@@ -13,3 +13,4 @@ static batching: 16 slot-steps, 10 used, 62% busy; continuous with a 5th request
 reader case: 7 GB per step at 28 steps/s = 196 GB/s of weight traffic; at 4 bits, 1.75 GB per step -> 112 steps/s if bandwidth-bound
 worked q1: cache per request 1.2 / 3.4 = 0.353 GB; free 24.0 - 7.0 - 1.2 = 15.8 GB; requests whose caches fit: 3.4 + 15.8 / 0.353 = 48; on the 48 GB card (48 - 7) / 0.353 = 116
 worked q2: 7.0 GB x 28 steps/s = 196 GB/s of weight traffic; the proposal's 1.4x bandwidth caps decode at 39 tokens/s, an answer of 120 tokens at 3.1 s instead of 4.3
+price per generated token: 620 / (96 x 30 x 86,400) = 2.49e-06; a 120-token answer 0.0003; three calls' worth of 120-token answers 0.0009

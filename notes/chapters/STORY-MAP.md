@@ -384,3 +384,7 @@ the appendices in `APPENDIX-PLAN.md`, A first.
 - The voice lint still catches "decides" and "reported" in fresh prose; run it on the chapter and the lab.
 - Tools: `scripts/reading-path.py` (counts), `scripts/lab-check.mjs` (browser check), the interpreter
   named in `RESUME.md`.
+- Pair reviews work. After the rework, a read-only subagent per adjacent pair (both chapters, both labs, the earlier
+  chapters the pair quotes) with six fixed checks (bridge, backward and forward references, terminology, contradictions,
+  stale headings) found about seventy concrete misalignments the single-chapter rework had not, most of them a phrase
+  each; two reviewers finding the same item independently was the signal to trust. Findings are logged per chapter.

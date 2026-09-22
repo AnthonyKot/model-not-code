@@ -25,3 +25,7 @@ Version line (TensorFlow-course recordings applied to chapter 2's classifier in 
 ## Owed
 
 The author's read. A run of the endpoint and the reviewers' page if the author installs FastAPI and Gradio; the appendix says which lines are the book's additions.
+
+## Cross-read repairs — 2026-09-22 (appendix C against chapters 2 and 5)
+
+Five repairs from a read-only review: the torch timing now reads the logged 0.19 ms (the 0.17 was the unlogged second run, receipt apc-11); the node list is stated in the graph's order (flatten between the two matrix products); "chapter 5's bundle boundary" is glossed as the appendix's phrase for the released function chapter 5 lists; "chapter 5's audit log" → the reviewers' and auditors' records chapter 5 keeps; "the lab's two timings" → chapter 2's lab's four step timings against a forecast, and the profiler as the loader's and the step's time at every operation. Every corpus number and the staged 255/225 slip were confirmed by the reviewer against run.log and export.py.
