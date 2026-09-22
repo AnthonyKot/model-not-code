@@ -8,3 +8,9 @@ ts-foundation table 2.2: 1.34/2.59 = 0.517 ; 4.87/8.69 = 0.56
 if per-item error SD were 40: SE of a 200-item mean 2.8, of a 50-item mean 5.7
 if per-item error SD were 60: SE of a 200-item mean 4.2, of a 50-item mean 8.5
 if per-item error SD were 80: SE of a 200-item mean 5.7, of a 50-item mean 11.3
+held-out 5/6 at share 0.15: lookup+rule 0.425, encoder 0.550, net +0.4998; break-even 3,001 once, then 300 a month
+held-out 4/6 at share 0.15: lookup+rule 0.425, encoder 0.525, net +0.3998; break-even 3,752 once, then 375 a month
+held-out 3/6 at share 0.15: lookup+rule 0.425, encoder 0.500, net +0.2998; break-even 5,003 once, then 500 a month
+one held-out hit in six is worth 0.10 a query
+0.91 vs 0.88 on 200 items: SE of the difference 0.0306; the gap of 0.03 is 1.0 SE
+0.91 vs 0.88 on 2000 items: SE of the difference 0.0097; the gap of 0.03 is 3.1 SE

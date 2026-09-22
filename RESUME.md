@@ -2,7 +2,7 @@
 
 Read this first in any new session, then only the files it names. Updated 2026-09-22 (the rework section below is current; everything under it is history). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
-## Rework in progress — 2026-09-22: chapters 3, 1, 2, 4, 5, 6, 7 done; next is chapter 8
+## Rework in progress — 2026-09-22: all eight chapters done; next is the cross-check of 8, then the site copy
 
 **Authority: `notes/chapters/STORY-MAP.md`** (its §7 has the status and the lessons from the first three).
 The author's read of the whole book: chapters are visible concatenations of the essays, and they go so
@@ -19,16 +19,18 @@ writer is named in the first sentence; see the note's "Story-map rework" entry).
 reference now points at the formula glossed beside it). Chapter 6 is reworked (2026-09-22; path 2325,
 folds 24.4%, page 3076; its first draft came in short and over-folded, and two folds went back on the
 page). Chapter 7 is reworked (2026-09-22; path 2103, folds 25.4%, page 2820; its re-run matched every
-exact line and, as its text says, not the timing lines). Nothing is pushed; catalog status is still
-`published` for all eight, so the live site is unchanged until the next push. Chapter 8 is untouched
-and still carries its exercise on the chapter page. Site support for labs is in place:
+exact line and, as its text says, not the timing lines). Chapter 8 is reworked (2026-09-22; path 2694, folds 22.7%, page 3486; the pause sits before the break-even
+reveal, the old vendor-table pause became worked question 2, and receipt `dsn-42` was repaired; its re-run
+matched `run.log` byte for byte). Nothing is pushed; catalog status is still `published` for all eight, so
+the live site is unchanged until the next push. Every chapter now has its exercise in `labs/<slug>.md`. Site support for labs is in place:
 `site/build.mjs` builds `docs/labs/<slug>.html` with the mission wrapper and completion button when
 `labs/<slug>.md` exists, the chapter page gets an "Open the lab" block, `site/check.mjs` and
 `checks/paraphrase.mjs` cover labs, `site/styles.css` has the fold style, and `site/app.js` opens folds
 for print.
 
-**Next, in order.** Chapter 8 (the lab move, the story paragraph, the pause and heading rewrites; it
-closes the book, so no bridge). After all eight:
+**Next, in order.** Cross-check chapter 8 against 1–7 (bridges, cross-references, numbers quoted from
+another chapter's run, old heading names in chapters, labs and site copy; chapter 7's bridge misreads the
+break-even as "3,001 a month" and needs the repair). Then:
 `about.md`, the home-page copy in `site/build.mjs`, `README.md` and `CONTEXT.md` §1 (they still say the
 exercise is on the chapter page), then push. After the push: the three tool appendices planned in
 `notes/chapters/APPENDIX-PLAN.md` (agreed 2026-09-22; A first).
