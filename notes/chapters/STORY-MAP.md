@@ -341,12 +341,12 @@ The book is done when all eight are done, `about.html` describes the shape (stor
 and `README.md`, `RESUME.md` and `CONTEXT.md` §1 point here instead of at the 20,000–35,000
 character target.
 
-## 7. Status and lessons (2026-09-22, after chapters 3, 1, 2, 4, 5 and 6)
+## 7. Status and lessons (2026-09-22, after chapters 3, 1, 2, 4, 5, 6 and 7)
 
 **Done:** chapter 3 (pilot), then 1 and 2, in that order, by the main session; commits `1115505`,
 `8840699`, `eeb9442`, `fa86b08`. The author's provisional verdict on the three: OK, 7 of 10 (given as an
-assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). Chapters 4, 5 and 6 followed later the same day (their notes have the
-entries). **Next:** 7–8, then the §6 site copy, then push.
+assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). Chapters 4, 5, 6 and 7 followed later the same day (their notes have the
+entries). **Next:** 8, then the §6 site copy, then push.
 
 | Ch | Reading path | Folds | Page | Notes |
 |---|---|---|---|---|
@@ -356,6 +356,7 @@ entries). **Next:** 7–8, then the §6 site copy, then push.
 | 4 | 2,696 | 902 (25.1%) | 3,598 | six folds; corridor one beat of 443 words; eight trims; five tables kept on the path |
 | 5 | 2,697 | 916 (25.4%) | 3,613 | 7 folds incl. two worked answers; bundle + clocks one beat, investigation + loop + gate one beat; five trims |
 | 6 | 2,325 | 751 (24.4%) | 3,076 | 6 folds; first draft short and 29.5% folded, SE formula and repairs back on the page; one pass |
+| 7 | 2,103 | 717 (25.4%) | 2,820 | 5 folds; page inside §2's range; one fold trim |
 
 **What the three taught, for chapters 4–8.**
 

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The lab for chapter 7, Serve the Assistant Cheaply: cache the keys, quantise the weights, batch the tokens.">
+  <meta name="theme-color" content="#153b35">
+  <meta property="og:title" content="Lab: cache the keys, quantise the weights, batch the tokens">
+  <meta property="og:description" content="The lab for chapter 7, Serve the Assistant Cheaply: cache the keys, quantise the weights, batch the tokens.">
+  <meta property="og:type" content="website">
+  <title>Lab: cache the keys, quantise the weights, batch the tokens · The Program Is Now a Model</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b35'/%3E%3Ctext x='17' y='44' font-size='35' fill='%23fffdf8'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script defer src="../assets/app.js"></script>
+</head>
+<body class="article-view" data-active-slug="serve-the-assistant-cheaply">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="../index.html" aria-label="The Program Is Now a Model home">
+      <span class="wordmark__mark">T</span>
+      <span><strong>The Program Is Now a Model</strong><small>Eight project chapters for a senior developer moving into ML and AI engineering</small></span>
+    </a>
+    <div class="header-actions">
+      <a href="../about.html">About</a>
+      <span class="progress-summary" data-progress-summary>0 of 8 exercises</span>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="book-navigation">Contents</button>
+    </div>
+  </header>
+  <div class="page-shell">
+    <aside class="book-nav" id="book-navigation" data-book-nav>
+      <div class="book-nav__intro"><a href="../index.html">The chapters</a><p>One shop, eight chapters. 8 of 8 written. <a href="../old/index.html">Archived essays →</a></p></div>
+      <nav aria-label="Book contents">
+    <a class="book-nav__item" href="../chapters/search-the-catalogue.html" data-mission-link="search-the-catalogue">
+      <span class="book-nav__number">01</span>
+      <span>Search the Catalogue, Then Answer From It</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/trust-the-number.html" data-mission-link="trust-the-number">
+      <span class="book-nav__number">02</span>
+      <span>Trust the Number Before You Ship the Classifier</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/reuse-a-pretrained-model.html" data-mission-link="reuse-a-pretrained-model">
+      <span class="book-nav__number">03</span>
+      <span>Reuse a Pretrained Model</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/train-from-reward.html" data-mission-link="train-from-reward">
+      <span class="book-nav__number">04</span>
+      <span>Train From Reward</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/keep-it-right-after-launch.html" data-mission-link="keep-it-right-after-launch">
+      <span class="book-nav__number">05</span>
+      <span>Keep It Right After Launch</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/build-the-assistant.html" data-mission-link="build-the-assistant">
+      <span class="book-nav__number">06</span>
+      <span>Build the Assistant</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item is-active" href="../chapters/serve-the-assistant-cheaply.html" data-mission-link="serve-the-assistant-cheaply">
+      <span class="book-nav__number">07</span>
+      <span>Serve the Assistant Cheaply</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a>
+    <a class="book-nav__item" href="../chapters/did-the-shop-need-a-model.html" data-mission-link="did-the-shop-need-a-model">
+      <span class="book-nav__number">08</span>
+      <span>Did the Shop Need a Model?</span>
+      <span class="book-nav__check" aria-label="Exercise completed">✓</span>
+    </a></nav>
+    </aside>
+    <main id="main" class="essay-page lab-page">
+    <header class="essay-hero">
+      <div class="essay-kicker"><span>07</span>Lab · <a href="../chapters/serve-the-assistant-cheaply.html">Chapter 7, Serve the Assistant Cheaply</a></div>
+      <h1 class="essay-title">cache the keys, quantise the weights, batch the tokens</h1>
+      <p class="essay-payoff">Runs on a laptop CPU. The expected output is printed below the code; mark the exercise complete when yours matches.</p>
+    </header>
+    <article class="prose"><p>The lab for chapter 7, <a href="../chapters/serve-the-assistant-cheaply.html">Serve the Assistant Cheaply</a>. It trains chapter 1&#39;s generator with the attention written out, generates with and without a cache, quantises a block by hand and then the whole generator at two block sizes, times a matrix product at five batch sizes on your CPU, and then hands you the week 37 serving report and the purchase proposal to judge.</p>
+<section class="mission" data-mission="serve-the-assistant-cheaply"><div class="mission__label">Try the exercise</div>
+<h2 id="exercise-cache-the-keys-quantise-the-weights-batch-the-tokens">Exercise: cache the keys, quantise the weights, batch the tokens</h2>
+<p>The script trains chapter 1&#39;s generator with the attention written out, generates with and without a cache, quantises a block by hand and then the whole generator at two block sizes, and times a matrix product at five batch sizes. PyTorch on a CPU, about four seconds. The timing lines are measured on eight CPU threads and will differ on your machine; every other line is exact.</p>
+<pre><code class="language-python">import math
+import time
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+torch.set_num_threads(8)
+titles  = [&quot;slim wireless keyboard&quot;, &quot;steel kettle&quot;, &quot;leather watch&quot;, &quot;canvas backpack&quot;]
+answers = [&quot;the slim wireless keyboard fits a laptop bag&quot;, &quot;the steel kettle boils water fast&quot;,
+           &quot;the leather watch tells the time&quot;, &quot;the canvas backpack carries school books&quot;]
+words = sorted({w for t in titles + answers for w in t.split()})
+vocab = [&quot;&lt;pad&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;] + words
+ids = {w: i for i, w in enumerate(vocab)}
+PAD = 0
+
+def batch(texts):
+    rows = [[&quot;&lt;s&gt;&quot;] + t.split() + [&quot;&lt;/s&gt;&quot;] for t in texts]
+    width = max(len(r) for r in rows)
+    return torch.tensor([[ids[w] for w in r] + [PAD] * (width - len(r)) for r in rows])
+
+class Block(nn.Module):
+    &quot;&quot;&quot;Chapter 1&#39;s block with the attention written out, so the keys and values can live in a cache.&quot;&quot;&quot;
+    def __init__(self, n_vocab, dim=16, max_len=64):
+        super().__init__()
+        self.tok, self.pos = nn.Embedding(n_vocab, dim), nn.Embedding(max_len, dim)
+        self.q, self.k, self.v = nn.Linear(dim, dim), nn.Linear(dim, dim), nn.Linear(dim, dim)
+        self.dim = dim
+    def forward(self, x, cache=None, start=0):
+        h = self.tok(x) + self.pos(torch.arange(start, start + x.shape[1]))   # x holds positions start .. start+T-1
+        q, k, v = self.q(h), self.k(h), self.v(h)
+        if cache is not None:                                             # keys and values of earlier positions are reused
+            if &quot;K&quot; in cache:
+                k, v = torch.cat([cache[&quot;K&quot;], k], 1), torch.cat([cache[&quot;V&quot;], v], 1)
+            cache[&quot;K&quot;], cache[&quot;V&quot;] = k, v
+        T, S = q.shape[1], k.shape[1]
+        mask = torch.ones(T, S, dtype=torch.bool).tril(S - T)             # a position sees keys up to itself
+        scores = (q @ k.transpose(1, 2)) / math.sqrt(self.dim)
+        scores = scores.masked_fill(~mask, float(&quot;-inf&quot;))
+        return h + F.softmax(scores, -1) @ v, (T, S)
+
+torch.manual_seed(0)
+gen, head = Block(len(vocab)), nn.Linear(16, len(vocab))
+opt = torch.optim.Adam(list(gen.parameters()) + list(head.parameters()), lr=0.01)
+x = batch([f&quot;{t} {a}&quot; for t, a in zip(titles, answers)])
+for step in range(300):
+    logits = head(gen(x[:, :-1])[0])
+    loss = F.cross_entropy(logits.reshape(-1, len(vocab)), x[:, 1:].reshape(-1), ignore_index=PAD)
+    opt.zero_grad(); loss.backward(); opt.step()
+print(f&quot;generator trained, next-token loss {loss.item():.4f}&quot;)
+
+# ---------- Part 1: the same answer with and without a cache ----------
+def generate(prompt, max_new=12, use_cache=False):
+    &quot;&quot;&quot;Greedy decoding. Returns the text, the number of key/value rows computed, and the score-matrix shapes.&quot;&quot;&quot;
+    out = [ids[&quot;&lt;s&gt;&quot;]] + [ids[w] for w in prompt.split()]
+    rows, shapes = 0, []
+    with torch.no_grad():
+        if use_cache:
+            cache = {}
+            h, (T, S) = gen(torch.tensor([out]), cache, 0); rows += T; shapes.append((T, S))   # prefill: the prompt in one pass
+            nxt = int(head(h)[0, -1].argmax())
+            for _ in range(max_new):
+                out.append(nxt)
+                if vocab[nxt] == &quot;&lt;/s&gt;&quot;:
+                    break
+                h, (T, S) = gen(torch.tensor([[nxt]]), cache, len(out) - 1); rows += T; shapes.append((T, S))   # decode: one token
+                nxt = int(head(h)[0, -1].argmax())
+        else:
+            for _ in range(max_new + 1):
+                h, (T, S) = gen(torch.tensor([out])); rows += T; shapes.append((T, S))       # the whole sequence, every step
+                nxt = int(head(h)[0, -1].argmax()); out.append(nxt)
+                if vocab[nxt] == &quot;&lt;/s&gt;&quot;:
+                    break
+    return &quot; &quot;.join(vocab[i] for i in out[1 + len(prompt.split()):]), rows, shapes
+
+for use_cache in (False, True):
+    text, rows, shapes = generate(&quot;steel kettle&quot;, use_cache=use_cache)
+    print(f&quot;cache {str(use_cache):5s}: {text!r}; key/value rows computed {rows}; score matrices {shapes}&quot;)
+long_prompt = &quot; &quot;.join([&quot;steel kettle&quot;] * 8)
+for use_cache in (False, True):
+    t0 = time.perf_counter()
+    for _ in range(20):
+        generate(long_prompt, max_new=30, use_cache=use_cache)
+    print(f&quot;cache {str(use_cache):5s}: {1000 * (time.perf_counter() - t0) / 20:.1f} ms per 30-token generation from a 17-token prompt (measured)&quot;)
+
+# ---------- Part 2: four bits per weight ----------
+def quantise(w, bits=4, block=8):
+    &quot;&quot;&quot;Uniform asymmetric quantisation: per block, scale = (max - min) / (2^bits - 1), offset = min.&quot;&quot;&quot;
+    flat = w.flatten(); n = flat.numel(); pad = (-n) % block
+    blocks = torch.cat([flat, torch.zeros(pad)]).view(-1, block)
+    lo, hi = blocks.min(1, keepdim=True).values, blocks.max(1, keepdim=True).values
+    scale = (hi - lo).clamp(min=1e-8) / (2 ** bits - 1)
+    codes = ((blocks - lo) / scale).round().clamp(0, 2 ** bits - 1)
+    return (codes * scale + lo).flatten()[:n].view_as(w), codes, scale, lo
+
+w8 = torch.tensor([0.12, -0.31, 0.05, 0.27, -0.08, 0.19, -0.22, 0.02])
+deq, codes, scale, lo = quantise(w8)
+print(f&quot;one block: codes {codes.flatten().int().tolist()}, scale {scale.item():.5f}, offset {lo.item():.2f}, &quot;
+      f&quot;largest error {(deq - w8).abs().max().item():.4f} (half a step is {scale.item() / 2:.5f})&quot;)
+w8[3] = 2.4
+deq, codes, scale, lo = quantise(w8)
+keep = [i for i in range(8) if i != 3]
+print(f&quot;with 2.4 in slot 3: codes {codes.flatten().int().tolist()}, scale {scale.item():.4f}, largest error among the other seven {(deq - w8)[keep].abs().max().item():.4f}&quot;)
+
+with torch.no_grad():
+    saved = {k: v.clone() for k, v in gen.state_dict().items()}
+    n = sum(p.numel() for p in gen.parameters())
+    for block in (8, 64):
+        worst = 0.0
+        for p in gen.parameters():
+            deq, *_ = quantise(p.data, block=block)
+            worst = max(worst, (deq - p.data).abs().max().item()); p.data.copy_(deq)
+        text = generate(&quot;steel kettle&quot;, use_cache=True)[0]
+        extra = 2 * 2 * math.ceil(n / block)                     # a 16-bit scale and a 16-bit offset per block
+        print(f&quot;generator&#39;s {n} weights in 4-bit blocks of {block}: codes {n // 2} bytes + {extra} bytes of scales and offsets &quot;
+              f&quot;(16-bit weights: {2 * n}); largest error {worst:.4f}; answer {text!r}&quot;)
+        gen.load_state_dict(saved)
+
+# ---------- Part 3: what a batch costs ----------
+d = 2048
+W = torch.randn(d, d)
+print(f&quot;one {d} x {d} weight matrix, {2 * d * d / 1e6:.1f} MB at 2 bytes a weight; step time by batch size (measured):&quot;)
+for B in (1, 4, 16, 64, 256):
+    X = torch.randn(B, d)
+    for _ in range(3):
+        X @ W.T
+    t0 = time.perf_counter()
+    for _ in range(50):
+        X @ W.T
+    ms = 1000 * (time.perf_counter() - t0) / 50
+    print(f&quot;  B = {B:3d}: {ms:6.3f} ms per step, {1000 * ms / B:7.1f} us per token, arithmetic intensity {B} flop per byte&quot;)
+</code></pre>
+<p>What each part does:</p>
+<ul>
+<li><strong><code>Block</code></strong> is chapter 1&#39;s block with the attention spelled out instead of <code>scaled_dot_product_attention</code>, so the keys and values can be kept. <code>cache</code> is a dictionary the caller owns; on a decode step the new key and value are appended to it and the scores are computed against all of them. <code>start</code> tells the position embedding where the new token sits. The mask <code>tril(S − T)</code> lets each of the T query positions see keys up to its own index among the S stored.</li>
+<li><strong>Part 1</strong>, <code>generate</code>, runs greedy decoding two ways and counts key/value rows and score-matrix shapes. With the cache, the prompt is one prefill pass and each later step feeds one token. The timing lines repeat a 30-token generation from a 17-token prompt twenty times.</li>
+<li><strong>Part 2</strong>, <code>quantise</code>, is the per-block scale and offset: codes are integers 0–15, the reconstruction is <code>code · scale + offset</code>. It runs on the hand block, on the block with the outlier, and on every weight tensor of the generator at blocks of 8 and 64, restoring the weights after each. The byte counts assume 16-bit scales and offsets.</li>
+<li><strong>Part 3</strong> times <code>X @ W.T</code> for a 2,048 × 2,048 matrix at batch 1 to 256 after three warm-up calls, and prints the per-token cost and the arithmetic intensity B.</li>
+</ul>
+<p><strong>Expected result.</strong> Timing lines vary; everything else is deterministic:</p>
+<pre><code>generator trained, next-token loss 0.1430
+cache False: &#39;the steel kettle boils water fast &lt;/s&gt;&#39;; key/value rows computed 42; score matrices [(3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9)]
+cache True : &#39;the steel kettle boils water fast &lt;/s&gt;&#39;; key/value rows computed 9; score matrices [(3, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9)]
+cache False: 1.2 ms per 30-token generation from a 17-token prompt (measured)
+cache True : 1.0 ms per 30-token generation from a 17-token prompt (measured)
+one block: codes [11, 0, 9, 15, 6, 13, 2, 9], scale 0.03867, offset -0.31, largest error 0.0180 (half a step is 0.01933)
+with 2.4 in slot 3: codes [2, 0, 2, 15, 1, 3, 0, 2], scale 0.1807, largest error among the other seven 0.0900
+generator&#39;s 2240 weights in 4-bit blocks of 8: codes 1120 bytes + 1120 bytes of scales and offsets (16-bit weights: 4480); largest error 0.1858; answer &#39;the steel kettle boils water fast &lt;/s&gt;&#39;
+generator&#39;s 2240 weights in 4-bit blocks of 64: codes 1120 bytes + 140 bytes of scales and offsets (16-bit weights: 4480); largest error 0.2151; answer &#39;the steel kettle boils water fast &lt;/s&gt;&#39;
+one 2048 x 2048 weight matrix, 8.4 MB at 2 bytes a weight; step time by batch size (measured):
+  B =   1:  0.360 ms per step,   359.6 us per token, arithmetic intensity 1 flop per byte
+  B =   4:  0.369 ms per step,    92.2 us per token, arithmetic intensity 4 flop per byte
+  B =  16:  0.648 ms per step,    40.5 us per token, arithmetic intensity 16 flop per byte
+  B =  64:  1.377 ms per step,    21.5 us per token, arithmetic intensity 64 flop per byte
+  B = 256:  4.907 ms per step,    19.2 us per token, arithmetic intensity 256 flop per byte
+</code></pre>
+<p>Read it against the chapter. The cache gives the same answer with 9 rows instead of 42, and the score matrices shrink from n × n to 1 × n. The hand block&#39;s error is under half a step; the outlier multiplies the others&#39; error by five. Blocks of 64 cost less bookkeeping and a slightly larger error, and neither changes the toy&#39;s answer. The step time is nearly flat from batch 1 to 4 while the per-token cost falls, and flattens near 19 µs by batch 256.</p>
+<p>Two things to try. First, change <code>bits=4</code> to <code>bits=2</code> in <code>quantise</code>: the hand block&#39;s four levels put the largest error at 0.9611 for blocks of 8, and at blocks of 64 the generator&#39;s answer becomes <em>the leather slim boils water fast</em>. Second, set <code>d = 512</code>: the whole matrix is 0.5 MB, the step at batch 1 takes about 25 µs, and compute takes over sooner, with the per-token cost only falling by about twenty times to batch 256 instead of the larger matrix&#39;s.</p>
+<h3 id="your-call-the-week-37-serving-report">Your call: the week 37 serving report</h3>
+<p>The shop runs the assistant&#39;s generator on one GPU. Here is the week&#39;s report and the platform team&#39;s proposal. The report&#39;s last two lines are what a purchase decision costs and what it claims; the rest is what the dashboard shows.</p>
+<pre><code>SERVING REPORT, week 37 (one GPU, the assistant&#39;s generator)
+  requests per second, average          0.8
+  prompt tokens per request (retrieved chunks + question)  600
+  answer tokens per request               120
+  time to first token                     180 ms
+  decode speed per request                28 tokens/s  (an answer takes 4.3 s)
+  requests decoding at once, average      3.4
+  generated tokens per second, all users  96
+  GPU utilisation (arithmetic units busy) 19%
+  GPU memory: weights 7.0 GB + caches 1.2 GB of 24.0 GB
+  monthly cost, this GPU                  620
+PROPOSAL from the platform team: move to the next card up: twice the arithmetic, 1.4 times the memory bandwidth, 48 GB, 1450 a month, &#39;to bring latency down&#39;.
+</code></pre>
+<p>Write down, before opening the discussion:</p>
+<ol>
+<li>Whether decode on this card is memory-bound or compute-bound, and the two lines of the report that say so. This is the step every later answer depends on.</li>
+<li>The lever you would pull first to bring an answer&#39;s 4.3 seconds down, what it would cost, and roughly what it would gain; use the chapter&#39;s arithmetic, with bytes per step and the report&#39;s numbers.</li>
+<li>One option you reject, with the number that rejects it. The proposal is one candidate; &quot;keep everything&quot; and &quot;buy it anyway&quot; are both allowed if the numbers support them.</li>
+<li>What you cannot tell from this report and would measure before spending money.</li>
+</ol>
+<p>A lever chosen for a reason the report&#39;s numbers do not support is not a pass, even if it is the lever the discussion picks.</p>
+<details>
+<summary>Hints, if you are stuck</summary>
+
+<p>About three and a half requests at once and 19% utilisation say what the arithmetic units are doing. Each decode step reads the 7 GB of weights; at 28 steps a second, that is a bandwidth. Ask what each proposal changes about bytes per step and about the arithmetic, and which of the two the step is waiting on. Batching raises tokens per second for all users; ask whether it changes the seconds one customer waits.</p>
+</details>
+
+<details>
+<summary>Discussion — open after writing your decision</summary>
+
+<p><strong>Memory-bound.</strong> About three and a half requests decoding at once and 19% utilisation: the arithmetic units are idle most of the time, and the step is waiting on the weights. Each step reads 7 GB; at 28 steps per second that is about 196 GB/s of weight traffic, which is the card&#39;s bandwidth being spent almost entirely on weights. Time to first token is short, 180 ms for a 600-token prefill, so the compute-bound phase is not where the four seconds go.</p>
+<p><strong>The proposal.</strong> Twice the arithmetic changes nothing a memory-bound decode is waiting on. 1.4 times the bandwidth is the part that would help, and it caps the gain at about 1.4 times: 28 tokens per second becomes at most 39, an answer of 4.3 seconds becomes about 3.1, for 830 more a month. The 48 GB is headroom the report does not need: caches use 1.2 GB, leaving 15.8 GB free. Rejecting it is well supported by the 19% line; buying it anyway is defensible only if the shop wants 3 seconds and will not accept a re-evaluated model, which the report cannot say.</p>
+<p><strong>Four-bit weights.</strong> Bytes per step fall from 7 GB to about 1.75 GB. If the step stays bandwidth-bound, that is up to four times the decode speed, 28 to about 112 tokens per second, on the same card and the same bill. The cost is chapter 2&#39;s: the quantised generator&#39;s answers go through chapter 6&#39;s golden set and a release comparison before it serves anyone. This is the first lever for the four seconds.</p>
+<p><strong>Batching.</strong> With 0.8 requests a second and 4.3 seconds an answer, about 3.4 requests overlap, and a step at that batch reads the weights once for 3.4 tokens. Admitting more requests per step would raise the tokens per second for all users, about 4.7 times at batch 16 if the step time holds, and there is memory for 48 requests&#39; caches. It does not shorten one customer&#39;s wait: the step time is what a customer waits for, and batching leaves it where it is. Batching is the right lever for a bill or a queue, and the wrong one for this complaint, which is latency at low load.</p>
+<p><strong>What to measure first.</strong> Step time against batch size on this card, as the exercise does, to find where the machine&#39;s own crossover is; and the quantised model&#39;s golden-set scores against the current one, with the standard error, before anyone touches the proposal.</p>
+<p><strong>Not a pass:</strong> the bigger card because &quot;it is faster&quot;; batching because &quot;throughput&quot; without saying it leaves per-request latency alone; four-bit weights without the re-evaluation as part of its cost.</p>
+</details>
+</section></article>
+    <div class="mission-action" data-mission-action="serve-the-assistant-cheaply">
+      <div><strong>Check your understanding.</strong><span>Run the exercise and compare your output with the expected result.</span></div>
+      <button type="button" data-complete-mission="serve-the-assistant-cheaply">Mark exercise complete</button>
+    </div>
+    <nav class="essay-pager" aria-label="Back to the chapter">
+    <a href="../chapters/serve-the-assistant-cheaply.html"><span>Back to chapter 7</span>Serve the Assistant Cheaply</a>
+    <a class="essay-pager__next" href="../chapters/did-the-shop-need-a-model.html"><span>Next</span>Did the Shop Need a Model?</a>
+  </nav>
+    <details class="source-notes"><summary>Sources and limits</summary><ul><li><em>Building LLMs like ChatGPT from Scratch and Cloud Deployment</em> (Udemy, Neuralearn.ai), lectures 3.5–3.7, 4.1</li><li><em>AI Engineer Core Track: LLM Engineering, RAG, QLoRA, Agents</em> (Udemy, Ed Donner), lectures 3.15, 7.3, 8.5</li><li>Inference Engineering, pp. 64–65, 122–130, 188–191</li><li>Hands-On LLM Serving and Optimization, ch. 3, 5, 6</li><li>Автостопом по Квантизации, pp. 12–14</li><li>Large Language Models: A Deep Dive — Bridging Theory and Practice, p. 188</li></ul><p>Chapter 1's toy generator, an invented machine and an invented serving report; the CPU timings are measured on one machine and vary. Hardware ratios and engine feature names are as of the sources' dates.</p></details>
+  </main>
+  </div>
+</body>
+</html>

@@ -11,3 +11,5 @@ ops:byte ratio 200; matrix 33.6 MB
   B= 400: memory time  111.8 us, compute time  223.7 us, step  223.7 us, per token   0.56 us
 static batching: 16 slot-steps, 10 used, 62% busy; continuous with a 5th request of length 3 arriving at step 2 fills freed slots: used 13 of 16 = 81%
 reader case: 7 GB per step at 28 steps/s = 196 GB/s of weight traffic; at 4 bits, 1.75 GB per step -> 112 steps/s if bandwidth-bound
+worked q1: cache per request 1.2 / 3.4 = 0.353 GB; free 24.0 - 7.0 - 1.2 = 15.8 GB; requests whose caches fit: 3.4 + 15.8 / 0.353 = 48; on the 48 GB card (48 - 7) / 0.353 = 116
+worked q2: 7.0 GB x 28 steps/s = 196 GB/s of weight traffic; the proposal's 1.4x bandwidth caps decode at 39 tokens/s, an answer of 120 tokens at 3.1 s instead of 4.3
