@@ -1,25 +1,66 @@
 # RESUME — The Program Is Now a Model (book20)
 
-Read this first in any new session, then only the files it names. Updated 2026-09-14 (evening). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
+Read this first in any new session, then only the files it names. Updated 2026-09-22 (the rework section below is current; everything under it is history). Review tooling: `scripts/codex-review.sh` (codex, read-only, exact replacements) and `scripts/gemini-review.sh` (second round → proposal2.md); reports in `checks/reviews/<slug>/`, decisions logged in `notes/chapters/<slug>.md`. Author: one more codex run allowed if needed; none running.
 
-## Rework in progress — 2026-09-22
+## Rework in progress — 2026-09-22: chapters 3, 1, 2 done; next is chapter 4, then 5–8
 
-**Authority: `notes/chapters/STORY-MAP.md`.** The author's read of the whole book: chapters are visible
-concatenations of the essays, and they go so deep into specific computations that the picture is lost.
-Decision: keep the eight chapters and the shop; rebuild each around one story stated in its opening
-paragraph; fold derivations into `<details>`; move every exercise to `labs/<slug>.md` with the
-`<!--mission-->` marker; target 2,000–2,700 words on the reading path. Yardstick is `~/book1`.
-Order: chapter 3 is the pilot (author reads it first), then 1, 2, 4, then 5–8. Where STORY-MAP
-disagrees with `CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins.
+**Authority: `notes/chapters/STORY-MAP.md`** (its §7 has the status and the lessons from the first three).
+The author's read of the whole book: chapters are visible concatenations of the essays, and they go so
+deep into specific computations that the picture is lost. Decision: keep the eight chapters and the shop;
+rebuild each around one story stated in its opening paragraph; fold derivations into `<details>`; move
+every exercise to `labs/<slug>.md` with the `<!--mission-->` marker. Where STORY-MAP disagrees with
+`CHAPTER-PLAN.md` or `review.md`, STORY-MAP wins.
 
-**Pilot done, 2026-09-22 (Claude main session):** chapter 3 reworked to the card (story paragraph, pause, four
-story-step beats, seven folds, two worked questions, bridge; reading path 2,698 words, 25% folded); its exercise
-moved verbatim to `labs/reuse-a-pretrained-model.md`; `site/build.mjs` now builds `docs/labs/<slug>.html` with the
-mission wrapper and completion button, and `check.mjs` / `paraphrase.mjs` cover labs. Exercise re-run identical.
-Decisions and counts: `notes/chapters/reuse-a-pretrained-model.md`. **Chapter 1 reworked the same way on the author's go-ahead (2026-09-22; reading path 2,696 words, 25% folded;
-lab moved; exercise re-run identical).** Chapter 2 followed (reading path 2,431, 24.6% folded; the input-pipeline section is now the lab's setup
-section; exercise re-run identical apart from the timing lines). Owed: the author's read of chapters 3, 1 and 2; then chapter 4, then 5–8. Interpreter: the scratch venv is gone; PyTorch 2.14.0 (cu130 build, CPU) is at
-`~/.gemini/antigravity-cli/scratch/myenv/bin/python`. Chapters 1, 2, 4–8 untouched; not pushed.
+**State.** Chapters 3 (pilot), 1 and 2 are reworked and committed (`1115505`, `8840699`, `eeb9442`,
+lab link repairs `fa86b08`); the author's provisional verdict on all three is OK, 7 of 10 (2026-09-22,
+given as an assumption in chat rather than a line-by-line read). Nothing is pushed; catalog status is
+still `published` for all eight, so the live site is unchanged until the next push. Chapters 4–8 are
+untouched and still carry their exercises on the chapter page. Site support for labs is in place:
+`site/build.mjs` builds `docs/labs/<slug>.html` with the mission wrapper and completion button when
+`labs/<slug>.md` exists, the chapter page gets an "Open the lab" block, `site/check.mjs` and
+`checks/paraphrase.mjs` cover labs, `site/styles.css` has the fold style, and `site/app.js` opens folds
+for print.
+
+**Next, in order.** Chapter 4 (`train-from-reward`; the corridor must become one beat of at most 700
+words and the writer be named in the story paragraph), then 5, 6, 7, 8 (mostly the lab move, the story
+paragraph, the pause and heading rewrites; 6 and 7 have labs larger than their bodies). While in
+chapter 5, fix its "chapter 1's mean squared error", which chapter 1 never introduces. After all eight:
+`about.md`, the home-page copy in `site/build.mjs`, `README.md` and `CONTEXT.md` §1 (they still say the
+exercise is on the chapter page), then push.
+
+**Per chapter** (STORY-MAP §5, as run three times):
+
+1. `labs/<slug>.md`: a `# Lab: …` title, a two-line header naming the chapter and linking
+   `../chapters/<slug>.md`, any setup material the card sends to the lab, then `<!--mission-->` and the
+   `## Exercise` section moved verbatim (diff it). Replace any "section N" or "above" phrases in the
+   moved walk-through with the new heading names; change nothing else in it.
+2. Rewrite the chapter to the card: story paragraph with its number, a two-to-four-sentence map, beats
+   with story-step headings (no heading may be a mechanism name), each beat opening as the step that
+   follows the previous one, the pause in bold before the surprising number, `<details><summary>Optional:
+   …</summary>` folds with named summaries, a short "Where it stops", "## Two questions to work" (one
+   varies the example with new derived numbers, one conceptual naming the wrong turn; answers in
+   `<details><summary>Worked answer</summary>`), "## The lab" with the numbers it prints and a link to
+   `../labs/<slug>.md`, and the bridge paragraph. Keep the sources line.
+3. New numbers in a worked question: derive them on the page, extend `workspace/<slug>/worked.py`,
+   regenerate `corpus/<slug>/run-worked.log` (earlier sections must diff clean), add an `observed`
+   receipt row.
+4. Count: `python3 scripts/reading-path.py chapters/<slug>.md`. Reading path 2,000–2,700 (2,900 for
+   ch. 2), folds 18–25%. Expect the first draft to land at about 3,200 words and 30% folded and to need
+   two or three trimming passes; chapter 2 went the other way (35% folded) and two folds went back on
+   the page. Page totals have run about 200 words over §2's 3,400 when a chapter carries several glossed
+   formulas; the path and fold share are the binding criteria.
+5. `npm run build && npm run check && npm run consistency`; the voice lint pattern from
+   `scripts/lint-voice.sh` applied to `chapters/<slug>.md` and the lab (watch "decides", "reported",
+   "wants"); `node scripts/lab-check.mjs <slug>` (clicks the lab button, checks the progress count and
+   the contents tick, screenshots). Read the page once with every fold closed (strip `<details>` blocks
+   and read what is left) before calling it done.
+6. Re-run the lab's code block and diff against `corpus/<slug>/run.log`. Interpreter: the scratch venv
+   named below no longer exists; use `~/.gemini/antigravity-cli/scratch/myenv/bin/python` (PyTorch
+   2.14.0+cu130, runs on CPU, prints a harmless NumPy warning to stderr). Chapters 1–3 reproduced their
+   logs byte for byte (chapter 2's four `num_workers` timings vary, as its text says).
+7. Log what was folded, moved and cut in `notes/chapters/<slug>.md` under a dated "Story-map rework"
+   heading (the three existing entries are the template); update this section; commit with the
+   session's trailer. Status stays `published`; do not push until the author says.
 
 ## The book is complete — 2026-09-17
 

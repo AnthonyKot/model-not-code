@@ -66,3 +66,5 @@ Authorized targeted fixes only. No independent task added and no optional-sectio
 **Rendered.** Headless Chromium (Playwright's cached shell) on the built site: the lab page renders with the mission wrapper and button; clicking it gives "1 of 8 exercises" and ticks chapter 3 in the contents; the chapter page shows the folds closed, a fold opens with the styled summary, and the "Open the lab" block replaces the button; no console errors.
 
 **Not done.** The author's read; the other seven chapters; `about.md`, `README.md` and `CONTEXT.md` §1 (STORY-MAP §6 leaves those until all eight are done).
+
+**Author, 2026-09-22 (provisional):** OK, 7 of 10, given in chat as an assumption rather than a line-by-line read; no changes requested. Chapters 4–8 proceed on the same pattern.

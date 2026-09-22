@@ -83,3 +83,5 @@ scrolls, no page overflow.
 **Checks.** Build green (8 chapters, 3 with labs); site validation 26 pages; receipts 37 passed, 0 failed, 2 unchecked (URLs, as before); paraphrase 0 failures for chapter and lab; voice lint clean on the chapter (the lab's setup section keeps the original "decides how many honest comparisons" verbatim); headless-browser check: the lab button ticks chapter 2 in the contents and the progress count, no console errors. Read once with every fold closed: the argument survives. Exercise re-run from the lab's code block with the interpreter noted in chapter 3's log: identical to `corpus/trust-the-number/run.log` on every line except the four `num_workers` timings (90.3 / 70.0 / 36.3 / 23.6 ms against 87.2 / 67.8 / 33.9 / 22.2), which the lab's expected-result note already says vary between runs. Not re-run: the two variations.
 
 **Not done.** The author's read; chapters 4–8.
+
+**Author, 2026-09-22 (provisional):** OK, 7 of 10, given in chat as an assumption rather than a line-by-line read; no changes requested. Chapters 4–8 proceed on the same pattern.

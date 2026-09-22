@@ -71,3 +71,5 @@ Authorized targeted fixes only. No independent task added and no optional-sectio
 **Checks.** Build green (8 chapters, 2 with labs); site validation 25 pages; receipts 34 passed, 0 failed, 4 unchecked (paper and URL, as before); paraphrase 0 failures for the chapter and the lab; voice lint clean; headless-browser check: the lab button ticks chapter 1 in the contents and the progress count, no console errors. Read once with every fold closed: the argument survives (story → tokens and the two-score model → one vector and the click-log diagonal → attention and the pause → the cheat, the mask, the KV cache → limits → questions → lab → bridge). Exercise re-run from the lab's code block with the interpreter noted in chapter 3's log: byte-identical to `corpus/search-the-catalogue/run.log`. Not re-run: the two variations (their code did not move).
 
 **Not done.** The author's read; chapters 2 and 4–8.
+
+**Author, 2026-09-22 (provisional):** OK, 7 of 10, given in chat as an assumption rather than a line-by-line read; no changes requested. Chapters 4–8 proceed on the same pattern.

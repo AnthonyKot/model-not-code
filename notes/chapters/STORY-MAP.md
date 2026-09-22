@@ -340,3 +340,39 @@ has read it.
 The book is done when all eight are done, `about.html` describes the shape (story, folds, labs),
 and `README.md`, `RESUME.md` and `CONTEXT.md` §1 point here instead of at the 20,000–35,000
 character target.
+
+## 7. Status and lessons (2026-09-22, after chapters 3, 1 and 2)
+
+**Done:** chapter 3 (pilot), then 1 and 2, in that order, by the main session; commits `1115505`,
+`8840699`, `eeb9442`, `fa86b08`. The author's provisional verdict on the three: OK, 7 of 10 (given as an
+assumption in chat, not a line-by-line read). Site support for labs is built (§4 done). **Next:** 4, then
+5–8, then the §6 site copy, then push.
+
+| Ch | Reading path | Folds | Page | Notes |
+|---|---|---|---|---|
+| 3 | 2,698 | 900 (25.0%) | 3,598 | seven folds; page ~200 over §2's 3,400 |
+| 1 | 2,696 | 898 (25.0%) | 3,594 | eight folds; beat 4 at 599 words; six glossed formulas on the path |
+| 2 | 2,431 | 794 (24.6%) | 3,225 | six folds; input pipeline moved to the lab as setup |
+
+**What the three taught, for chapters 4–8.**
+
+- The first draft lands long. Writing to the card produced 3,200–3,400 words on the path with 30% folded
+  every time; two or three trimming passes got each one under 2,700. Budget time for that, and trim by
+  cutting whole sentences and merging paragraphs rather than shaving words.
+- Folding can overshoot. Chapter 2's first draft folded the standard error and the precision paragraph and
+  came out at 35% folded with a 2,100-word path; both went back on the page. If a later chapter (6 uses
+  chapter 2's standard error) depends on a passage, it stays on the page.
+- A display formula costs 60–80 words with its gloss, and the gloss is not optional (CONTEXT §4). Chapter
+  1 keeps six. Where the page total matters more than the formula, fold the formula with its gloss as a
+  unit (chapter 1's gradient-descent update and step table are one fold).
+- The page total (§2's 2,400–3,400) is the target most often missed, by about 200 words, and only when the
+  card keeps several tables on the page. The reading path and the fold share are the criteria that
+  matter (§6); log the page total and move on.
+- Every "section N" in a moved lab walk-through goes stale. Replace with the new heading's name at move
+  time.
+- The worked questions want one new derived number each (chapter 3: a second supplier's drift to 2.386;
+  chapter 1: the row at τ = 0.1; chapter 2: a 2% blade rate and `pos_weight` 49), verified in
+  `worked.py`, logged and receipted. Reusing a number already on the page makes a weaker question.
+- The voice lint still catches "decides" and "reported" in fresh prose; run it on the chapter and the lab.
+- Tools: `scripts/reading-path.py` (counts), `scripts/lab-check.mjs` (browser check), the interpreter
+  named in `RESUME.md`.
