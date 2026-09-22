@@ -3,3 +3,6 @@ reciprocal ranks [1.0, 1.0, 0.5, 0.333, 1.0, 0.2] MRR 0.672 recall@3 5 / 6 = 0.8
 0.833 vs 0.917, n=300: diff 0.0840 SE 0.0268 z 3.14
 0.7298 vs 0.7475, n=150: diff 0.0177 SE 0.0507 z 0.35
 SE from a 95% interval of ±37: 18.9
+== worked question 1 (2026-09-22): header repeated 0.667 vs whole sheets 0.917 at n = 12
+ variance terms 0.2221 + 0.0761 = 0.2982; SE at n=12 0.158; z 1.59; 3 SE at n=12 = 0.47
+ n for 3 SE: 9 x 0.2982 / 0.0625 = 42.9
